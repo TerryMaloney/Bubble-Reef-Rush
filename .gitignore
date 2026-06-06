@@ -1,0 +1,32 @@
+# Godot 4
+.godot/
+*.import
+export.cfg
+export_presets.cfg
+
+# Mono / C#
+.mono/
+data_*/
+mono_crash.*.json
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# IDE
+.vscode/
+.idea/
+*.suo
+
+# Build artifacts
+builds/
+*.apk
+*.ipa
+*.aab
+
+# Credentials (never commit these)
+*.keystore
+*.jks
+*.p12
+google-services.json

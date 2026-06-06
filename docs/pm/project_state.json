@@ -1,0 +1,28 @@
+{
+  "project": "Bubble Reef Rush",
+  "phase": 1,
+  "started": "2026-06-06",
+  "description": "Underwater rhythm runner for kids. Godot 4, Android-first.",
+  "agents": {
+    "C-1": { "status": "in-progress", "outputs": [], "blocked_on": [] },
+    "C-2": { "status": "blocked", "blocked_on": ["C-1"], "outputs": [] },
+    "C-3": { "status": "in-progress", "outputs": [], "blocked_on": [] },
+    "C-4": { "status": "in-progress", "outputs": [], "blocked_on": [] },
+    "T-1": { "status": "blocked", "blocked_on": ["C-1", "C-2", "C-4"], "outputs": [] },
+    "T-2": { "status": "blocked", "blocked_on": ["C-1", "C-4"], "outputs": [] },
+    "T-3": { "status": "blocked", "blocked_on": ["T-1", "T-2"], "outputs": [] },
+    "T-4": { "status": "blocked", "blocked_on": ["T-1"], "outputs": [] },
+    "T-5": { "status": "blocked", "blocked_on": ["T-1", "C-2", "C-3"], "outputs": [] },
+    "QA-1": { "status": "blocked", "blocked_on": ["T-1", "T-2", "T-3", "T-5"], "outputs": [] },
+    "QA-2": { "status": "in-progress", "blocked_on": [], "outputs": [] },
+    "B-1": { "status": "blocked", "blocked_on": ["C-3", "QA-2"], "outputs": [] },
+    "B-2": { "status": "blocked", "blocked_on": ["C-1", "QA-2"], "outputs": [] }
+  },
+  "human_decisions_needed": [],
+  "bugs_open": [],
+  "phase_1_complete_when": ["C-1", "C-3", "C-4"],
+  "phase_2_complete_when": ["T-1", "T-2", "T-4", "B-2", "QA-2"],
+  "phase_3_complete_when": ["T-3", "T-5", "B-1"],
+  "phase_4_complete_when": ["QA-1"],
+  "notes": "Human has Google Play developer account. No Apple dev account yet. Music: AI-generated via Suno/Udio using prompts in docs/audio/audio_bible.md."
+}
