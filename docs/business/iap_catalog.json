@@ -1,0 +1,291 @@
+{
+  "_meta": {
+    "document": "Bubble Reef Rush IAP Product Catalog",
+    "version": "1.0",
+    "author": "Monetization Designer B-2",
+    "notes": [
+      "All products are non-consumable (one-time purchase, permanent entitlement).",
+      "google_play_sku uses the product ID as registered in Google Play Console.",
+      "apple_product_id uses reverse-domain format matching the app bundle ID com.terrymaloney.bubblereef.",
+      "presentation_trigger describes the in-game moment when the IAP prompt is shown. Prompts NEVER appear on main menu, during levels, or on results screens.",
+      "parental_gate_required: true means the math gate (ui_copy.md key: parental_gate_math) must be passed before the platform payment sheet launches.",
+      "price_usd is the anchor price. Localized prices are determined by platform regional pricing — always pull from billing API for display, never hardcode.",
+      "reef_bundle entitlement grants both unlock_full_reef and creator_pass. Receipt validation must treat bundle ownership as equivalent to owning both individual products.",
+      "future_cosmetics are placeholders for post-launch planning. None exist at launch. Each will require a new version submission and compliance review before release."
+    ]
+  },
+  "products": [
+    {
+      "product_id": "unlock_full_reef",
+      "display_name": "Unlock Full Reef",
+      "price_usd": 2.99,
+      "google_play_sku": "unlock_full_reef",
+      "apple_product_id": "com.terrymaloney.bubblereef.unlock_full_reef",
+      "type": "non_consumable",
+      "what_it_unlocks": [
+        "zone_4_volcanic_vent_fields_all_8_levels",
+        "zone_5_twilight_trench_all_8_levels",
+        "character_finn_great_white_shark",
+        "access_path_to_zone_6_unlock_condition",
+        "all_future_zone_dlc_if_added"
+      ],
+      "unlock_description_player_facing": "Play Zones 4 and 5 — 16 more levels plus Finn the shark!",
+      "level_count_unlocked": 16,
+      "characters_unlocked": ["finn"],
+      "presentation_trigger": "Player attempts to enter Zone 4 or Zone 5 from Zone Select screen, or taps the Unlock Zone button for Zone 4 or Zone 5",
+      "presentation_never_on": [
+        "main_menu",
+        "during_active_level",
+        "results_screen",
+        "settings_screen",
+        "push_notification",
+        "app_launch_onboarding"
+      ],
+      "parental_gate_required": true,
+      "parental_gate_copy_keys": {
+        "title": "parental_gate_title",
+        "prompt": "parental_gate_prompt",
+        "math_question": "parental_gate_math",
+        "wrong_answer": "parental_gate_wrong",
+        "correct_answer": "parental_gate_success"
+      },
+      "dismiss_button_label": "No thanks",
+      "dismiss_suppression_hours": 48,
+      "buy_button_label_format": "Get It — {localized_price}",
+      "store_section": "section_header_unlock",
+      "coppa_compliant": true,
+      "families_policy_compliant": true,
+      "age_rating": "ESRB_E_PEGI_3",
+      "contains_advertising": false,
+      "consumable": false,
+      "has_subscription": false,
+      "status": "planned",
+      "notes": "Full Reef buyers must receive all future zone DLC automatically at no additional charge. This commitment is stated in the IAP description and must be honored in all future updates. Do not add a Zone 6 or Zone 7 that requires a separate purchase without grandfathering Full Reef owners."
+    },
+    {
+      "product_id": "creator_pass",
+      "display_name": "Creator Pass",
+      "price_usd": 1.99,
+      "google_play_sku": "creator_pass",
+      "apple_product_id": "com.terrymaloney.bubblereef.creator_pass",
+      "type": "non_consumable",
+      "what_it_unlocks": [
+        "public_gallery_publishing",
+        "community_gallery_browsing_and_downloads",
+        "unlimited_saved_levels",
+        "full_obstacle_catalog_in_editor",
+        "eighth_beat_grid_subdivision_immediately",
+        "sixteenth_beat_grid_subdivision_immediately"
+      ],
+      "unlock_description_player_facing": "Publish your levels for everyone to play, unlimited saves, and all obstacles in the editor!",
+      "presentation_trigger": "Player taps the Share/Publish button in Build Mode without owning Creator Pass, or attempts to browse community gallery, or attempts to save a 6th local level",
+      "presentation_never_on": [
+        "main_menu",
+        "during_active_level",
+        "results_screen",
+        "settings_screen",
+        "push_notification",
+        "app_launch_onboarding"
+      ],
+      "parental_gate_required": true,
+      "parental_gate_copy_keys": {
+        "title": "parental_gate_title",
+        "prompt": "parental_gate_prompt",
+        "math_question": "parental_gate_math",
+        "wrong_answer": "parental_gate_wrong",
+        "correct_answer": "parental_gate_success"
+      },
+      "dismiss_button_label": "Maybe later",
+      "dismiss_suppression_hours": 48,
+      "buy_button_label_format": "Get It — {localized_price}",
+      "store_section": "section_header_unlock",
+      "coppa_compliant": true,
+      "families_policy_compliant": true,
+      "age_rating": "ESRB_E_PEGI_3",
+      "contains_advertising": false,
+      "consumable": false,
+      "has_subscription": false,
+      "status": "planned",
+      "notes": "Creator Pass does not unlock story zones or characters. The 5-saved-level free cap and direct share code (non-gallery) remain fully functional without this purchase. Community gallery access (both publishing and downloading) requires Creator Pass."
+    },
+    {
+      "product_id": "reef_bundle",
+      "display_name": "Reef Bundle",
+      "price_usd": 3.99,
+      "google_play_sku": "reef_bundle",
+      "apple_product_id": "com.terrymaloney.bubblereef.reef_bundle",
+      "type": "non_consumable",
+      "what_it_unlocks": [
+        "all_entitlements_from_unlock_full_reef",
+        "all_entitlements_from_creator_pass"
+      ],
+      "unlock_description_player_facing": "Everything in Full Reef and Creator Pass — all 16 extra levels, Finn the shark, and full level creation tools!",
+      "component_products": ["unlock_full_reef", "creator_pass"],
+      "individual_price_total_usd": 4.98,
+      "savings_usd": 0.99,
+      "savings_display": "Save $1!",
+      "presentation_trigger": "Displayed as a third option on any Full Reef or Creator Pass IAP prompt (as a value alternative, not an upsell), and always visible in the Reef Shop store screen",
+      "presentation_never_on": [
+        "main_menu",
+        "during_active_level",
+        "results_screen",
+        "settings_screen",
+        "push_notification",
+        "app_launch_onboarding"
+      ],
+      "parental_gate_required": true,
+      "parental_gate_copy_keys": {
+        "title": "parental_gate_title",
+        "prompt": "parental_gate_prompt",
+        "math_question": "parental_gate_math",
+        "wrong_answer": "parental_gate_wrong",
+        "correct_answer": "parental_gate_success"
+      },
+      "dismiss_button_label": "No thanks",
+      "dismiss_suppression_hours": 48,
+      "buy_button_label_format": "Get Both — {localized_price}",
+      "store_section": "section_header_unlock",
+      "receipt_validation_note": "A player owning reef_bundle must be treated as owning both unlock_full_reef and creator_pass for all entitlement checks. Similarly, a player who independently purchased both individual products must not be prompted to buy the bundle. Entitlement check order: (1) owns reef_bundle? (2) owns both individual products? (3) owns one individual product? — prompt for the other, show bundle as alternative.",
+      "coppa_compliant": true,
+      "families_policy_compliant": true,
+      "age_rating": "ESRB_E_PEGI_3",
+      "contains_advertising": false,
+      "consumable": false,
+      "has_subscription": false,
+      "status": "planned",
+      "notes": "The Reef Bundle must always be priced as the discounted option. If individual product prices are ever adjusted, the bundle price must be recalculated to maintain a genuine discount (not a penny discount — minimum $0.75 savings). Do not raise the bundle price above the sum of individual products."
+    }
+  ],
+  "future_cosmetics": [
+    {
+      "product_id": "skin_pebble_rainbow",
+      "display_name": "Rainbow Puff (Pebble Skin)",
+      "price_usd": 0.99,
+      "google_play_sku": "skin_pebble_rainbow",
+      "apple_product_id": "com.terrymaloney.bubblereef.skin_pebble_rainbow",
+      "type": "non_consumable",
+      "character": "pebble",
+      "what_it_unlocks": "Pebble rainbow color variant — animated spectrum trail and iridescent body shimmer",
+      "gameplay_effect": "none",
+      "power_advantage": false,
+      "store_section": "section_header_skins",
+      "ui_copy_display_key": "skin_item_display_format",
+      "ui_copy_display_example": "Pebble — Rainbow Puff",
+      "parental_gate_required": true,
+      "status": "future",
+      "notes": "Example skin. Do not release until base game has been live for at least 60 days and economy balance is validated with real player data."
+    },
+    {
+      "product_id": "skin_zap_midnight",
+      "display_name": "Midnight Storm (Zap Skin)",
+      "price_usd": 0.99,
+      "google_play_sku": "skin_zap_midnight",
+      "apple_product_id": "com.terrymaloney.bubblereef.skin_zap_midnight",
+      "type": "non_consumable",
+      "character": "zap",
+      "what_it_unlocks": "Zap dark navy and white lightning color variant — electric white trail instead of standard yellow sparks",
+      "gameplay_effect": "none",
+      "power_advantage": false,
+      "store_section": "section_header_skins",
+      "ui_copy_display_key": "skin_item_display_format",
+      "parental_gate_required": true,
+      "status": "future"
+    },
+    {
+      "product_id": "skin_mochi_starlight",
+      "display_name": "Starlight Drift (Mochi Skin)",
+      "price_usd": 0.99,
+      "google_play_sku": "skin_mochi_starlight",
+      "apple_product_id": "com.terrymaloney.bubblereef.skin_mochi_starlight",
+      "type": "non_consumable",
+      "character": "mochi",
+      "what_it_unlocks": "Mochi gold-and-white starfield color variant — star particle trail instead of standard neon tendrils",
+      "gameplay_effect": "none",
+      "power_advantage": false,
+      "store_section": "section_header_skins",
+      "ui_copy_display_key": "skin_item_display_format",
+      "parental_gate_required": true,
+      "status": "future"
+    },
+    {
+      "product_id": "accessory_pebble_captain_hat",
+      "display_name": "Captain's Hat (Pebble Accessory)",
+      "price_usd": 0.99,
+      "google_play_sku": "accessory_pebble_captain_hat",
+      "apple_product_id": "com.terrymaloney.bubblereef.accessory_pebble_captain_hat",
+      "type": "non_consumable",
+      "character": "pebble",
+      "what_it_unlocks": "Small navy captain's hat that bobs on Pebble's head during gameplay and idle animations — cosmetic overlay on all existing Pebble skins",
+      "gameplay_effect": "none",
+      "power_advantage": false,
+      "store_section": "section_header_skins",
+      "parental_gate_required": true,
+      "status": "future",
+      "notes": "Accessories should stack with skin variants — a player with Rainbow Puff and Captain's Hat sees Pebble in rainbow colors wearing the hat."
+    },
+    {
+      "product_id": "skin_finn_ocean_camo",
+      "display_name": "Ocean Camo (Finn Skin)",
+      "price_usd": 0.99,
+      "google_play_sku": "skin_finn_ocean_camo",
+      "apple_product_id": "com.terrymaloney.bubblereef.skin_finn_ocean_camo",
+      "type": "non_consumable",
+      "character": "finn",
+      "what_it_unlocks": "Finn blue-green camouflage pattern variant — stealth dorsal fin silhouette, teal bubble wake trail",
+      "gameplay_effect": "none",
+      "power_advantage": false,
+      "requires_base_character": "character_finn",
+      "requires_product": "unlock_full_reef",
+      "store_section": "section_header_skins",
+      "ui_copy_display_key": "skin_item_display_format",
+      "parental_gate_required": true,
+      "status": "future",
+      "notes": "This skin requires Finn to be unlocked (via Full Reef purchase). The store must not display this skin as purchasable until unlock_full_reef or reef_bundle is owned. Show with label_coming_soon or hide until prerequisite is met."
+    },
+    {
+      "product_id": "ui_theme_deep_ocean",
+      "display_name": "Deep Ocean Theme",
+      "price_usd": 1.99,
+      "google_play_sku": "ui_theme_deep_ocean",
+      "apple_product_id": "com.terrymaloney.bubblereef.ui_theme_deep_ocean",
+      "type": "non_consumable",
+      "what_it_unlocks": "Full menu and UI reskin — deep navy and bioluminescent teal palette, animated background with drifting deep-sea particles, custom zone select screen art for all zones",
+      "gameplay_effect": "none",
+      "power_advantage": false,
+      "store_section": "section_header_skins",
+      "parental_gate_required": true,
+      "status": "future",
+      "notes": "UI themes are permanent and do not expire. This theme applies only to menus, zone select, and results screens — never to active gameplay levels (gameplay visual identity stays consistent for clarity). The player can switch back to the default theme at any time in Settings."
+    }
+  ],
+  "prohibited_product_types": [
+    {
+      "type": "consumable_coin_pack",
+      "reason": "No real money can purchase coins. Coins are earn-only through gameplay."
+    },
+    {
+      "type": "subscription",
+      "reason": "No subscription model of any kind. All purchases are one-time non-consumable."
+    },
+    {
+      "type": "loot_box_or_random_reward",
+      "reason": "All purchased items must have a known, specific, listed description. No randomized rewards for real money."
+    },
+    {
+      "type": "energy_or_lives_refill",
+      "reason": "No energy or lives systems exist in the game. Nothing to sell."
+    },
+    {
+      "type": "gameplay_power_advantage",
+      "reason": "Pay-to-win is prohibited by design and by Google Play Families and Apple App Store policies. All characters and items are cosmetic only."
+    },
+    {
+      "type": "advertising_network",
+      "reason": "No third-party advertising of any kind. The two IAPs are the complete revenue model."
+    },
+    {
+      "type": "time_limited_offer",
+      "reason": "No countdown timers, no limited-time pricing, no seasonal sale mechanics. All prices are stable and permanent."
+    }
+  ]
+}
