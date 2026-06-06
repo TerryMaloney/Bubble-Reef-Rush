@@ -1,0 +1,45 @@
+; Godot 4.3 project configuration for Bubble Reef Rush — portrait Android-first rhythm runner.
+; Engine config file, format version 5 — do not edit manually outside Godot editor.
+
+config_version=5
+
+[application]
+
+config/name="Bubble Reef Rush"
+config/features=PackedStringArray("4.3", "Mobile")
+run/main_scene="res://scenes/gameplay/MainMenu.tscn"
+
+[autoload]
+
+GameManager="*res://src/core/GameManager.gd"
+EventBus="*res://src/core/EventBus.gd"
+SaveSystem="*res://src/core/SaveSystem.gd"
+BeatConductor="*res://src/rhythm/BeatConductor.gd"
+
+[display]
+
+window/size/viewport_width=1080
+window/size/viewport_height=1920
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[input]
+
+swim_dive={
+"deadzone": 0.5,
+"events": [Object(InputEventScreenTouch,"resource_local_to_scene":false,"resource_name":"","device":-1,"pressed":true,"position":Vector2(0, 0),"index":0,"canceled":false,"double_tap":false,"script":null)
+, Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":0,"position":Vector2(0, 0),"global_position":Vector2(0, 0),"factor":1.0,"button_index":1,"canceled":false,"pressed":true,"double_click":false,"script":null)
+]
+}
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[physics]
+
+2d/default_gravity=0
+
+[rendering]
+
+renderer/rendering_method="mobile"

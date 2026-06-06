@@ -1,0 +1,168 @@
+{
+  "schema_version": "1.1",
+
+  "metadata": {
+    "id": "z1-l1",
+    "name": "First Dive",
+    "description": "Your first swim through the Sunlit Shallows. Learn to hold and release!",
+    "zone": 1,
+    "level_index": 1,
+    "bpm": 100,
+    "bpm_variable": false,
+    "difficulty": 1,
+    "difficulty_tag": "Beginner",
+    "author": "Bubble Reef Rush Team",
+    "created_at": "2026-06-06T09:00:00Z",
+    "is_official": true,
+    "total_beats": 32,
+    "tags": []
+  },
+
+  "music": {
+    "filename": "zone_1_sunlit_shallows.ogg",
+    "loop": false,
+    "loop_start_beat": 0,
+    "preview_start_beat": 4,
+    "preview_duration_beats": 8,
+    "beat_offset_ms": 0,
+    "volume_db": 0
+  },
+
+  "beat_map": [
+    {
+      "beat_index": 4,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "coral_spike",
+      "lane_position": 1.0,
+      "parameters": {
+        "wall_attachment": "bottom",
+        "height": 120
+      }
+    },
+    {
+      "beat_index": 8,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "coral_spike",
+      "lane_position": 0.0,
+      "parameters": {
+        "wall_attachment": "top",
+        "height": 120
+      }
+    },
+    {
+      "beat_index": 12,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "coral_spike",
+      "lane_position": 1.0,
+      "parameters": {
+        "wall_attachment": "bottom",
+        "height": 180
+      }
+    },
+    {
+      "beat_index": 16,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "coral_spike",
+      "lane_position": 0.0,
+      "parameters": {
+        "wall_attachment": "top",
+        "height": 120
+      }
+    },
+    {
+      "beat_index": 20,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "coral_spike",
+      "lane_position": 1.0,
+      "parameters": {
+        "wall_attachment": "bottom",
+        "height": 120
+      }
+    },
+    {
+      "beat_index": 24,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "coral_spike",
+      "lane_position": 0.0,
+      "parameters": {
+        "wall_attachment": "top",
+        "height": 180
+      }
+    },
+    {
+      "beat_index": 28,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "coral_spike",
+      "lane_position": 1.0,
+      "parameters": {
+        "wall_attachment": "bottom",
+        "height": 120
+      }
+    }
+  ],
+
+  "collectibles": [
+    {
+      "beat_index": 6,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.5,
+      "value": 10
+    },
+    {
+      "beat_index": 14,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.5,
+      "value": 10
+    },
+    {
+      "beat_index": 22,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.5,
+      "value": 10
+    },
+    {
+      "beat_index": 30,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.5,
+      "value": 10
+    }
+  ],
+
+  "speed_zones": [
+    {
+      "start_beat": 0,
+      "end_beat": 32,
+      "speed_multiplier": 1.0,
+      "transition_beats": 0,
+      "label": "Normal cruise throughout"
+    }
+  ],
+
+  "background": {
+    "asset_key": "bg_sunlit_shallows",
+    "parallax_enabled": true,
+    "color_override": null,
+    "shader_key": null,
+    "ambient_particle_key": "bubbles_light"
+  },
+
+  "unlock_requirements": {
+    "min_stars_zone_previous": null,
+    "required_level_id": null,
+    "required_level_stars": 1,
+    "requires_full_reef_iap": false,
+    "requires_creator_pass": false,
+    "min_total_stars": null
+  },
+
+  "par_score": {
+    "one_star": 280,
+    "two_star": 490,
+    "three_star": 630,
+    "max_possible": 700
+  }
+}
