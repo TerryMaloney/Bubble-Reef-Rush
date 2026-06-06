@@ -40,6 +40,10 @@ pointing/emulate_touch_from_mouse=true
 
 2d/default_gravity=0
 
+[audio]
+
+buses/default_bus_layout="res://default_bus_layout.tres"
+
 [rendering]
 
 renderer/rendering_method="mobile"

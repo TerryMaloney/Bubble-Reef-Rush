@@ -15,58 +15,62 @@
     "par_score"
   ],
   "additionalProperties": false,
-
   "properties": {
-
     "schema_version": {
       "type": "string",
       "description": "Schema version string. Increment minor on backwards-compatible additions, major on breaking changes.",
       "pattern": "^\\d+\\.\\d+$",
       "example": "1.1"
     },
-
     "metadata": {
       "type": "object",
       "description": "Level identity and authorship information.",
-      "required": ["id", "name", "zone", "bpm", "bpm_variable", "difficulty", "author", "created_at", "is_official"],
+      "required": [
+        "id",
+        "name",
+        "zone",
+        "bpm",
+        "bpm_variable",
+        "difficulty",
+        "author",
+        "created_at",
+        "is_official"
+      ],
       "additionalProperties": false,
       "properties": {
-
         "id": {
           "type": "string",
           "description": "Unique level identifier. Official levels use format 'z{zone}-l{level}' (e.g. 'z1-l1'). Player-created levels use a UUID v4.",
           "pattern": "^(z[1-6]-l[1-8])|([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
-          "examples": ["z1-l1", "a3b4c5d6-e7f8-4a9b-b0c1-d2e3f4a5b6c7"]
+          "examples": [
+            "z1-l1",
+            "a3b4c5d6-e7f8-4a9b-b0c1-d2e3f4a5b6c7"
+          ]
         },
-
         "name": {
           "type": "string",
-          "description": "Display name shown on the level select screen. 3–40 characters.",
+          "description": "Display name shown on the level select screen. 3\u201340 characters.",
           "minLength": 3,
           "maxLength": 40
         },
-
         "description": {
           "type": "string",
-          "description": "Optional short description shown on level select hover/tap. 0–120 characters.",
+          "description": "Optional short description shown on level select hover/tap. 0\u2013120 characters.",
           "maxLength": 120,
           "default": ""
         },
-
         "zone": {
           "type": "integer",
-          "description": "Zone number (1–6). Determines background defaults, obstacle availability, and unlock chain.",
+          "description": "Zone number (1\u20136). Determines background defaults, obstacle availability, and unlock chain.",
           "minimum": 1,
           "maximum": 6
         },
-
         "level_index": {
           "type": "integer",
-          "description": "Level's position within its zone (1–8 for official levels). Not required for player-created levels.",
+          "description": "Level's position within its zone (1\u20138 for official levels). Not required for player-created levels.",
           "minimum": 1,
           "maximum": 8
         },
-
         "bpm": {
           "type": "number",
           "description": "Primary BPM of the level. For variable-BPM levels (Zone 5), this is the starting BPM. Used to calculate default beat_interval_ms = (60 / bpm) * 1000.",
@@ -74,19 +78,21 @@
           "maximum": 220,
           "multipleOf": 0.5
         },
-
         "bpm_variable": {
           "type": "boolean",
           "description": "If true, bpm may change mid-level via bpm_changes array. Only permitted for Zone 5 levels and Zone 5-style player-created levels. When true, timing windows recalculate in real time.",
           "default": false
         },
-
         "bpm_changes": {
           "type": "array",
           "description": "Array of BPM change events for variable-BPM levels. Only read when bpm_variable is true. Events are processed in beat_index order.",
           "items": {
             "type": "object",
-            "required": ["beat_index", "new_bpm", "transition_beats"],
+            "required": [
+              "beat_index",
+              "new_bpm",
+              "transition_beats"
+            ],
             "additionalProperties": false,
             "properties": {
               "beat_index": {
@@ -110,48 +116,46 @@
           },
           "default": []
         },
-
         "difficulty": {
           "type": "integer",
-          "description": "Difficulty rating 1–5. 1 = very easy (Z1 early), 5 = expert (Z6 late). Used for level select display and search filtering.",
+          "description": "Difficulty rating 1\u20135. 1 = very easy (Z1 early), 5 = expert (Z6 late). Used for level select display and search filtering.",
           "minimum": 1,
           "maximum": 5
         },
-
         "difficulty_tag": {
           "type": "string",
           "description": "Human-readable difficulty label. Automatically computed by the editor from obstacle density and speed; can be manually overridden DOWN but not UP.",
-          "enum": ["Beginner", "Intermediate", "Advanced", "Expert"]
+          "enum": [
+            "Beginner",
+            "Intermediate",
+            "Advanced",
+            "Expert"
+          ]
         },
-
         "author": {
           "type": "string",
-          "description": "For official levels: 'Bubble Reef Rush Team'. For player-created levels: the player's chosen display name (sanitized, 3–20 chars, no PII).",
+          "description": "For official levels: 'Bubble Reef Rush Team'. For player-created levels: the player's chosen display name (sanitized, 3\u201320 chars, no PII).",
           "minLength": 3,
           "maxLength": 30
         },
-
         "created_at": {
           "type": "string",
           "description": "ISO 8601 UTC timestamp of level creation. Set by the game engine on first save, not editable in the level editor UI.",
           "format": "date-time"
         },
-
         "is_official": {
           "type": "boolean",
           "description": "True for levels shipped with the game. False for all player-created levels. Controls which moderation rules apply."
         },
-
         "total_beats": {
           "type": "integer",
           "description": "Total number of beats in this level. Equal to the beat count of the referenced music track. Used by the game to know when to end the level.",
           "minimum": 8,
           "maximum": 512
         },
-
         "tags": {
           "type": "array",
-          "description": "Optional creator-defined tags for community gallery search. Max 5 tags, each 2–20 chars, lowercase, no spaces.",
+          "description": "Optional creator-defined tags for community gallery search. Max 5 tags, each 2\u201320 chars, lowercase, no spaces.",
           "items": {
             "type": "string",
             "minLength": 2,
@@ -163,40 +167,40 @@
         }
       }
     },
-
     "music": {
       "type": "object",
       "description": "Reference to the music track and playback settings.",
-      "required": ["filename", "loop", "loop_start_beat", "preview_start_beat", "preview_duration_beats"],
+      "required": [
+        "filename",
+        "loop",
+        "loop_start_beat",
+        "preview_start_beat",
+        "preview_duration_beats"
+      ],
       "additionalProperties": false,
       "properties": {
-
         "filename": {
           "type": "string",
           "description": "Path to the audio file relative to assets/audio/music/. Must be an .ogg file for Godot 4 streaming. Example: 'zone1/sunlit_shallows_01.ogg'",
           "pattern": "^[a-z0-9_/\\-]+\\.ogg$"
         },
-
         "loop": {
           "type": "boolean",
           "description": "Whether the track loops. False for all official levels (fixed length). True is permitted for player-created levels that want a repeating backdrop.",
           "default": false
         },
-
         "loop_start_beat": {
           "type": "number",
           "description": "Beat index where the loop restarts from. Only used when loop is true.",
           "minimum": 0,
           "default": 0
         },
-
         "preview_start_beat": {
           "type": "number",
           "description": "Beat where the level select preview clip starts playing.",
           "minimum": 0,
           "default": 4
         },
-
         "preview_duration_beats": {
           "type": "number",
           "description": "How many beats the level select preview plays before looping.",
@@ -204,13 +208,11 @@
           "maximum": 16,
           "default": 8
         },
-
         "beat_offset_ms": {
           "type": "number",
           "description": "Audio-to-beat alignment offset in milliseconds. Positive = music starts before beat 0. Negative = music starts after beat 0. Used to correct for audio file silence at start or late downbeat.",
           "default": 0
         },
-
         "volume_db": {
           "type": "number",
           "description": "Playback volume adjustment in decibels relative to the master music bus. Used to normalize loudness across tracks.",
@@ -220,29 +222,34 @@
         }
       }
     },
-
     "beat_map": {
       "type": "array",
       "description": "Ordered array of all obstacles in this level. Must be sorted by beat_index ascending. Multiple entries may share the same beat_index (simultaneous obstacles in different lanes).",
       "items": {
         "type": "object",
-        "required": ["beat_index", "beat_subdivision", "obstacle_type", "lane_position"],
+        "required": [
+          "beat_index",
+          "beat_subdivision",
+          "obstacle_type",
+          "lane_position"
+        ],
         "additionalProperties": false,
         "properties": {
-
           "beat_index": {
             "type": "number",
             "description": "Which beat this obstacle appears on, counting from 0. Beat 0 is the first beat of the level. May be a decimal for subdivisions: 0.5 = eighth note, 0.25 = sixteenth note.",
             "minimum": 0
           },
-
           "beat_subdivision": {
             "type": "string",
-            "description": "Subdivision label for editor display. Does not affect gameplay — beat_index encodes the actual position.",
-            "enum": ["quarter", "eighth", "sixteenth"],
+            "description": "Subdivision label for editor display. Does not affect gameplay \u2014 beat_index encodes the actual position.",
+            "enum": [
+              "quarter",
+              "eighth",
+              "sixteenth"
+            ],
             "default": "quarter"
           },
-
           "obstacle_type": {
             "type": "string",
             "description": "Slug of the obstacle type to spawn. Must match an entry in the obstacle catalog.",
@@ -261,201 +268,270 @@
               "mirror_fish"
             ]
           },
-
           "lane_position": {
             "type": "number",
             "description": "Normalized vertical position (0.0 = top of playfield, 1.0 = bottom). For wall-attached obstacles (coral_spike, eel_snap, current_jet), this is the wall attachment point. For free-floating obstacles (jellyfish, bubble_mine), this is the initial center Y.",
             "minimum": 0.0,
             "maximum": 1.0
           },
-
           "parameters": {
             "type": "object",
-            "description": "Obstacle-specific parameters. Keys depend on obstacle_type. See obstacle_catalog.md for valid keys per type. Only include keys relevant to the obstacle type — extra keys are ignored.",
+            "description": "Obstacle-specific parameters. Keys depend on obstacle_type. See obstacle_catalog.md for valid keys per type. Only include keys relevant to the obstacle type \u2014 extra keys are ignored.",
             "additionalProperties": true,
             "properties": {
-
               "wall_attachment": {
                 "type": "string",
                 "description": "coral_spike, eel_snap, current_jet: which wall the obstacle attaches to.",
-                "enum": ["top", "bottom", "left", "right"]
+                "enum": [
+                  "top",
+                  "bottom",
+                  "left",
+                  "right"
+                ]
               },
-
               "height": {
                 "type": "integer",
                 "description": "coral_spike: height of spike cluster in pixels.",
-                "enum": [120, 180, 240]
+                "enum": [
+                  120,
+                  180,
+                  240
+                ]
               },
-
               "color_variant": {
                 "type": "string",
                 "description": "jellyfish_drift, crystal_shard: color variant key.",
-                "enum": ["purple", "pink", "blue", "teal"]
+                "enum": [
+                  "purple",
+                  "pink",
+                  "blue",
+                  "teal"
+                ]
               },
-
               "sine_amplitude": {
                 "type": "number",
                 "description": "jellyfish_drift: vertical oscillation amplitude in pixels.",
-                "enum": [50, 100, 150]
+                "enum": [
+                  50,
+                  100,
+                  150
+                ]
               },
-
               "sine_frequency": {
                 "type": "number",
                 "description": "jellyfish_drift: vertical oscillation frequency in Hz.",
-                "enum": [0.5, 1.0, 2.0]
+                "enum": [
+                  0.5,
+                  1.0,
+                  2.0
+                ]
               },
-
               "blade_count": {
                 "type": "integer",
                 "description": "kelp_curtain: number of kelp blades.",
-                "enum": [4, 6, 8]
+                "enum": [
+                  4,
+                  6,
+                  8
+                ]
               },
-
               "sway_speed": {
                 "type": "number",
                 "description": "kelp_curtain: sway cycle frequency in Hz.",
-                "enum": [0.5, 1.0, 1.5]
+                "enum": [
+                  0.5,
+                  1.0,
+                  1.5
+                ]
               },
-
               "gap_beat_alignment": {
                 "type": "number",
                 "description": "kelp_curtain: beat index when the gap is fully open. Must fall within a beat window after placement beat.",
                 "minimum": 0
               },
-
               "arm_radius": {
                 "type": "integer",
                 "description": "bubble_mine: proximity radius in pixels that triggers the warning pulse.",
-                "enum": [160, 200, 240]
+                "enum": [
+                  160,
+                  200,
+                  240
+                ]
               },
-
               "origin_wall": {
                 "type": "string",
                 "description": "current_jet, eel_snap, crystal_shard: origin wall.",
-                "enum": ["left", "right", "top", "bottom"]
+                "enum": [
+                  "left",
+                  "right",
+                  "top",
+                  "bottom"
+                ]
               },
-
               "beat_phase_offset": {
                 "type": "number",
                 "description": "current_jet, anchor_chain: fractional beat offset for the obstacle's cycle start.",
                 "minimum": 0.0,
                 "maximum": 1.0
               },
-
               "cycle_beats": {
                 "type": "integer",
                 "description": "current_jet: total beats per fire/cooldown cycle.",
-                "enum": [2, 3, 4]
+                "enum": [
+                  2,
+                  3,
+                  4
+                ]
               },
-
               "max_angle_degrees": {
                 "type": "integer",
                 "description": "anchor_chain: maximum swing arc in degrees from vertical.",
-                "enum": [20, 35, 50]
+                "enum": [
+                  20,
+                  35,
+                  50
+                ]
               },
-
               "pendulum_frequency": {
                 "type": "number",
                 "description": "anchor_chain: pendulum swing frequency in Hz.",
-                "enum": [0.3, 0.5, 0.8]
+                "enum": [
+                  0.3,
+                  0.5,
+                  0.8
+                ]
               },
-
               "chain_length": {
                 "type": "integer",
                 "description": "anchor_chain: chain length in pixels.",
-                "enum": [300, 500, 700]
+                "enum": [
+                  300,
+                  500,
+                  700
+                ]
               },
-
               "wall_origin": {
                 "type": "string",
                 "description": "lava_burst: wall the eruption originates from.",
-                "enum": ["bottom", "top"]
+                "enum": [
+                  "bottom",
+                  "top"
+                ]
               },
-
               "x_position": {
                 "type": "number",
-                "description": "lava_burst: normalized horizontal position of vent (0.0–1.0).",
+                "description": "lava_burst: normalized horizontal position of vent (0.0\u20131.0).",
                 "minimum": 0.0,
                 "maximum": 1.0
               },
-
               "dormant_beats": {
                 "type": "integer",
                 "description": "lava_burst, eel_snap: number of beats the obstacle stays dormant between activations.",
-                "enum": [2, 4, 6, 8]
+                "enum": [
+                  2,
+                  4,
+                  6,
+                  8
+                ]
               },
-
               "strike_length": {
                 "type": "integer",
                 "description": "eel_snap: how far the eel extends in pixels.",
-                "enum": [200, 300, 400]
+                "enum": [
+                  200,
+                  300,
+                  400
+                ]
               },
-
               "entry_side": {
                 "type": "string",
                 "description": "pressure_wall, crystal_shard: side the obstacle enters from.",
-                "enum": ["left", "right"]
+                "enum": [
+                  "left",
+                  "right"
+                ]
               },
-
               "gap_y_normalized": {
                 "type": "number",
                 "description": "pressure_wall: normalized vertical center of the safe gap.",
                 "minimum": 0.1,
                 "maximum": 0.9
               },
-
               "gap_height": {
                 "type": "integer",
                 "description": "pressure_wall: height of safe gap in pixels.",
-                "enum": [120, 160, 200]
+                "enum": [
+                  120,
+                  160,
+                  200
+                ]
               },
-
               "travel_speed": {
                 "type": "integer",
                 "description": "pressure_wall: lateral travel speed in pixels/sec.",
-                "enum": [300, 450, 600]
+                "enum": [
+                  300,
+                  450,
+                  600
+                ]
               },
-
               "duration_beats": {
                 "type": "integer",
                 "description": "dark_void: number of beats the void effect lasts.",
-                "enum": [2, 4, 6, 8]
+                "enum": [
+                  2,
+                  4,
+                  6,
+                  8
+                ]
               },
-
               "pulse_with_beat": {
                 "type": "boolean",
                 "description": "dark_void: if true, the visibility cutout pulses in radius on each beat.",
                 "default": true
               },
-
               "lateral_speed": {
                 "type": "integer",
                 "description": "crystal_shard: horizontal travel speed in pixels/sec.",
-                "enum": [400, 600, 800]
+                "enum": [
+                  400,
+                  600,
+                  800
+                ]
               },
-
               "diagonal_speed_initial": {
                 "type": "string",
                 "description": "crystal_shard: initial vertical direction of travel.",
-                "enum": ["up", "down"]
+                "enum": [
+                  "up",
+                  "down"
+                ]
               },
-
               "rotation_direction": {
                 "type": "string",
                 "description": "crystal_shard: rotation direction.",
-                "enum": ["clockwise", "counter"]
+                "enum": [
+                  "clockwise",
+                  "counter"
+                ]
               },
-
               "delay_frames": {
                 "type": "integer",
                 "description": "mirror_fish: number of frames behind player position the mirror fish is (at 60fps).",
-                "enum": [20, 30, 45]
+                "enum": [
+                  20,
+                  30,
+                  45
+                ]
               },
-
               "approach_speed_bonus": {
                 "type": "integer",
                 "description": "mirror_fish: additional px/sec on top of scroll speed for the mirror fish's approach.",
-                "enum": [50, 100, 150]
+                "enum": [
+                  50,
+                  100,
+                  150
+                ]
               }
             }
           }
@@ -464,35 +540,34 @@
       "minItems": 0,
       "maxItems": 200
     },
-
     "speed_zones": {
       "type": "array",
       "description": "Array of speed modification zones. Speed multipliers affect horizontal scroll speed only, not physics. Zones must not overlap. Sorted by start_beat ascending.",
       "items": {
         "type": "object",
-        "required": ["start_beat", "end_beat", "speed_multiplier"],
+        "required": [
+          "start_beat",
+          "end_beat",
+          "speed_multiplier"
+        ],
         "additionalProperties": false,
         "properties": {
-
           "start_beat": {
             "type": "number",
             "description": "Beat index where this speed zone begins.",
             "minimum": 0
           },
-
           "end_beat": {
             "type": "number",
-            "description": "Beat index where this speed zone ends (exclusive — the beat at end_beat uses the next zone's speed or default 1.0).",
+            "description": "Beat index where this speed zone ends (exclusive \u2014 the beat at end_beat uses the next zone's speed or default 1.0).",
             "minimum": 0
           },
-
           "speed_multiplier": {
             "type": "number",
-            "description": "Scroll speed multiplier relative to the base speed. 1.0 = normal. 0.5 = half speed (slower). 2.0 = double speed. Range 0.25–2.5.",
+            "description": "Scroll speed multiplier relative to the base speed. 1.0 = normal. 0.5 = half speed (slower). 2.0 = double speed. Range 0.25\u20132.5.",
             "minimum": 0.25,
             "maximum": 2.5
           },
-
           "transition_beats": {
             "type": "number",
             "description": "Number of beats to linearly ramp from the previous speed to this speed_multiplier. 0 = instant snap.",
@@ -500,7 +575,6 @@
             "maximum": 8,
             "default": 0
           },
-
           "label": {
             "type": "string",
             "description": "Optional editor-only label for this speed zone (e.g. 'Slow Buildup', 'Rush Sequence'). Not shown in-game.",
@@ -511,14 +585,16 @@
       },
       "default": []
     },
-
     "background": {
       "type": "object",
       "description": "Background and visual layer references for this level.",
-      "required": ["asset_key", "parallax_enabled", "color_override"],
+      "required": [
+        "asset_key",
+        "parallax_enabled",
+        "color_override"
+      ],
       "additionalProperties": false,
       "properties": {
-
         "asset_key": {
           "type": "string",
           "description": "Key referencing the background asset set in the BackgroundManager autoload. Corresponds to a named entry in assets/backgrounds/backgrounds_manifest.json.",
@@ -533,54 +609,66 @@
             "bg_custom"
           ]
         },
-
         "parallax_enabled": {
           "type": "boolean",
           "description": "Whether parallax scrolling is active for this level. Disable for very low-end devices (auto-disabled via quality preset).",
           "default": true
         },
-
         "color_override": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Optional hex color string (#RRGGBB) to tint the entire background. null = no override, use asset defaults. Used by Zone 6 to apply prismatic color cycling via shader.",
           "pattern": "^#[0-9A-Fa-f]{6}$",
           "default": null
         },
-
         "shader_key": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Optional shader override key. References shaders/backgrounds/ directory. 'heat_wave' for Z4, 'depth_distort' for Z5, 'prismatic_cycle' for Z6, null for others.",
           "default": null
         },
-
         "ambient_particle_key": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Key for the ambient particle system to run in this level (e.g. 'bubbles_light', 'deep_sea_motes', 'volcanic_ash', 'crystal_dust'). null = none.",
           "default": null
         }
       }
     },
-
     "unlock_requirements": {
       "type": "object",
       "description": "Conditions that must be met before this level can be played. All listed conditions must be satisfied simultaneously.",
-      "required": ["min_stars_zone_previous", "required_level_id", "requires_full_reef_iap", "requires_creator_pass"],
+      "required": [
+        "min_stars_zone_previous",
+        "required_level_id",
+        "requires_full_reef_iap",
+        "requires_creator_pass"
+      ],
       "additionalProperties": false,
       "properties": {
-
         "min_stars_zone_previous": {
-          "type": ["integer", "null"],
-          "description": "Minimum total stars earned in the previous zone. null = no zone star requirement. Used to gate Z6 (requires all stars in Z1–Z5).",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "Minimum total stars earned in the previous zone. null = no zone star requirement. Used to gate Z6 (requires all stars in Z1\u2013Z5).",
           "minimum": 0,
           "default": null
         },
-
         "required_level_id": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Level ID that must be completed (any star rating) before this level is accessible. null = no prerequisite level. Typically set to the fourth level of the previous zone (e.g. 'z1-l4' to unlock Zone 2).",
           "default": null
         },
-
         "required_level_stars": {
           "type": "integer",
           "description": "Minimum star rating required on the required_level_id. 1 = any completion. Ignored if required_level_id is null.",
@@ -588,34 +676,39 @@
           "maximum": 3,
           "default": 1
         },
-
         "requires_full_reef_iap": {
           "type": "boolean",
           "description": "If true, player must have purchased the Full Reef IAP ($2.99) to access this level. Always true for Z4 and Z5 levels.",
           "default": false
         },
-
         "requires_creator_pass": {
           "type": "boolean",
-          "description": "If true, player must own Creator Pass to access this level. Used only for community-published levels at creator's discretion (rare — most published levels are free to play).",
+          "description": "If true, player must own Creator Pass to access this level. Used only for community-published levels at creator's discretion (rare \u2014 most published levels are free to play).",
           "default": false
         },
-
         "min_total_stars": {
-          "type": ["integer", "null"],
-          "description": "Minimum total stars across all zones. Used for Z6 unlock (requires 120 stars = 3 stars × 40 levels). null = no total stars requirement.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "Minimum total stars across all zones. Used for Z6 unlock (requires 120 stars = 3 stars \u00d7 40 levels). null = no total stars requirement.",
           "minimum": 0,
           "default": null
         }
       }
     },
-
     "collectibles": {
       "type": "array",
       "description": "Optional array of collectible items (pearls, bonus coins) placed on the beat grid. Added in schema v1.1. Absent field or empty array = no collectibles.",
       "items": {
         "type": "object",
-        "required": ["beat_index", "beat_subdivision", "collectible_type", "lane_position", "value"],
+        "required": [
+          "beat_index",
+          "beat_subdivision",
+          "collectible_type",
+          "lane_position",
+          "value"
+        ],
         "additionalProperties": false,
         "properties": {
           "beat_index": {
@@ -626,12 +719,19 @@
           "beat_subdivision": {
             "type": "string",
             "description": "Grid resolution this collectible was placed at in the editor.",
-            "enum": ["quarter", "eighth", "sixteenth"]
+            "enum": [
+              "quarter",
+              "eighth",
+              "sixteenth"
+            ]
           },
           "collectible_type": {
             "type": "string",
             "description": "Type of collectible. 'pearl' = primary collectible (Zone 1 onwards). 'bonus_coin' = bonus coin cluster triggered by crystal resonance (Zone 6 only).",
-            "enum": ["pearl", "bonus_coin"]
+            "enum": [
+              "pearl",
+              "bonus_coin"
+            ]
           },
           "lane_position": {
             "type": "number",
@@ -648,32 +748,32 @@
         }
       }
     },
-
     "par_score": {
       "type": "object",
       "description": "Score thresholds for star ratings. Set manually by level designer. The game computes star count from final_score vs these thresholds.",
-      "required": ["one_star", "two_star", "three_star", "max_possible"],
+      "required": [
+        "one_star",
+        "two_star",
+        "three_star",
+        "max_possible"
+      ],
       "additionalProperties": false,
       "properties": {
-
         "one_star": {
           "type": "integer",
           "description": "Minimum score to earn 1 star (level completion threshold). Below this = 0 stars (level complete but no stars).",
           "minimum": 0
         },
-
         "two_star": {
           "type": "integer",
           "description": "Minimum score to earn 2 stars.",
           "minimum": 0
         },
-
         "three_star": {
           "type": "integer",
           "description": "Minimum score to earn 3 stars.",
           "minimum": 0
         },
-
         "max_possible": {
           "type": "integer",
           "description": "Theoretical maximum score achievable on this level (all PERFECTs at max combo multiplier). Used by results screen to show percentage. Computed by the level editor automatically.",
@@ -681,170 +781,5 @@
         }
       }
     }
-
-  }
-}
-
----EXAMPLE LEVEL BELOW---
-
-{
-  "schema_version": "1.0",
-
-  "metadata": {
-    "id": "z1-l1",
-    "name": "First Dive",
-    "description": "Your first swim through the Sunlit Shallows. Learn to hold and release!",
-    "zone": 1,
-    "level_index": 1,
-    "bpm": 100,
-    "bpm_variable": false,
-    "difficulty": 1,
-    "difficulty_tag": "Beginner",
-    "author": "Bubble Reef Rush Team",
-    "created_at": "2024-01-15T09:00:00Z",
-    "is_official": true,
-    "total_beats": 32,
-    "tags": []
-  },
-
-  "music": {
-    "filename": "zone1/sunlit_shallows_01.ogg",
-    "loop": false,
-    "loop_start_beat": 0,
-    "preview_start_beat": 4,
-    "preview_duration_beats": 8,
-    "beat_offset_ms": 0,
-    "volume_db": 0
-  },
-
-  "beat_map": [
-    {
-      "beat_index": 4,
-      "beat_subdivision": "quarter",
-      "obstacle_type": "coral_spike",
-      "lane_position": 1.0,
-      "parameters": {
-        "wall_attachment": "bottom",
-        "height": 120
-      }
-    },
-    {
-      "beat_index": 8,
-      "beat_subdivision": "quarter",
-      "obstacle_type": "coral_spike",
-      "lane_position": 0.0,
-      "parameters": {
-        "wall_attachment": "top",
-        "height": 120
-      }
-    },
-    {
-      "beat_index": 12,
-      "beat_subdivision": "quarter",
-      "obstacle_type": "coral_spike",
-      "lane_position": 1.0,
-      "parameters": {
-        "wall_attachment": "bottom",
-        "height": 180
-      }
-    },
-    {
-      "beat_index": 14,
-      "beat_subdivision": "quarter",
-      "obstacle_type": "coral_spike",
-      "lane_position": 0.0,
-      "parameters": {
-        "wall_attachment": "top",
-        "height": 120
-      }
-    },
-    {
-      "beat_index": 16,
-      "beat_subdivision": "quarter",
-      "obstacle_type": "coral_spike",
-      "lane_position": 1.0,
-      "parameters": {
-        "wall_attachment": "bottom",
-        "height": 120
-      }
-    },
-    {
-      "beat_index": 20,
-      "beat_subdivision": "quarter",
-      "obstacle_type": "coral_spike",
-      "lane_position": 0.0,
-      "parameters": {
-        "wall_attachment": "top",
-        "height": 180
-      }
-    },
-    {
-      "beat_index": 24,
-      "beat_subdivision": "quarter",
-      "obstacle_type": "coral_spike",
-      "lane_position": 1.0,
-      "parameters": {
-        "wall_attachment": "bottom",
-        "height": 240
-      }
-    },
-    {
-      "beat_index": 28,
-      "beat_subdivision": "quarter",
-      "obstacle_type": "coral_spike",
-      "lane_position": 0.0,
-      "parameters": {
-        "wall_attachment": "top",
-        "height": 120
-      }
-    }
-  ],
-
-  "speed_zones": [
-    {
-      "start_beat": 0,
-      "end_beat": 8,
-      "speed_multiplier": 0.8,
-      "transition_beats": 0,
-      "label": "Slow intro"
-    },
-    {
-      "start_beat": 8,
-      "end_beat": 24,
-      "speed_multiplier": 1.0,
-      "transition_beats": 4,
-      "label": "Normal cruise"
-    },
-    {
-      "start_beat": 24,
-      "end_beat": 32,
-      "speed_multiplier": 1.1,
-      "transition_beats": 2,
-      "label": "Slight finale push"
-    }
-  ],
-
-  "background": {
-    "asset_key": "bg_sunlit_shallows",
-    "parallax_enabled": true,
-    "color_override": null,
-    "shader_key": null,
-    "ambient_particle_key": "bubbles_light"
-  },
-
-  "unlock_requirements": {
-    "min_stars_zone_previous": null,
-    "required_level_id": null,
-    "required_level_stars": 1,
-    "requires_full_reef_iap": false,
-    "requires_creator_pass": false,
-    "min_total_stars": null
-  },
-
-  "par_score": {
-    "one_star": 320,
-    "two_star": 560,
-    "three_star": 720,
-    "max_possible": 800
   }
 }
