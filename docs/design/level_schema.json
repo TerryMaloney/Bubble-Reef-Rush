@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "bubble-reef-rush/level-schema/v1.0",
+  "$id": "bubble-reef-rush/level-schema/v1.1",
   "title": "Bubble Reef Rush Level File Schema",
   "description": "Defines the structure of a .brl level file for Bubble Reef Rush. All .brl files are stored under assets/levels/. Player-created levels use the same schema and are stored under user://levels/.",
   "type": "object",
@@ -22,7 +22,7 @@
       "type": "string",
       "description": "Schema version string. Increment minor on backwards-compatible additions, major on breaking changes.",
       "pattern": "^\\d+\\.\\d+$",
-      "example": "1.0"
+      "example": "1.1"
     },
 
     "metadata": {
@@ -606,6 +606,45 @@
           "description": "Minimum total stars across all zones. Used for Z6 unlock (requires 120 stars = 3 stars × 40 levels). null = no total stars requirement.",
           "minimum": 0,
           "default": null
+        }
+      }
+    },
+
+    "collectibles": {
+      "type": "array",
+      "description": "Optional array of collectible items (pearls, bonus coins) placed on the beat grid. Added in schema v1.1. Absent field or empty array = no collectibles.",
+      "items": {
+        "type": "object",
+        "required": ["beat_index", "beat_subdivision", "collectible_type", "lane_position", "value"],
+        "additionalProperties": false,
+        "properties": {
+          "beat_index": {
+            "type": "number",
+            "description": "Beat position where this collectible appears. Same coordinate space as beat_map entries.",
+            "minimum": 0
+          },
+          "beat_subdivision": {
+            "type": "string",
+            "description": "Grid resolution this collectible was placed at in the editor.",
+            "enum": ["quarter", "eighth", "sixteenth"]
+          },
+          "collectible_type": {
+            "type": "string",
+            "description": "Type of collectible. 'pearl' = primary collectible (Zone 1 onwards). 'bonus_coin' = bonus coin cluster triggered by crystal resonance (Zone 6 only).",
+            "enum": ["pearl", "bonus_coin"]
+          },
+          "lane_position": {
+            "type": "number",
+            "description": "Normalized vertical position in the lane (0.0 = top, 1.0 = bottom).",
+            "minimum": 0.0,
+            "maximum": 1.0
+          },
+          "value": {
+            "type": "integer",
+            "description": "Coin/score value awarded when collected.",
+            "minimum": 1,
+            "maximum": 500
+          }
         }
       }
     },
