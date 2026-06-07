@@ -54,7 +54,7 @@ func _spawn_obstacle(entry: Dictionary, _current_beat: float) -> void:
 	var obstacle: Node2D = packed.instantiate() as Node2D
 
 	# Spawn off the right edge; Y is the normalized lane position × screen height.
-	var viewport_size: Vector2 = get_viewport_rect().size
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
 	obstacle.position.x = viewport_size.x + 100.0
 	obstacle.position.y = float(entry.get("lane_position", 0.5)) * viewport_size.y
 

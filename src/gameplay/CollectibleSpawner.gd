@@ -44,7 +44,7 @@ func _spawn_collectible(entry: Dictionary) -> void:
 	var packed: PackedScene = load(PEARL_SCENE) as PackedScene
 	var collectible: Node2D = packed.instantiate() as Node2D
 
-	var viewport_size: Vector2 = get_viewport_rect().size
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
 	collectible.position.x = viewport_size.x + 100.0
 	collectible.position.y = float(entry.get("lane_position", 0.5)) * viewport_size.y
 
