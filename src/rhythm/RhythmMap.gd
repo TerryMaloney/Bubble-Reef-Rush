@@ -91,7 +91,7 @@ var _cached: bool = false
 # ---------------------------------------------------------------------------
 
 ## Load a level by its ID (e.g. "z1-l1") from the default levels directory.
-## The file is looked up as LEVELS_DIR + id + ".json".
+## The file is looked up as LEVELS_DIR + id + ".brl".
 ## Player-created levels can pass a full "user://…" path instead.
 func load_level(level_id_or_path: String) -> void:
 	_cached = false
@@ -102,7 +102,7 @@ func load_level(level_id_or_path: String) -> void:
 	if level_id_or_path.begins_with("res://") or level_id_or_path.begins_with("user://"):
 		path = level_id_or_path
 	else:
-		path = LEVELS_DIR + level_id_or_path + ".json"
+		path = LEVELS_DIR + level_id_or_path + ".brl"
 
 	if not FileAccess.file_exists(path):
 		var err: String = "Level file not found: %s" % path

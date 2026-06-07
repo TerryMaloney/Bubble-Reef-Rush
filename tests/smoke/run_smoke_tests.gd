@@ -1,12 +1,14 @@
-## Smoke test runner. Execute with: godot --headless -s res://tests/smoke/run_smoke_tests.gd
+## Smoke test runner. Execute with: godot --headless --script tests/smoke/run_smoke_tests.gd
 extends SceneTree
 
 func _init() -> void:
+	await process_frame
+
 	# Check autoloads are present
-	assert(has_node("/root/GameManager"), "GameManager autoload missing")
-	assert(has_node("/root/EventBus"), "EventBus autoload missing")
-	assert(has_node("/root/SaveSystem"), "SaveSystem autoload missing")
-	assert(has_node("/root/BeatConductor"), "BeatConductor autoload missing")
+	assert(root.has_node("GameManager"), "GameManager autoload missing")
+	assert(root.has_node("EventBus"), "EventBus autoload missing")
+	assert(root.has_node("SaveSystem"), "SaveSystem autoload missing")
+	assert(root.has_node("BeatConductor"), "BeatConductor autoload missing")
 
 	# Check level file loads
 	var level_path := "res://assets/levels/z1-l1.brl"
@@ -25,7 +27,8 @@ func _init() -> void:
 	assert((data as Dictionary).has("beat_map"), "z1-l1.brl missing beat_map")
 
 	# SaveSystem basic check
-	var profile_id := SaveSystem.get_active_profile_id()
+	var save_sys = root.get_node("SaveSystem")
+	var profile_id: String = save_sys.get_active_profile_id()
 	assert(not profile_id.is_empty(), "SaveSystem returned empty profile id")
 
 	print("SMOKE_OK")
