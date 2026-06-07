@@ -6,7 +6,7 @@
 >
 > **Legend:** ✅ Done · 🔄 In progress · ⬜ Not started · 🔒 Blocked (dependency noted)
 >
-> Last updated: 2026-06-07
+> Last updated: 2026-06-07 (M2 complete)
 
 ---
 
@@ -88,37 +88,37 @@ checklist, close it by ticking completed items and committing the updated file.
 
 ---
 
-## Milestone 2 — Level Select + Zone Navigation
+## Milestone 2 — Level Select + Zone Navigation ✅ (complete)
 
 > Player can browse and choose levels. Lays groundwork for 48-level content
 > pipeline.
 
 ### 2.1 Zone select screen
 
-- ⬜ `scenes/gameplay/ZoneSelect.tscn` — shows 6 zone cards
-- ⬜ Zone lock/unlock display (Z1 always unlocked; Z2+ locked until prior zone
+- ✅ `scenes/gameplay/ZoneSelect.tscn` — shows 6 zone cards
+- ✅ Zone lock/unlock display (Z1 always unlocked; Z2+ locked until prior zone
   completed; Z4–Z5 require IAP flag, show lock icon)
-- ⬜ `src/gameplay/ZoneSelect.gd` — reads unlock state from SaveSystem
+- ✅ `src/gameplay/ZoneSelect.gd` — reads unlock state from SaveSystem
 
 ### 2.2 Level select screen
 
-- ⬜ `scenes/gameplay/LevelSelect.tscn` — grid of 8 level buttons per zone
-- ⬜ Each button shows: level name, best star count (0–3), lock state
-- ⬜ `src/gameplay/LevelSelect.gd` — tap button → GameManager.start_level(id)
+- ✅ `scenes/gameplay/LevelSelect.tscn` — grid of 8 level buttons per zone
+- ✅ Each button shows: level name, best star count (0–3), lock state
+- ✅ `src/gameplay/LevelSelect.gd` — tap button → GameManager.start_level(id)
 
 ### 2.3 GameManager navigation
 
-- ⬜ `GameManager.go_to_zone_select()` — called from MainMenu PLAY button
-- ⬜ `GameManager.go_to_level_select(zone_id)` — called from zone card tap
-- ⬜ `GameManager.go_to_main_menu()` — already wired; verify works from results
+- ✅ `GameManager.go_to_zone_select()` — called from MainMenu PLAY button
+- ✅ `GameManager.go_to_level_select(zone_id)` — called from zone card tap
+- ✅ `GameManager.go_to_main_menu()` — already wired; verify works from results
 - ⬜ Back-button handling on each screen (Android back gesture → previous screen)
 
 ### 2.4 Level data scaffold
 
-- ⬜ Create stub `.brl` files for Z1-L2 through Z1-L8 (minimal: 8 beats, 1
-  obstacle each). These do not need to be tuned yet — just exist so level select
-  buttons are not broken.
-- ⬜ Update SaveSystem to track "zone_completed" flags needed for unlock logic
+- ✅ Stub `.brl` files for Z1-L2 through Z1-L8 — all 7 created (16 beats, empty
+  beat_map, par_score.one_star=0 so any completion earns ≥1 star)
+- ✅ SaveSystem helpers: `get_best_stars()`, `is_level_cleared()`,
+  `get_all_level_results()` — batch read avoids 8 separate file loads in LevelSelect
 
 ---
 
@@ -475,7 +475,7 @@ These apply to every coding session regardless of milestone:
 
 | Zone | BRL Files | Obstacles Ready | Art | Audio |
 |------|-----------|-----------------|-----|-------|
-| Z1 | 1/8 | 2/2 needed | ⬜ | ⬜ |
+| Z1 | 8/8 | 2/2 needed | ⬜ | ⬜ |
 | Z2 | 0/8 | 0/4 needed | ⬜ | ⬜ |
 | Z3 | 0/8 | 0/7 needed | ⬜ | ⬜ |
 | Z4 | 0/8 | 0/6 needed | ⬜ | 🔒 IAP |
