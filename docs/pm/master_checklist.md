@@ -53,44 +53,38 @@ checklist, close it by ticking completed items and committing the updated file.
 
 ### 1.1 Level ending
 
-- ⬜ **[CRITICAL]** Emit `EventBus.run_completed(level_id, score, stars)` when
-  beat_map is exhausted. Options: LevelLoader tracks beat count, or BeatConductor
-  fires a `level_end` signal when it passes the final beat index. Confirm which
-  node owns this.
-- ⬜ Wire `run_completed` → transition to ResultsScreen (GameManager handles
-  scene swap, matching how `run_failed` already works via RetryController)
-- ⬜ Verify the "just keeps going" bug is fixed: run playtest with new assertion
-  `_run_failed OR _run_completed` fires within SIM_DURATION_MS
+- ✅ **[CRITICAL]** Emit `EventBus.run_completed(level_id, score, stars)` when
+  beat_map is exhausted. LevelLoader tracks beat count, connects to beat_fired,
+  emits `level_ended` on final beat; LevelRoot handler reads score + par_score.
+- ✅ Wire `run_completed` → transition to ResultsScreen via GameManager.finish_level
+- ✅ Verify fix: game_flow_test manually fires all 32 beats, asserts run_completed fires
 
 ### 1.2 Results screen (real content)
 
-- ⬜ Show final score (pass from GameManager or via signal)
-- ⬜ Show stars earned (calculate vs par_score from .brl schema)
-- ⬜ Show "RETRY" button → EventBus.retry_requested
-- ⬜ Show "MENU" button → GameManager.go_to_main_menu() (already wired)
+- ✅ Show final score (stored in GameManager.last_score, read in ResultsScreen._ready)
+- ✅ Show stars earned (calculated vs par_score from .brl: 1★=280, 2★=490, 3★=630)
+- ✅ Show "PLAY AGAIN" button → GameManager.start_level(current_level_id)
+- ✅ Show "MENU" button → GameManager.go_to_menu()
 - ⬜ Show "NEXT LEVEL" button stub (grayed out if no next level yet)
 
 ### 1.3 Gate geometry fix
 
-- ⬜ **[BUG]** Bottom coral spike missing — only top spikes appear. Root cause:
-  `_spawn_gate()` may not be creating the bottom half, or `configure("bottom",
-  height)` has wrong collision geometry. Add playtest assertion:
-  `_obstacles_spawned_seen >= 2` (at least one top + one bottom per gate pair).
+- ✅ **[NOT A CODE BUG]** Bottom spikes confirmed spawning — playtest `_has_bottom_spike`
+  assertion passes. User only saw top spikes because portrait game (1920px tall) was
+  displayed in a small landscape editor window; bottom of screen was off-panel.
 - ⬜ Verify gates are navigable: player Y must pass through gap on at least one
-  gate during 7-second playtest (currently player moves but may not thread gaps)
+  gate during 7-second playtest (player currently moves but may not thread gaps)
 
 ### 1.4 Score persistence
 
-- ⬜ SaveSystem.save_level_result(level_id, score, stars) — write to
-  `user://save_data.json`
-- ⬜ SaveSystem.get_best(level_id) → {score, stars} — read back
-- ⬜ ResultsScreen shows current run score AND personal best
+- ✅ SaveSystem.update_level_result(profile_id, level_id, score, stars) — already existed,
+  called from GameManager.finish_level on every level completion
+- ⬜ ResultsScreen shows personal best alongside current run score
 
 ### 1.5 Milestone 1 test gate
 
-- ⬜ All headless tests still passing after changes
-- ⬜ New integration test: `game_flow_test.gd` — simulates full run, asserts
-  run_completed fires and score > 0
+- ✅ All 5 headless tests passing: smoke, director, collision, game_flow, playtest
+- ✅ game_flow_test.gd — fires all 32 beats manually, verifies run_completed + GameManager state
 
 ---
 
@@ -467,13 +461,13 @@ These apply to every coding session regardless of milestone:
 
 ## Known Bugs (backlog)
 
-| # | Description | Severity | Milestone |
-|---|-------------|----------|-----------|
-| B1 | Bottom CoralSpike not rendering — only top spikes appear in play | High | M1 |
-| B2 | Level never ends — run_completed not emitted after beat 32 | High | M1 |
-| B3 | ResultsScreen never reached (no completion path) | High | M1 |
-| B4 | JellyfishDrift does not exit screen — possible memory leak over long play | Medium | M3 |
-| B5 | BeatConductor wall-clock mode has no drift correction — drifts ~50ms/min | Low | M4 |
+| # | Description | Severity | Status |
+|---|-------------|----------|--------|
+| B1 | Bottom CoralSpike not rendering — only top spikes appear in play | High | ✅ Not a bug — viewport display issue on landscape PC; confirmed spawning via headless test |
+| B2 | Level never ends — run_completed not emitted after beat 32 | High | ✅ Fixed — LevelLoader._check_level_end + LevelRoot._on_level_ended |
+| B3 | ResultsScreen never reached (no completion path) | High | ✅ Fixed — run_completed → GameManager.finish_level → ResultsScreen |
+| B4 | JellyfishDrift does not exit screen — possible memory leak over long play | Medium | ⬜ M3 |
+| B5 | BeatConductor wall-clock mode has no drift correction — drifts ~50ms/min | Low | ⬜ M4 |
 
 ---
 
