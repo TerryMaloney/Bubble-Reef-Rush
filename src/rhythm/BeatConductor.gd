@@ -73,6 +73,10 @@ var _paused: bool = false
 ## True when Zone 5 variable-BPM mode is active.
 var _variable_bpm_mode: bool = false
 
+## When no audio stream is present, fall back to wall-clock timing.
+var _use_wall_clock: bool = false
+var _wall_clock_start_msec: int = 0
+
 ## Pre-baked beat timestamps for Zone 5.
 ## Each element is a float: the playback-position (in seconds from track start)
 ## at which that beat index occurs. Index 0 → beat 0 timestamp, etc.
@@ -135,8 +139,13 @@ func start_level(bpm: float, music_stream: AudioStream) -> void:
 	_variable_bpm_mode = false
 	_beat_map_timestamps.clear()
 
-	_music_player.stream = music_stream
-	_music_player.play()
+	if music_stream != null:
+		_music_player.stream = music_stream
+		_music_player.play()
+		_use_wall_clock = false
+	else:
+		_use_wall_clock = true
+	_wall_clock_start_msec = Time.get_ticks_msec()
 
 	# Anchor the first beat slightly ahead of now so we never fire beat 0
 	# before the audio output has actually started.
@@ -266,7 +275,10 @@ func _notification(what: int) -> void:
 ## user's personal offset. This is the single source of truth for all timing
 ## comparisons in the rhythm system.
 func _get_corrected_time() -> float:
-	var raw: float = AudioServer.get_time_since_last_mix() - AudioServer.get_output_latency()
+	if _use_wall_clock:
+		var elapsed: float = float(Time.get_ticks_msec() - _wall_clock_start_msec) / 1000.0
+		return elapsed + (user_latency_offset_ms / 1000.0)
+	var raw: float = _music_player.get_playback_position() + AudioServer.get_time_since_last_mix() - AudioServer.get_output_latency()
 	return raw + (user_latency_offset_ms / 1000.0)
 
 
