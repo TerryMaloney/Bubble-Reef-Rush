@@ -13,8 +13,8 @@ const CORAL_SPIKE_SCENE: String = "res://scenes/obstacles/CoralSpike.tscn"
 # Gate geometry: gap width in pixels at the easiest vs hardest intensity.
 # (Player capsule is ~56px tall, so even GAP_MIN leaves comfortable clearance —
 # difficulty comes from having to be *at* the gap on the beat.)
-const GAP_MAX_PX: float = 1100.0
-const GAP_MIN_PX: float = 360.0
+const GAP_MAX_PX: float = 460.0
+const GAP_MIN_PX: float = 200.0
 # If effective intensity falls at/below this, the gate is skipped entirely
 # (open water) — this is how rests and heavy assist produce breathing room.
 const SKIP_INTENSITY: float = 0.08

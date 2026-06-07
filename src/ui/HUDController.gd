@@ -70,7 +70,7 @@ func _on_input_judged(result: TimingJudge.TimingResult, _offset_ms: float, _beat
 			score += 60 * combo_mult
 			_flash_judgment("GOOD", Color(0.2, 0.6, 1.0))
 		TimingJudge.TimingResult.MISS:
-			_flash_judgment("MISS", Color(0.5, 0.5, 0.5))
+			pass  # no text — with no audio cue, a MISS label is just noise
 
 	_update_score_label()
 
