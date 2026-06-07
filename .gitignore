@@ -6,6 +6,7 @@ __pycache__/
 # Godot 4
 .godot/
 *.import
+*.uid
 export.cfg
 export_presets.cfg
 

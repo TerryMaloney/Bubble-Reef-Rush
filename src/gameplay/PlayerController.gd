@@ -9,6 +9,10 @@ class_name PlayerController
 @export var max_dive_speed: float = 640.0
 @export var drag: float = 0.92
 
+## Instant downward velocity kick applied the moment a tap begins, so quick
+## taps feel responsive instead of mushy. Hold-to-dive still accelerates on top.
+@export var dive_impulse: float = 280.0
+
 var diving: bool = false
 var alive: bool = true
 
@@ -25,6 +29,8 @@ func _input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed("swim_dive"):
 		diving = true
+		# Immediate impulse so the tap is felt right away (clamped next frame).
+		velocity.y += dive_impulse
 		timing_judge.judge_input(BeatConductor.get_current_beat_time_ms())
 	elif event.is_action_released("swim_dive"):
 		diving = false
