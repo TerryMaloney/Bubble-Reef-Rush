@@ -19,6 +19,7 @@ var _run_started: bool = false
 var _player_hit: bool = false
 var _collectibles_taken: int = 0
 var _run_failed: bool = false
+var _bottom_spikes_seen: bool = false
 
 
 func _init() -> void:
@@ -83,6 +84,10 @@ func _init() -> void:
 			max_y = maxf(max_y, y)
 		_obstacles_spawned_seen = maxi(_obstacles_spawned_seen, _count_obstacles(level))
 
+		# Check whether any bottom-attachment spike is live this frame.
+		if not _bottom_spikes_seen:
+			_bottom_spikes_seen = _has_bottom_spike(level)
+
 	_press_dive(false)
 
 	# ---- Report ----
@@ -91,6 +96,7 @@ func _init() -> void:
 	print("run_started fired: %s" % _run_started)
 	print("Beats fired: %d" % _beats_fired)
 	print("Obstacles seen on screen (peak): %d" % _obstacles_spawned_seen)
+	print("Bottom spike ever seen: %s" % _bottom_spikes_seen)
 	print("Collectibles taken: %d" % _collectibles_taken)
 	print("Player hit fired: %s" % _player_hit)
 	print("run_failed fired: %s" % _run_failed)
@@ -111,6 +117,7 @@ func _init() -> void:
 	# ---- Core-loop assertions ----
 	_hard_assert(_beats_fired >= 4, "Beat clock not firing (got %d beats)" % _beats_fired)
 	_hard_assert(_obstacles_spawned_seen >= 1, "No gates/obstacles ever spawned")
+	_hard_assert(_bottom_spikes_seen, "No bottom-attachment spike ever seen — gate bottom half broken")
 	_hard_assert(absf(max_y - min_y) > 20.0, "Player never moved vertically — input/physics dead")
 
 	print("PLAYTEST_OK")
@@ -123,6 +130,17 @@ func _count_obstacles(level: Node) -> int:
 		if child is Area2D:
 			n += 1
 	return n
+
+
+## Returns true if any live Area2D child has a CollisionShape2D offset to negative Y,
+## which is the signature of a bottom-attachment CoralSpike (pointing upward from wall).
+func _has_bottom_spike(level: Node) -> bool:
+	for child: Node in level.get_children():
+		if child is Area2D:
+			var coll: Node = child.get_node_or_null("CollisionShape2D")
+			if coll != null and (coll as CollisionShape2D).position.y < -10.0:
+				return true
+	return false
 
 
 func _press_dive(pressed: bool) -> void:
