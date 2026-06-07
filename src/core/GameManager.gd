@@ -17,6 +17,10 @@ var current_level_id: String = ""
 ## fresh level is chosen from the menu, or when the level is completed.
 var consecutive_deaths: int = 0
 
+## Stored at level completion so ResultsScreen can read them without a signal.
+var last_score: int = 0
+var last_stars: int = 0
+
 var _active_profile: String = ""
 
 
@@ -37,7 +41,7 @@ func start_level(level_id: String) -> void:
 
 
 func retry_level() -> void:
-	get_tree().reload_current_scene()
+	get_tree().change_scene_to_file(LEVEL_ROOT_SCENE)
 
 
 func go_to_menu() -> void:
@@ -46,6 +50,8 @@ func go_to_menu() -> void:
 
 
 func finish_level(score: int, stars: int) -> void:
+	last_score = score
+	last_stars = stars
 	current_state = State.RESULTS
 	_active_profile = SaveSystem.get_active_profile_id()
 	SaveSystem.update_level_result(_active_profile, current_level_id, score, stars)
@@ -59,11 +65,10 @@ func open_build_mode() -> void:
 
 func _on_run_failed(_level_id: String, _score: int) -> void:
 	# RetryController handles the prompt; GameManager just records state.
-	current_state = State.RESULTS
+	current_state = State.PLAYING
 	consecutive_deaths += 1
 
 
 func _on_run_completed(level_id: String, score: int, stars: int) -> void:
 	consecutive_deaths = 0
 	finish_level(score, stars)
-	EventBus.run_completed.emit(level_id, score, stars)

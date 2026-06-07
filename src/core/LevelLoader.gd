@@ -3,11 +3,18 @@ extends Node
 
 class_name LevelLoader
 
+## Emitted when the last beat of the level has fired and no run_failed has occurred.
+signal level_ended(level_id: String)
+
 var rhythm_map: RhythmMap
 
 ## Obstacle and collectible spawner refs — set by LevelRoot after adding this node.
 var obstacle_spawner: Node = null
 var collectible_spawner: Node = null
+
+var _total_beats: int = 0
+var _level_id_meta: String = ""
+var _result_emitted: bool = false
 
 
 func load_level(level_id_or_path: String) -> void:
@@ -41,6 +48,13 @@ func _on_map_loaded(level_id: String) -> void:
 	else:
 		BeatConductor.start_level(bpm, music_stream)
 
+	# Cache level-end data and arm the completion detector.
+	_total_beats = int(meta.get("total_beats", 32))
+	_level_id_meta = level_id
+	_result_emitted = false
+	BeatConductor.beat_fired.connect(_check_level_end)
+	EventBus.run_failed.connect(_on_run_aborted)
+
 	EventBus.run_started.emit(level_id)
 
 	if obstacle_spawner != null and obstacle_spawner.has_method("setup"):
@@ -48,6 +62,19 @@ func _on_map_loaded(level_id: String) -> void:
 
 	if collectible_spawner != null and collectible_spawner.has_method("setup"):
 		collectible_spawner.setup(rhythm_map)
+
+
+func _check_level_end(beat_index: int) -> void:
+	if _result_emitted:
+		return
+	if beat_index >= _total_beats - 1:
+		_result_emitted = true
+		level_ended.emit(_level_id_meta)
+
+
+func _on_run_aborted(_level_id: String, _score: int) -> void:
+	# run_failed fired first — suppress level_ended so we don't double-transition.
+	_result_emitted = true
 
 
 func _on_map_load_failed(error: String) -> void:
