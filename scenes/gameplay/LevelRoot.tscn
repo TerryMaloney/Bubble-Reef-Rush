@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/LevelRoot.gd" id="1"]
 [ext_resource type="Script" path="res://src/core/LevelLoader.gd" id="2"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://src/gameplay/RetryController.gd" id="5"]
 [ext_resource type="Script" path="res://src/ui/HUDController.gd" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="7"]
+[ext_resource type="Script" path="res://src/gameplay/DifficultyDirector.gd" id="8"]
 
 [node name="LevelRoot" type="Node2D"]
 script = ExtResource("1")
@@ -27,6 +28,9 @@ script = ExtResource("4")
 
 [node name="RetryController" type="Node" parent="."]
 script = ExtResource("5")
+
+[node name="DifficultyDirector" type="Node" parent="."]
+script = ExtResource("8")
 
 [node name="Player" parent="." instance=ExtResource("7")]
 position = Vector2(200, 960)

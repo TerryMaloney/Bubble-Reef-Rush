@@ -11,6 +11,12 @@ const BUILD_MODE_SCENE: String = "res://scenes/buildmode/BuildModeRoot.tscn"
 
 var current_state: State = State.MENU
 var current_level_id: String = ""
+
+## Consecutive deaths on the current level, carried across instant-retries so
+## the DifficultyDirector can ease a level a player is stuck on. Reset when a
+## fresh level is chosen from the menu, or when the level is completed.
+var consecutive_deaths: int = 0
+
 var _active_profile: String = ""
 
 
@@ -25,6 +31,8 @@ func _ready() -> void:
 func start_level(level_id: String) -> void:
 	current_state = State.LOADING
 	current_level_id = level_id
+	# A deliberately-chosen level starts fresh — clear the carried-death assist.
+	consecutive_deaths = 0
 	get_tree().change_scene_to_file(LEVEL_ROOT_SCENE)
 
 
@@ -52,8 +60,10 @@ func open_build_mode() -> void:
 func _on_run_failed(_level_id: String, _score: int) -> void:
 	# RetryController handles the prompt; GameManager just records state.
 	current_state = State.RESULTS
+	consecutive_deaths += 1
 
 
 func _on_run_completed(level_id: String, score: int, stars: int) -> void:
+	consecutive_deaths = 0
 	finish_level(score, stars)
 	EventBus.run_completed.emit(level_id, score, stars)

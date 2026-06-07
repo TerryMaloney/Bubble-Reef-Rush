@@ -97,9 +97,20 @@ func _init() -> void:
 	print("Player Y range: %.1f .. %.1f (start %.1f)" % [min_y, max_y, start_y])
 	print("=========================")
 
+	# ---- Difficulty director trace (untyped so this entry script keeps no
+	# compile-time dependency on the director class) ----
+	var director: Variant = level.get_node_or_null("DifficultyDirector")
+	if director != null:
+		print("Director assist at end: %.2f" % director.get_assist())
+		# Sample the authored sawtooth vs effective intensity at a few beats so
+		# the curve shape is visible in the log.
+		print("Intensity sample (authored 0.6):")
+		for b: int in [4, 14, 16, 22, 28]:
+			print("  beat %2d -> effective %.2f" % [b, director.effective_intensity(0.6, b)])
+
 	# ---- Core-loop assertions ----
 	_hard_assert(_beats_fired >= 4, "Beat clock not firing (got %d beats)" % _beats_fired)
-	_hard_assert(_obstacles_spawned_seen >= 1, "No obstacles ever spawned")
+	_hard_assert(_obstacles_spawned_seen >= 1, "No gates/obstacles ever spawned")
 	_hard_assert(absf(max_y - min_y) > 20.0, "Player never moved vertically — input/physics dead")
 
 	print("PLAYTEST_OK")

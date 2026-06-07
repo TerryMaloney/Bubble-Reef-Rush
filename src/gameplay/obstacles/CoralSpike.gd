@@ -30,6 +30,12 @@ func setup(entry: Dictionary) -> void:
 	_configure(attachment, height)
 
 
+## Directly size this spike — used by ObstacleSpawner when composing a gate
+## out of a top and bottom piece. attachment is "top" or "bottom".
+func configure(attachment: String, height: float) -> void:
+	_configure(attachment, height)
+
+
 func _configure(attachment: String, height: float) -> void:
 	# Build a fresh shape per instance so we never mutate a shared sub-resource.
 	var shape: RectangleShape2D = RectangleShape2D.new()

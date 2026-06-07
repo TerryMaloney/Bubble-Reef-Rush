@@ -8,9 +8,23 @@ const OBSTACLE_SCENE_MAP: Dictionary = {
 	"coral_spike": "res://scenes/obstacles/CoralSpike.tscn",
 	"jellyfish_drift": "res://scenes/obstacles/JellyfishDrift.tscn",
 }
+const CORAL_SPIKE_SCENE: String = "res://scenes/obstacles/CoralSpike.tscn"
+
+# Gate geometry: gap width in pixels at the easiest vs hardest intensity.
+# (Player capsule is ~56px tall, so even GAP_MIN leaves comfortable clearance —
+# difficulty comes from having to be *at* the gap on the beat.)
+const GAP_MAX_PX: float = 1100.0
+const GAP_MIN_PX: float = 360.0
+# If effective intensity falls at/below this, the gate is skipped entirely
+# (open water) — this is how rests and heavy assist produce breathing room.
+const SKIP_INTENSITY: float = 0.08
+const SPIKE_WIDTH: float = 60.0
 
 var _pending: Array[Dictionary] = []
 var _rhythm_map: RhythmMap
+
+## Set by LevelRoot. When present, gates consult it for effective intensity.
+var director: DifficultyDirector = null
 
 
 func setup(rhythm_map: RhythmMap) -> void:
@@ -41,6 +55,14 @@ func _process(_delta: float) -> void:
 
 func _spawn_obstacle(entry: Dictionary, _current_beat: float) -> void:
 	var obstacle_type: String = str(entry.get("obstacle_type", ""))
+	var params: Dictionary = entry.get("parameters", {}) as Dictionary
+
+	# A "pressure_wall" entry, or any entry that carries gap parameters, becomes
+	# a difficulty-driven gate (top + bottom spike with a gap to fly through).
+	if obstacle_type == "pressure_wall" or params.has("gap_y_normalized"):
+		_spawn_gate(entry, params)
+		return
+
 	if not OBSTACLE_SCENE_MAP.has(obstacle_type):
 		push_warning("ObstacleSpawner: Unknown obstacle type '%s' — skipping." % obstacle_type)
 		return
@@ -63,3 +85,50 @@ func _spawn_obstacle(entry: Dictionary, _current_beat: float) -> void:
 
 	if obstacle.has_method("setup"):
 		obstacle.setup(entry)
+
+
+## Build a gate: a top and bottom CoralSpike with a navigable gap between them.
+## The gap *size* is driven by the (possibly DDA-adjusted) effective intensity;
+## the gap *center* comes from the authored chart.
+func _spawn_gate(entry: Dictionary, params: Dictionary) -> void:
+	var beat_index: int = int(entry.get("beat_index", 0))
+	var authored: float = float(params.get("intensity", 0.5))
+
+	var effective: float = authored
+	if director != null:
+		effective = director.effective_intensity(authored, beat_index)
+
+	# Rest / heavy-assist beats open into clear water.
+	if effective <= SKIP_INTENSITY:
+		return
+
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+	var screen_h: float = viewport_size.y
+	var spawn_x: float = viewport_size.x + 100.0
+
+	var gap_px: float = lerpf(GAP_MAX_PX, GAP_MIN_PX, clampf(effective, 0.0, 1.0))
+	var gap_center_norm: float = float(params.get("gap_y_normalized", entry.get("lane_position", 0.5)))
+	var gap_center_y: float = clampf(gap_center_norm * screen_h, gap_px * 0.5 + 40.0, screen_h - gap_px * 0.5 - 40.0)
+
+	var gap_top: float = gap_center_y - gap_px * 0.5
+	var gap_bottom: float = gap_center_y + gap_px * 0.5
+
+	# Top piece spans from the top wall down to the gap.
+	if gap_top > 20.0:
+		_spawn_spike("top", gap_top, spawn_x, 0.0)
+	# Bottom piece spans from the gap down to the bottom wall.
+	var bottom_height: float = screen_h - gap_bottom
+	if bottom_height > 20.0:
+		_spawn_spike("bottom", bottom_height, spawn_x, screen_h)
+
+
+func _spawn_spike(attachment: String, height: float, x: float, wall_y: float) -> void:
+	if not ResourceLoader.exists(CORAL_SPIKE_SCENE):
+		push_warning("ObstacleSpawner: CoralSpike scene missing — cannot build gate.")
+		return
+	var packed: PackedScene = load(CORAL_SPIKE_SCENE) as PackedScene
+	var spike: Node2D = packed.instantiate() as Node2D
+	spike.position = Vector2(x, wall_y)
+	get_parent().add_child(spike)
+	if spike.has_method("configure"):
+		spike.configure(attachment, height)
