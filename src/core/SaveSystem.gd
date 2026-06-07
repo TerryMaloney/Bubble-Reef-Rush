@@ -1,7 +1,6 @@
 # Autoload node that manages local family profiles and per-profile level progress persistence.
 extends Node
 
-class_name SaveSystem
 
 const PROFILE_INDEX_PATH: String = "user://profiles/index.cfg"
 const LEVELS_DIR_TEMPLATE: String = "user://profiles/%s/levels/"

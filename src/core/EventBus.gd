@@ -1,7 +1,6 @@
 # Cross-scene signal bus — only signals that cross scene boundaries are declared here.
 extends Node
 
-class_name EventBus
 
 signal player_hit
 signal collectible_taken(value: int)

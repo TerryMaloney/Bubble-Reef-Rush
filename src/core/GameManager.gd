@@ -1,7 +1,6 @@
 # Autoload scene state machine — owns scene transitions, retry logic, and level lifecycle.
 extends Node
 
-class_name GameManager
 
 enum State { MENU, LOADING, PLAYING, PAUSED, RESULTS, BUILD_MODE }
 
