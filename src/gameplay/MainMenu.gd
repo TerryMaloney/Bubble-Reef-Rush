@@ -8,4 +8,4 @@ func _ready() -> void:
 
 
 func _on_play_pressed() -> void:
-	EventBus.level_load_requested.emit("z1-l1")
+	GameManager.go_to_zone_select()

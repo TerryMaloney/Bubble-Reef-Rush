@@ -62,6 +62,17 @@ offset_right = 160.0
 offset_bottom = 120.0
 text = "PLAY AGAIN"
 
+[node name="LevelsButton" type="Button" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = 240.0
+offset_right = 160.0
+offset_bottom = 320.0
+text = "LEVELS"
+
 [node name="MenuButton" type="Button" parent="."]
 anchor_left = 0.5
 anchor_top = 0.5

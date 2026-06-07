@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.1",
+  "metadata": {
+    "id": "z1-l8",
+    "name": "Sunlit Finale",
+    "description": "The culminating challenge of the Sunlit Shallows zone.",
+    "zone": 1,
+    "level_index": 8,
+    "bpm": 115,
+    "bpm_variable": false,
+    "difficulty": 2,
+    "difficulty_tag": "Easy",
+    "author": "Bubble Reef Rush Team",
+    "created_at": "2026-06-07T00:00:00Z",
+    "is_official": true,
+    "total_beats": 16,
+    "tags": []
+  },
+  "music": {
+    "filename": "zone_1_sunlit_shallows.ogg",
+    "loop": false,
+    "loop_start_beat": 0,
+    "preview_start_beat": 0,
+    "preview_duration_beats": 8,
+    "beat_offset_ms": 0,
+    "volume_db": 0
+  },
+  "beat_map": [],
+  "collectibles": [],
+  "speed_zones": [],
+  "background": {
+    "asset_key": "bg_sunlit_shallows",
+    "parallax_enabled": true,
+    "color_override": null,
+    "shader_key": null,
+    "ambient_particle_key": "bubbles_light"
+  },
+  "unlock_requirements": {
+    "min_stars_zone_previous": null,
+    "required_level_id": null,
+    "required_level_stars": 1,
+    "requires_full_reef_iap": false,
+    "requires_creator_pass": false,
+    "min_total_stars": null
+  },
+  "par_score": {
+    "one_star": 0,
+    "two_star": 100,
+    "three_star": 250,
+    "max_possible": 400
+  }
+}

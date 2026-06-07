@@ -119,6 +119,21 @@ func update_level_result(profile_id: String, level_id: String, score: int, stars
 		save_progress(profile_id, data)
 
 
+func get_best_stars(profile_id: String, level_id: String) -> int:
+	var data: Dictionary = load_progress(profile_id)
+	return int(((data.get("levels", {}) as Dictionary).get(level_id, {}) as Dictionary).get("best_stars", 0))
+
+
+func is_level_cleared(profile_id: String, level_id: String) -> bool:
+	var data: Dictionary = load_progress(profile_id)
+	return (data.get("levels", {}) as Dictionary).has(level_id)
+
+
+func get_all_level_results(profile_id: String) -> Dictionary:
+	var data: Dictionary = load_progress(profile_id)
+	return data.get("levels", {}) as Dictionary
+
+
 func _write_json(path: String, payload: Dictionary) -> void:
 	var tmp_path: String = path + ".tmp"
 	var file: FileAccess = FileAccess.open(tmp_path, FileAccess.WRITE)

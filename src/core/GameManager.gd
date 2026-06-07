@@ -8,9 +8,12 @@ const MAIN_MENU_SCENE: String = "res://scenes/gameplay/MainMenu.tscn"
 const LEVEL_ROOT_SCENE: String = "res://scenes/gameplay/LevelRoot.tscn"
 const RESULTS_SCENE: String = "res://scenes/gameplay/ResultsScreen.tscn"
 const BUILD_MODE_SCENE: String = "res://scenes/buildmode/BuildModeRoot.tscn"
+const ZONE_SELECT_SCENE: String = "res://scenes/gameplay/ZoneSelect.tscn"
+const LEVEL_SELECT_SCENE: String = "res://scenes/gameplay/LevelSelect.tscn"
 
 var current_state: State = State.MENU
 var current_level_id: String = ""
+var current_zone_id: String = ""
 
 ## Consecutive deaths on the current level, carried across instant-retries so
 ## the DifficultyDirector can ease a level a player is stuck on. Reset when a
@@ -56,6 +59,17 @@ func finish_level(score: int, stars: int) -> void:
 	_active_profile = SaveSystem.get_active_profile_id()
 	SaveSystem.update_level_result(_active_profile, current_level_id, score, stars)
 	get_tree().change_scene_to_file(RESULTS_SCENE)
+
+
+func go_to_zone_select() -> void:
+	current_state = State.MENU
+	get_tree().change_scene_to_file(ZONE_SELECT_SCENE)
+
+
+func go_to_level_select(zone_id: String) -> void:
+	current_zone_id = zone_id
+	current_state = State.MENU
+	get_tree().change_scene_to_file(LEVEL_SELECT_SCENE)
 
 
 func open_build_mode() -> void:
