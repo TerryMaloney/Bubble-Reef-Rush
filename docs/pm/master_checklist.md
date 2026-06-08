@@ -6,7 +6,7 @@
 >
 > **Legend:** ✅ Done · 🔄 In progress · ⬜ Not started · 🔒 Blocked (dependency noted)
 >
-> Last updated: 2026-06-08 (physics calibration + SFX architecture + ResultsScreen polish)
+> Last updated: 2026-06-08 (Z1 full content — all 8 levels authored)
 
 ---
 
@@ -162,8 +162,8 @@ checklist, close it by ticking completed items and committing the updated file.
 
 ### 2.4 Level data scaffold
 
-- ✅ Stub `.brl` files for Z1-L2 through Z1-L8 — all 7 created (16 beats, empty
-  beat_map, par_score.one_star=0 so any completion earns ≥1 star)
+- ✅ Stub `.brl` files for Z1-L2 through Z1-L8 — all 7 created, then replaced with
+  full authored beat maps (see Content Pipeline Status below)
 - ✅ SaveSystem helpers: `get_best_stars()`, `is_level_cleared()`,
   `get_all_level_results()` — batch read avoids 8 separate file loads in LevelSelect
 
@@ -527,7 +527,7 @@ These apply to every coding session regardless of milestone:
 
 | Zone | BRL Files | Obstacles Ready | Art | Audio |
 |------|-----------|-----------------|-----|-------|
-| Z1 | 8/8 | 2/2 needed | ⬜ | ⬜ |
+| Z1 | 8/8 ✅ full charts | 2/2 needed | ⬜ | 🔄 WAV generated, needs editor import |
 | Z2 | 0/8 | 0/4 needed | ⬜ | ⬜ |
 | Z3 | 0/8 | 0/7 needed | ⬜ | ⬜ |
 | Z4 | 0/8 | 0/6 needed | ⬜ | 🔒 IAP |

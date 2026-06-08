@@ -2,32 +2,590 @@
   "schema_version": "1.1",
   "metadata": {
     "id": "z1-l8",
-    "name": "Sunlit Finale",
-    "description": "The culminating challenge of the Sunlit Shallows zone.",
+    "name": "Sunlit Summit",
+    "description": "Zone 1 boss. Eight-gate runs build to a ten-gate climax. Maximum pressure.",
     "zone": 1,
     "level_index": 8,
-    "bpm": 115,
+    "bpm": 100.0,
     "bpm_variable": false,
-    "difficulty": 2,
-    "difficulty_tag": "Easy",
+    "difficulty": 8,
+    "difficulty_tag": "Expert",
     "author": "Bubble Reef Rush Team",
-    "created_at": "2026-06-07T00:00:00Z",
+    "created_at": "2026-06-08T00:00:00Z",
     "is_official": true,
-    "total_beats": 16,
+    "total_beats": 56,
     "tags": []
   },
   "music": {
-    "filename": "zone_1_sunlit_shallows.ogg",
+    "filename": "zone_1_sunlit_shallows.wav",
     "loop": false,
     "loop_start_beat": 0,
-    "preview_start_beat": 0,
+    "preview_start_beat": 4,
     "preview_duration_beats": 8,
     "beat_offset_ms": 0,
     "volume_db": 0
   },
-  "beat_map": [],
-  "collectibles": [],
-  "speed_zones": [],
+  "beat_map": [
+    {
+      "beat_index": 4,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.5,
+      "parameters": {
+        "gap_y_normalized": 0.5,
+        "intensity": 0.48,
+        "section": "intro"
+      }
+    },
+    {
+      "beat_index": 5,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.22
+    },
+    {
+      "beat_index": 6,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.7,
+      "parameters": {
+        "gap_y_normalized": 0.7,
+        "intensity": 0.55,
+        "section": "intro"
+      }
+    },
+    {
+      "beat_index": 8,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.43,
+      "parameters": {
+        "gap_y_normalized": 0.43,
+        "intensity": 0.6,
+        "section": "intro"
+      }
+    },
+    {
+      "beat_index": 10,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.7,
+      "parameters": {
+        "gap_y_normalized": 0.7,
+        "intensity": 0.65,
+        "section": "intro"
+      }
+    },
+    {
+      "beat_index": 11,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.73
+    },
+    {
+      "beat_index": 12,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.55,
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "intensity": 0.69,
+        "section": "run1a"
+      }
+    },
+    {
+      "beat_index": 13,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.43,
+      "parameters": {
+        "gap_y_normalized": 0.43,
+        "intensity": 0.7,
+        "section": "run1b"
+      }
+    },
+    {
+      "beat_index": 14,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.57,
+      "parameters": {
+        "gap_y_normalized": 0.57,
+        "intensity": 0.72,
+        "section": "run1c"
+      }
+    },
+    {
+      "beat_index": 15,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.43,
+      "parameters": {
+        "gap_y_normalized": 0.43,
+        "intensity": 0.73,
+        "section": "run1d"
+      }
+    },
+    {
+      "beat_index": 16,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.57,
+      "parameters": {
+        "gap_y_normalized": 0.57,
+        "intensity": 0.74,
+        "section": "run1e"
+      }
+    },
+    {
+      "beat_index": 17,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.43,
+      "parameters": {
+        "gap_y_normalized": 0.43,
+        "intensity": 0.75,
+        "section": "run1f"
+      }
+    },
+    {
+      "beat_index": 18,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.57,
+      "parameters": {
+        "gap_y_normalized": 0.57,
+        "intensity": 0.76,
+        "section": "run1g"
+      }
+    },
+    {
+      "beat_index": 19,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.43,
+      "parameters": {
+        "gap_y_normalized": 0.43,
+        "intensity": 0.77,
+        "section": "run1h"
+      }
+    },
+    {
+      "beat_index": 20,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.22
+    },
+    {
+      "beat_index": 21,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.62,
+      "parameters": {
+        "gap_y_normalized": 0.62,
+        "intensity": 0.78,
+        "section": "run2a"
+      }
+    },
+    {
+      "beat_index": 22,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.48,
+      "parameters": {
+        "gap_y_normalized": 0.48,
+        "intensity": 0.79,
+        "section": "run2b"
+      }
+    },
+    {
+      "beat_index": 23,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.62,
+      "parameters": {
+        "gap_y_normalized": 0.62,
+        "intensity": 0.8,
+        "section": "run2c"
+      }
+    },
+    {
+      "beat_index": 24,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.48,
+      "parameters": {
+        "gap_y_normalized": 0.48,
+        "intensity": 0.81,
+        "section": "run2d"
+      }
+    },
+    {
+      "beat_index": 25,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.62,
+      "parameters": {
+        "gap_y_normalized": 0.62,
+        "intensity": 0.82,
+        "section": "run2e"
+      }
+    },
+    {
+      "beat_index": 26,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.48,
+      "parameters": {
+        "gap_y_normalized": 0.48,
+        "intensity": 0.82,
+        "section": "run2f"
+      }
+    },
+    {
+      "beat_index": 27,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.62,
+      "parameters": {
+        "gap_y_normalized": 0.62,
+        "intensity": 0.83,
+        "section": "run2g"
+      }
+    },
+    {
+      "beat_index": 28,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.48,
+      "parameters": {
+        "gap_y_normalized": 0.48,
+        "intensity": 0.84,
+        "section": "run2h"
+      }
+    },
+    {
+      "beat_index": 29,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.73
+    },
+    {
+      "beat_index": 30,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.55,
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "intensity": 0.04,
+        "section": "rest"
+      }
+    },
+    {
+      "beat_index": 31,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.22
+    },
+    {
+      "beat_index": 32,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.42,
+      "parameters": {
+        "gap_y_normalized": 0.42,
+        "intensity": 0.85,
+        "section": "run3a"
+      }
+    },
+    {
+      "beat_index": 33,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.57,
+      "parameters": {
+        "gap_y_normalized": 0.57,
+        "intensity": 0.85,
+        "section": "run3b"
+      }
+    },
+    {
+      "beat_index": 34,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.42,
+      "parameters": {
+        "gap_y_normalized": 0.42,
+        "intensity": 0.86,
+        "section": "run3c"
+      }
+    },
+    {
+      "beat_index": 35,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.57,
+      "parameters": {
+        "gap_y_normalized": 0.57,
+        "intensity": 0.86,
+        "section": "run3d"
+      }
+    },
+    {
+      "beat_index": 36,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.42,
+      "parameters": {
+        "gap_y_normalized": 0.42,
+        "intensity": 0.87,
+        "section": "run3e"
+      }
+    },
+    {
+      "beat_index": 37,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.57,
+      "parameters": {
+        "gap_y_normalized": 0.57,
+        "intensity": 0.87,
+        "section": "run3f"
+      }
+    },
+    {
+      "beat_index": 38,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.42,
+      "parameters": {
+        "gap_y_normalized": 0.42,
+        "intensity": 0.87,
+        "section": "run3g"
+      }
+    },
+    {
+      "beat_index": 39,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.57,
+      "parameters": {
+        "gap_y_normalized": 0.57,
+        "intensity": 0.88,
+        "section": "run3h"
+      }
+    },
+    {
+      "beat_index": 40,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.73
+    },
+    {
+      "beat_index": 41,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.4,
+      "parameters": {
+        "gap_y_normalized": 0.4,
+        "intensity": 0.87,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 42,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.55,
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "intensity": 0.87,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 43,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.4,
+      "parameters": {
+        "gap_y_normalized": 0.4,
+        "intensity": 0.87,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 44,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.55,
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "intensity": 0.87,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 45,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.4,
+      "parameters": {
+        "gap_y_normalized": 0.4,
+        "intensity": 0.87,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 46,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.55,
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "intensity": 0.88,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 47,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.4,
+      "parameters": {
+        "gap_y_normalized": 0.4,
+        "intensity": 0.88,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 48,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.55,
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "intensity": 0.88,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 49,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.4,
+      "parameters": {
+        "gap_y_normalized": 0.4,
+        "intensity": 0.88,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 50,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.55,
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "intensity": 0.88,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 51,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.22
+    },
+    {
+      "beat_index": 52,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.38,
+      "parameters": {
+        "gap_y_normalized": 0.38,
+        "intensity": 0.85,
+        "section": "finale"
+      }
+    },
+    {
+      "beat_index": 53,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.73
+    },
+    {
+      "beat_index": 54,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.65,
+      "parameters": {
+        "gap_y_normalized": 0.65,
+        "intensity": 0.8,
+        "section": "finale"
+      }
+    }
+  ],
+  "collectibles": [
+    {
+      "beat_index": 7,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.7,
+      "value": 10
+    },
+    {
+      "beat_index": 9,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.43,
+      "value": 10
+    },
+    {
+      "beat_index": 20,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.48,
+      "value": 15
+    },
+    {
+      "beat_index": 31,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.55,
+      "value": 15
+    },
+    {
+      "beat_index": 40,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.42,
+      "value": 20
+    },
+    {
+      "beat_index": 51,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.4,
+      "value": 25
+    },
+    {
+      "beat_index": 53,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.38,
+      "value": 25
+    }
+  ],
+  "speed_zones": [
+    {
+      "start_beat": 0,
+      "end_beat": 56,
+      "speed_multiplier": 1.0,
+      "transition_beats": 0,
+      "label": "Normal cruise throughout"
+    }
+  ],
   "background": {
     "asset_key": "bg_sunlit_shallows",
     "parallax_enabled": true,
@@ -37,16 +595,16 @@
   },
   "unlock_requirements": {
     "min_stars_zone_previous": null,
-    "required_level_id": null,
+    "required_level_id": "z1-l7",
     "required_level_stars": 1,
     "requires_full_reef_iap": false,
     "requires_creator_pass": false,
     "min_total_stars": null
   },
   "par_score": {
-    "one_star": 0,
-    "two_star": 100,
-    "three_star": 250,
-    "max_possible": 400
+    "one_star": 600,
+    "two_star": 2000,
+    "three_star": 3200,
+    "max_possible": 4200
   }
 }

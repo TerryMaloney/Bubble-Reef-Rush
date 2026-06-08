@@ -2,32 +2,255 @@
   "schema_version": "1.1",
   "metadata": {
     "id": "z1-l2",
-    "name": "Spike Garden",
-    "description": "Top and bottom spikes, alternating positions.",
+    "name": "Finding the Beat",
+    "description": "The reef opens up \u2014 gates every two beats. Keep the rhythm going.",
     "zone": 1,
     "level_index": 2,
-    "bpm": 100,
+    "bpm": 100.0,
     "bpm_variable": false,
-    "difficulty": 1,
+    "difficulty": 2,
     "difficulty_tag": "Beginner",
     "author": "Bubble Reef Rush Team",
-    "created_at": "2026-06-07T00:00:00Z",
+    "created_at": "2026-06-08T00:00:00Z",
     "is_official": true,
-    "total_beats": 16,
+    "total_beats": 32,
     "tags": []
   },
   "music": {
-    "filename": "zone_1_sunlit_shallows.ogg",
+    "filename": "zone_1_sunlit_shallows.wav",
     "loop": false,
     "loop_start_beat": 0,
-    "preview_start_beat": 0,
+    "preview_start_beat": 4,
     "preview_duration_beats": 8,
     "beat_offset_ms": 0,
     "volume_db": 0
   },
-  "beat_map": [],
-  "collectibles": [],
-  "speed_zones": [],
+  "beat_map": [
+    {
+      "beat_index": 4,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.5,
+      "parameters": {
+        "gap_y_normalized": 0.5,
+        "intensity": 0.3,
+        "section": "intro"
+      }
+    },
+    {
+      "beat_index": 5,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.2
+    },
+    {
+      "beat_index": 6,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.65,
+      "parameters": {
+        "gap_y_normalized": 0.65,
+        "intensity": 0.36,
+        "section": "learn-dive"
+      }
+    },
+    {
+      "beat_index": 8,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.4,
+      "parameters": {
+        "gap_y_normalized": 0.4,
+        "intensity": 0.4,
+        "section": "learn-rise"
+      }
+    },
+    {
+      "beat_index": 10,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.65,
+      "parameters": {
+        "gap_y_normalized": 0.65,
+        "intensity": 0.44,
+        "section": "build"
+      }
+    },
+    {
+      "beat_index": 11,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.75
+    },
+    {
+      "beat_index": 12,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.4,
+      "parameters": {
+        "gap_y_normalized": 0.4,
+        "intensity": 0.48,
+        "section": "build"
+      }
+    },
+    {
+      "beat_index": 14,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.68,
+      "parameters": {
+        "gap_y_normalized": 0.68,
+        "intensity": 0.52,
+        "section": "build"
+      }
+    },
+    {
+      "beat_index": 16,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.42,
+      "parameters": {
+        "gap_y_normalized": 0.42,
+        "intensity": 0.55,
+        "section": "build"
+      }
+    },
+    {
+      "beat_index": 18,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.68,
+      "parameters": {
+        "gap_y_normalized": 0.68,
+        "intensity": 0.58,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 19,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.2
+    },
+    {
+      "beat_index": 20,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.42,
+      "parameters": {
+        "gap_y_normalized": 0.42,
+        "intensity": 0.62,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 22,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.7,
+      "parameters": {
+        "gap_y_normalized": 0.7,
+        "intensity": 0.65,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 24,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.43,
+      "parameters": {
+        "gap_y_normalized": 0.43,
+        "intensity": 0.68,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 26,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.7,
+      "parameters": {
+        "gap_y_normalized": 0.7,
+        "intensity": 0.7,
+        "section": "finale"
+      }
+    },
+    {
+      "beat_index": 27,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.75
+    },
+    {
+      "beat_index": 28,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.43,
+      "parameters": {
+        "gap_y_normalized": 0.43,
+        "intensity": 0.72,
+        "section": "finale"
+      }
+    },
+    {
+      "beat_index": 30,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.65,
+      "parameters": {
+        "gap_y_normalized": 0.65,
+        "intensity": 0.72,
+        "section": "finale"
+      }
+    }
+  ],
+  "collectibles": [
+    {
+      "beat_index": 5,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.5,
+      "value": 10
+    },
+    {
+      "beat_index": 9,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.4,
+      "value": 10
+    },
+    {
+      "beat_index": 17,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.42,
+      "value": 10
+    },
+    {
+      "beat_index": 25,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.43,
+      "value": 15
+    },
+    {
+      "beat_index": 31,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.65,
+      "value": 20
+    }
+  ],
+  "speed_zones": [
+    {
+      "start_beat": 0,
+      "end_beat": 32,
+      "speed_multiplier": 1.0,
+      "transition_beats": 0,
+      "label": "Normal cruise throughout"
+    }
+  ],
   "background": {
     "asset_key": "bg_sunlit_shallows",
     "parallax_enabled": true,
@@ -37,16 +260,16 @@
   },
   "unlock_requirements": {
     "min_stars_zone_previous": null,
-    "required_level_id": null,
+    "required_level_id": "z1-l1",
     "required_level_stars": 1,
     "requires_full_reef_iap": false,
     "requires_creator_pass": false,
     "min_total_stars": null
   },
   "par_score": {
-    "one_star": 0,
-    "two_star": 100,
-    "three_star": 250,
-    "max_possible": 400
+    "one_star": 280,
+    "two_star": 800,
+    "three_star": 1200,
+    "max_possible": 1700
   }
 }
