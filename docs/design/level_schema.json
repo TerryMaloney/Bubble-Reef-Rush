@@ -118,9 +118,9 @@
         },
         "difficulty": {
           "type": "integer",
-          "description": "Difficulty rating 1\u20135. 1 = very easy (Z1 early), 5 = expert (Z6 late). Used for level select display and search filtering.",
+          "description": "Difficulty rating 1\u20138. 1\u20132 = Beginner (Z1 early), 3\u20134 = Intermediate (Z1 late/Z2), 5\u20136 = Advanced (Z3\u2013Z4), 7\u20138 = Expert (Z5\u2013Z6). Used for level select display and search filtering.",
           "minimum": 1,
-          "maximum": 5
+          "maximum": 8
         },
         "difficulty_tag": {
           "type": "string",
@@ -181,8 +181,8 @@
       "properties": {
         "filename": {
           "type": "string",
-          "description": "Path to the audio file relative to assets/audio/music/. Must be an .ogg file for Godot 4 streaming. Example: 'zone1/sunlit_shallows_01.ogg'",
-          "pattern": "^[a-z0-9_/\\-]+\\.ogg$"
+          "description": "Path to the audio file relative to assets/audio/music/. Use .ogg for production (Godot 4 streaming); .wav is accepted during development. Example: 'zone_1_sunlit_shallows.ogg'",
+          "pattern": "^[a-z0-9_/\\-]+\\.(ogg|wav)$"
         },
         "loop": {
           "type": "boolean",
@@ -337,12 +337,9 @@
               },
               "sway_speed": {
                 "type": "number",
-                "description": "kelp_curtain: sway cycle frequency in Hz.",
-                "enum": [
-                  0.5,
-                  1.0,
-                  1.5
-                ]
+                "description": "kelp_curtain: sway angular frequency in rad/s used directly in sin(time * sway_speed + phase). Range: 1.5 (intro, gentle) to 3.0 (hard, rapid). Matches KelpCurtain.gd _sway_speed.",
+                "minimum": 0.5,
+                "maximum": 4.0
               },
               "gap_beat_alignment": {
                 "type": "number",

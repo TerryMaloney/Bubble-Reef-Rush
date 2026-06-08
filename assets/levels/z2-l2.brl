@@ -1,0 +1,284 @@
+{
+  "schema_version": "1.1",
+  "metadata": {
+    "id": "z2-l2",
+    "name": "Kelp Veil",
+    "description": "The kelp blades sway to the beat. Find the gap, wait for the flash, slip through.",
+    "zone": 2,
+    "level_index": 2,
+    "bpm": 120,
+    "bpm_variable": false,
+    "difficulty": 4,
+    "difficulty_tag": "Intermediate",
+    "author": "Bubble Reef Rush Team",
+    "created_at": "2026-06-08T00:00:00Z",
+    "is_official": true,
+    "total_beats": 32,
+    "tags": ["kelp_curtain", "intro"]
+  },
+  "music": {
+    "filename": "zone_2_kelp_forest.wav",
+    "loop": false,
+    "loop_start_beat": 0,
+    "preview_start_beat": 4,
+    "preview_duration_beats": 8,
+    "beat_offset_ms": 0,
+    "volume_db": 0
+  },
+  "beat_map": [
+    {
+      "beat_index": 4,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.50,
+      "parameters": {
+        "gap_y_normalized": 0.50,
+        "intensity": 0.28,
+        "section": "intro"
+      }
+    },
+    {
+      "beat_index": 6,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.50,
+      "parameters": {
+        "gap_y_normalized": 0.50,
+        "intensity": 0.30,
+        "section": "intro"
+      }
+    },
+    {
+      "beat_index": 8,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.45,
+      "parameters": {
+        "gap_y_normalized": 0.45,
+        "intensity": 0.32,
+        "section": "intro"
+      }
+    },
+    {
+      "beat_index": 10,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "kelp_curtain",
+      "lane_position": 0.50,
+      "parameters": {
+        "gap_y_normalized": 0.50,
+        "sway_speed": 1.5,
+        "section": "curtain-intro"
+      }
+    },
+    {
+      "beat_index": 12,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.55,
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "intensity": 0.35,
+        "section": "build"
+      }
+    },
+    {
+      "beat_index": 14,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.40,
+      "parameters": {
+        "gap_y_normalized": 0.40,
+        "intensity": 0.38,
+        "section": "build"
+      }
+    },
+    {
+      "beat_index": 16,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.50,
+      "parameters": {
+        "gap_y_normalized": 0.50,
+        "intensity": 0.04,
+        "section": "rest"
+      }
+    },
+    {
+      "beat_index": 17,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.22
+    },
+    {
+      "beat_index": 18,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "kelp_curtain",
+      "lane_position": 0.55,
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "sway_speed": 1.5,
+        "section": "build-2"
+      }
+    },
+    {
+      "beat_index": 20,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.40,
+      "parameters": {
+        "gap_y_normalized": 0.40,
+        "intensity": 0.42,
+        "section": "build-2"
+      }
+    },
+    {
+      "beat_index": 21,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.75
+    },
+    {
+      "beat_index": 22,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.60,
+      "parameters": {
+        "gap_y_normalized": 0.60,
+        "intensity": 0.45,
+        "section": "build-2"
+      }
+    },
+    {
+      "beat_index": 24,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "kelp_curtain",
+      "lane_position": 0.45,
+      "parameters": {
+        "gap_y_normalized": 0.45,
+        "sway_speed": 2.0,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 26,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.55,
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "intensity": 0.48,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 28,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.40,
+      "parameters": {
+        "gap_y_normalized": 0.40,
+        "intensity": 0.51,
+        "section": "climax"
+      }
+    },
+    {
+      "beat_index": 30,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "pressure_wall",
+      "lane_position": 0.60,
+      "parameters": {
+        "gap_y_normalized": 0.60,
+        "intensity": 0.54,
+        "section": "finale"
+      }
+    }
+  ],
+  "collectibles": [
+    {
+      "beat_index": 5,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.50,
+      "value": 10
+    },
+    {
+      "beat_index": 9,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.45,
+      "value": 10
+    },
+    {
+      "beat_index": 11,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.50,
+      "value": 10
+    },
+    {
+      "beat_index": 15,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.40,
+      "value": 10
+    },
+    {
+      "beat_index": 19,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.55,
+      "value": 10
+    },
+    {
+      "beat_index": 23,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.60,
+      "value": 15
+    },
+    {
+      "beat_index": 25,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.45,
+      "value": 15
+    },
+    {
+      "beat_index": 31,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.60,
+      "value": 20
+    }
+  ],
+  "speed_zones": [
+    {
+      "start_beat": 0,
+      "end_beat": 32,
+      "speed_multiplier": 1.0,
+      "transition_beats": 0,
+      "label": "Normal cruise throughout"
+    }
+  ],
+  "background": {
+    "asset_key": "bg_kelp_forest",
+    "parallax_enabled": true,
+    "color_override": null,
+    "shader_key": null,
+    "ambient_particle_key": "bubbles_medium"
+  },
+  "unlock_requirements": {
+    "min_stars_zone_previous": null,
+    "required_level_id": "z2-l1",
+    "required_level_stars": 1,
+    "requires_full_reef_iap": false,
+    "requires_creator_pass": false,
+    "min_total_stars": null
+  },
+  "par_score": {
+    "one_star": 200,
+    "two_star": 600,
+    "three_star": 1050,
+    "max_possible": 1600
+  }
+}

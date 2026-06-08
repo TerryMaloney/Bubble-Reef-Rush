@@ -6,7 +6,7 @@
 >
 > **Legend:** ✅ Done · 🔄 In progress · ⬜ Not started · 🔒 Blocked (dependency noted)
 >
-> Last updated: 2026-06-08 (M3 Z2 obstacle spec + BubbleMine + KelpCurtain implemented)
+> Last updated: 2026-06-08 (Z2-L1 + Z2-L2 authored; movement checker; schema fixes)
 
 ---
 
@@ -560,8 +560,8 @@ At 120 BPM (0.5s/beat) with sway_speed=2.0 rad/s, the blade travels 1.0 rad per 
 One full sway cycle (π rad = half-period) takes 1.57 beats. Blades are NOT aligned to beat.
 This is intentional — players must watch the flash cue, not just the blade position.
 
-- ⬜ Z2-L1 `.brl` — intro BubbleMine only. 32 beats, BPM 120. 3 mines + 8 pressure_walls.
-- ⬜ Z2-L2 `.brl` — intro KelpCurtain only. 32 beats, BPM 120. 3 curtains + 8 pressure_walls.
+- ✅ Z2-L1 `.brl` — "Pressure Zone": 32 beats, BPM 120. 13 active gates + 4 mines (arm_radius 160/200). Mine placed in same lane as preceding gate gap — teaches gate-then-dodge pattern.
+- ✅ Z2-L2 `.brl` — "Kelp Veil": 32 beats, BPM 120. 9 gates + 3 curtains (sway_speed 1.5→2.0) + 2 jellyfish. Curtains introduced one at a time with 4-beat gap to absorb lesson.
 - ⬜ Z2-L3 `.brl` — combined: mines + curtains. 36 beats, BPM 120.
 - ⬜ Z2-L4 `.brl` — pace increase. 40 beats, BPM 120. Unlock gate: complete Z1-L4 (any star).
 - ⬜ Z2-L5 `.brl` — 44 beats, BPM 125. sway_speed 2.5 on 2 curtains.
@@ -569,7 +569,8 @@ This is intentional — players must watch the flash cue, not just the blade pos
 - ⬜ Z2-L7 `.brl` — 52 beats, BPM 130. sway_speed 3.0 on late curtains.
 - ⬜ Z2-L8 `.brl` — 56 beats, BPM 130. arm_radius 240 on boss mines. Unlock Z3.
 - ⬜ Validate all Z2 BRL files: `python3 tools/validate_brl.py assets/levels/z2-*.brl`
-- ⬜ Write Z2 movement-constraint checker extension (Z2 budget: 0.125 up / 0.188 down per beat)
+- ✅ `tools/check_movements.py` — movement constraint checker supports all BPMs; all 10 levels pass
+  (schema epsilon fix applied for exact-boundary 1-beat transitions in Z1-L7/L8)
 - ⬜ Kelp Tunnel zone mechanic (GDD): lane restriction 50% for 8–16 beats (deferred to L5+)
 - ⬜ Zone 2 background art `bg_kelp_forest_scroll.png`
 - ⬜ Zone 2 music track (BPM 120–130; WAV placeholder: regenerate gen_audio.py at 120 BPM)
