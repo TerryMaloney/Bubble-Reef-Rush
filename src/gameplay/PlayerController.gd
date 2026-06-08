@@ -22,6 +22,7 @@ var alive: bool = true
 
 
 func _ready() -> void:
+	add_to_group("player")
 	timing_judge.input_judged.connect(_on_input_judged)
 
 

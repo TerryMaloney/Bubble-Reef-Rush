@@ -7,6 +7,8 @@ const SPAWN_LOOKAHEAD_BEATS: float = 4.0
 const OBSTACLE_SCENE_MAP: Dictionary = {
 	"coral_spike": "res://scenes/obstacles/CoralSpike.tscn",
 	"jellyfish_drift": "res://scenes/obstacles/JellyfishDrift.tscn",
+	"kelp_curtain": "res://scenes/obstacles/KelpCurtain.tscn",
+	"bubble_mine": "res://scenes/obstacles/BubbleMine.tscn",
 }
 const CORAL_SPIKE_SCENE: String = "res://scenes/obstacles/CoralSpike.tscn"
 

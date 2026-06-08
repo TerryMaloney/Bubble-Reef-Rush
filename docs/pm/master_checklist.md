@@ -6,7 +6,7 @@
 >
 > **Legend:** ✅ Done · 🔄 In progress · ⬜ Not started · 🔒 Blocked (dependency noted)
 >
-> Last updated: 2026-06-08 (Z1 full content — all 8 levels authored)
+> Last updated: 2026-06-08 (M3 Z2 obstacle spec + BubbleMine + KelpCurtain implemented)
 
 ---
 
@@ -190,25 +190,93 @@ checklist, close it by ticking completed items and committing the updated file.
 
 ### 3.3 KelpCurtain (Z2)
 
-- ⬜ `scenes/obstacles/KelpCurtain.tscn`
-- ⬜ `src/gameplay/obstacles/KelpCurtain.gd` — swaying blades, gap opens on beat
-- ⬜ Beat-phase-aligned gap timing (gap aligns to `gap_beat_alignment` parameter)
-- ⬜ Collision shape: each blade 24×180px; gap 120px wide
-- ⬜ Add to ObstacleSpawner type routing
+**Design:** Full-screen vertical barrier of swaying kelp blades with a navigable 120 px gap.
+The gap center is set by `lane_position` in the BRL (overridable via `parameters.gap_y_normalized`).
+Blades sway with staggered phases creating a wave effect; all blades flash teal on each beat as
+a timing cue. **Fixed-challenge obstacle — does NOT consult DifficultyDirector** (gap is always
+120 px; difficulty comes from Y-position accuracy, same as a pressure_wall but without DDA).
+
+**Geometry (verified):**
+- Blade: 24 × 180 px. Gap: 120 px (GAP_HALF = 60 px each side). MAX_SWAY = 0.2 rad.
+- At max sway, first blade extends (90 px × sin 0.2 rad) ≈ 18 px into gap from each side.
+- Effective gap at max sway: 120 − 18 − 18 = **84 px** vs player width ~40 px → 44 px clearance. ✓
+- Phases staggered by π/2 per blade; `sway_speed` default 2.0 rad/s (BRL-configurable).
+- Blades auto-fill screen height from code (count determined by viewport, not BRL param).
+
+**BRL entry format:**
+```json
+{
+  "obstacle_type": "kelp_curtain",
+  "beat_index": 8,
+  "beat_subdivision": "quarter",
+  "lane_position": 0.5,
+  "parameters": { "gap_y_normalized": 0.5, "sway_speed": 2.0 }
+}
+```
+`lane_position` = gap center Y normalized. `gap_y_normalized` in parameters overrides if present.
+Recommended range for Z2: 0.3 – 0.7 (extremes leave too little room above or below).
+
+**Z2 sway_speed scale:** 1.5 = intro (L1–L2), 2.0 = mid (L3–L5), 2.5–3.0 = late (L6–L8).
+Note: At sway_speed 3.0 rad/s the blade crosses the gap edge more than once per beat —
+requires precise timing, appropriate only for L7–L8.
+
+**Implementation pattern:**
+- Root `Node2D` (not Area2D); all children created in `setup()`.
+- Each blade: `Area2D` child with `RectangleShape2D(24 × 180)` + `Polygon2D`.
+- `position.y` reset to 0 in `setup()`; all blade `local_y` in screen-coordinate space.
+- Beat flash: `BeatConductor.beat_fired.connect(_on_beat_fired)` → `_beat_flash = 1.0` → decays 5/s.
+- `body_entered` per blade → `body.on_hit()` (same pattern as CoralSpike/JellyfishDrift).
+
+- ✅ `src/gameplay/obstacles/KelpCurtain.gd` — complete
+- ✅ `scenes/obstacles/KelpCurtain.tscn` — root Node2D only (blades built in code)
+- ✅ Added to `ObstacleSpawner.OBSTACLE_SCENE_MAP` as `"kelp_curtain"`
+- ⬜ Playtest in Z2-L1: verify gap is threadable at default sway (should be — 44 px clearance)
+- ⬜ Authored in Z2 BRL files (Milestone 10.1)
 
 ### 3.4 BubbleMine (Z2)
 
-- ⬜ `scenes/obstacles/BubbleMine.tscn`
-- ⬜ `src/gameplay/obstacles/BubbleMine.gd` — warning radius 160px, detonates on
-  player overlap, self-destructs off-screen
-- ⬜ State machine: IDLE → WARNING → EXPLODE → FREE
-- ⬜ Add to ObstacleSpawner type routing
+**Design:** A stationary (scrolling) mine that provides a proximity warning before detonating
+on player contact. Unlike pressure_wall/KelpCurtain, the BubbleMine occupies only one point in
+the lane — the challenge is navigating around it, not through a gap.
+
+**State machine:**
+- `IDLE → WARNING` when player distance ≤ `arm_radius` (default 160 px). Mine pulses orange.
+- `WARNING → EXPLODE` on `body_entered` (Godot Area2D physics; collision radius = 56 px = player height).
+  Calls `body.on_hit()`, disables CollisionShape2D, queues free after 0.2 s.
+- Scrolls at 408 px/s. `queue_free()` when `position.x < −200` (skipped if already EXPLODE).
+- Player reference: `get_tree().get_first_node_in_group("player")` cached in `_ready()`.
+  `PlayerController._ready()` must call `add_to_group("player")`.
+
+**BRL entry format:**
+```json
+{
+  "obstacle_type": "bubble_mine",
+  "beat_index": 12,
+  "beat_subdivision": "quarter",
+  "lane_position": 0.35,
+  "parameters": { "arm_radius": 160 }
+}
+```
+`lane_position` = mine Y (normalized). `arm_radius` options: 160 (intro) / 200 (mid) / 240 (late Z2).
+
+**Visual placeholder:** Blue octagon (r = 56 px), `Color(0.2, 0.5, 0.9)` idle;
+pulses orange `Color(1.0, ~0.8, ~0.2)` in WARNING; flashes bright orange on EXPLODE.
+
+- ✅ `src/gameplay/obstacles/BubbleMine.gd` — complete (IDLE/WARNING/EXPLODE state machine)
+- ✅ `scenes/obstacles/BubbleMine.tscn` — Area2D with CircleShape2D(r = 56) + Polygon2D
+- ✅ `PlayerController._ready()` — added `add_to_group("player")` for mine distance check
+- ✅ Added to `ObstacleSpawner.OBSTACLE_SCENE_MAP` as `"bubble_mine"`
+- ⬜ Playtest in Z2-L1: confirm WARNING triggers before collision at arm_radius 160 px
+- ⬜ Authored in Z2 BRL files (Milestone 10.1)
 
 ### 3.5 ObstacleSpawner routing table
 
-- ⬜ Add `obstacle_type` dispatch for: `jellyfish_drift`, `kelp_curtain`,
-  `bubble_mine` (coral_spike and pressure_wall already handled)
-- ⬜ Unknown obstacle_type logs a warning and skips (already done, verify)
+- ✅ `pressure_wall` → `_spawn_gate()` with DDA (existing)
+- ✅ `jellyfish_drift` → `OBSTACLE_SCENE_MAP` (existing)
+- ✅ `kelp_curtain` → `OBSTACLE_SCENE_MAP` (added M3.3)
+- ✅ `bubble_mine` → `OBSTACLE_SCENE_MAP` (added M3.4)
+- ✅ Unknown `obstacle_type` → `push_warning` + skip (existing)
+- ⬜ `coral_spike` standalone (non-gate) routing — currently only spawned as gate pair (M5 art pass)
 
 ---
 
@@ -313,6 +381,8 @@ checklist, close it by ticking completed items and committing the updated file.
 - ⬜ Auto-check: no beat position has collision filling entire lane height
 - ⬜ Minimum 16 beats of content before save allowed
 - ⬜ Must have been played through once before publish (play-through flag)
+- ⬜ Z2 obstacle validator extension: KelpCurtain gap_y_normalized 0.30–0.70 enforced
+- ⬜ BubbleMine lane_position 0.20–0.80 enforced (mines at screen edges = unfair)
 
 ### 6.5 Difficulty auto-tagger
 
@@ -451,13 +521,58 @@ checklist, close it by ticking completed items and committing the updated file.
 > After export pipeline works, build content for Z2 and Z3. Z4–Z6 are behind the
 > IAP gate and can be deferred further. Each zone = 8 levels + zone mechanics.
 
+### Why zone variety matters (replayability architecture)
+
+The game must NOT feel like "just harder Z1 with 8 more levels." Each zone introduces a
+genuinely new mechanical vocabulary so the player is always learning something new, not just
+surviving the same challenge faster. This is the primary replayability driver for the 48-level
+campaign. The secondary drivers are Build Mode (M6/M12) and daily/featured challenges (M12).
+
+Zone variety summary:
+| Zone | Core mechanic | New obstacle | Old obstacles still present |
+|------|--------------|--------------|----------------------------|
+| Z1 | Gate threading | pressure_wall | jellyfish_drift |
+| Z2 | Proximity avoidance + curtain threading | BubbleMine, KelpCurtain | pressure_wall, jellyfish_drift |
+| Z3 | Current management + chain avoidance | CurrentJet, AnchorChain | BubbleMine, KelpCurtain |
+| Z4 | Eel timing | EelSnap | all prior |
+| Z5 | Variable BPM | VortexPulse | all prior |
+| Z6 | Everything + density | creator-authored | all prior |
+
+**Z1 levels (L1–L8): NO CHANGES NEEDED.** Verified 2026-06-08. Z1 only uses `pressure_wall`
+and `jellyfish_drift`; no conflict with Z2 obstacle additions. All gate positions verified by
+physics constraint checker (≤0.30 norm up / ≤0.45 norm down per 2-beat window).
+
 ### 10.1 Zone 2 — Kelp Forest Canyon
 
-- ⬜ Z2-L1 through Z2-L8 `.brl` files authored
-- ⬜ KelpCurtain and BubbleMine obstacles complete (see Milestone 3)
-- ⬜ Kelp Tunnel zone mechanic (lane restriction 50% for 8–16 beats)
+**Zone-level design rules:**
+- BPM: 120 (L1–L4) rising to 130 (L5–L8). Use `bpm_variable: false`; same WAV covers the zone.
+- Intro levels (L1–L2): introduce BubbleMine and KelpCurtain separately (not together).
+- Mid levels (L3–L5): combine obstacles; use pressure_wall + BubbleMine in same measure.
+- Late levels (L6–L8): tighter gates, higher sway_speed (2.5–3.0), larger arm_radius (200–240).
+- Always include a rest gate or open-water beat every 8 beats (intensity ≤ 0.08 for pressure_wall).
+- KelpCurtain `gap_y_normalized` range: 0.30–0.70 (outside this the blades don't fill screen edge).
+- BubbleMine lane_position: 0.20–0.80 (mines near screen edges are nearly unavoidable — unfair).
+- Movement budget at 120 BPM (0.5s/beat): max up = 480×0.5/1920 = 0.125 norm; max down = 0.188 norm.
+  **Recalculate gate transitions for Z2 — tighter budget than Z1's 0.30/0.45 at 100 BPM.**
+
+**Obstacle sway_speed ↔ BPM alignment note:**
+At 120 BPM (0.5s/beat) with sway_speed=2.0 rad/s, the blade travels 1.0 rad per beat.
+One full sway cycle (π rad = half-period) takes 1.57 beats. Blades are NOT aligned to beat.
+This is intentional — players must watch the flash cue, not just the blade position.
+
+- ⬜ Z2-L1 `.brl` — intro BubbleMine only. 32 beats, BPM 120. 3 mines + 8 pressure_walls.
+- ⬜ Z2-L2 `.brl` — intro KelpCurtain only. 32 beats, BPM 120. 3 curtains + 8 pressure_walls.
+- ⬜ Z2-L3 `.brl` — combined: mines + curtains. 36 beats, BPM 120.
+- ⬜ Z2-L4 `.brl` — pace increase. 40 beats, BPM 120. Unlock gate: complete Z1-L4 (any star).
+- ⬜ Z2-L5 `.brl` — 44 beats, BPM 125. sway_speed 2.5 on 2 curtains.
+- ⬜ Z2-L6 `.brl` — 48 beats, BPM 125. arm_radius 200 on 3 mines.
+- ⬜ Z2-L7 `.brl` — 52 beats, BPM 130. sway_speed 3.0 on late curtains.
+- ⬜ Z2-L8 `.brl` — 56 beats, BPM 130. arm_radius 240 on boss mines. Unlock Z3.
+- ⬜ Validate all Z2 BRL files: `python3 tools/validate_brl.py assets/levels/z2-*.brl`
+- ⬜ Write Z2 movement-constraint checker extension (Z2 budget: 0.125 up / 0.188 down per beat)
+- ⬜ Kelp Tunnel zone mechanic (GDD): lane restriction 50% for 8–16 beats (deferred to L5+)
 - ⬜ Zone 2 background art `bg_kelp_forest_scroll.png`
-- ⬜ Zone 2 music track (BPM 120–130)
+- ⬜ Zone 2 music track (BPM 120–130; WAV placeholder: regenerate gen_audio.py at 120 BPM)
 
 ### 10.2 Zone 3 — Shipwreck Alley
 
@@ -486,15 +601,41 @@ checklist, close it by ticking completed items and committing the updated file.
 
 ---
 
-## Milestone 12 — Creator Pass + Community Gallery
+## Milestone 12 — Creator Pass + Community Gallery + Daily Challenges
 
-> Behind the $1.99 IAP. Requires content moderation queue (can be manual at
-> launch). Deferred until core game is launched and stable.
+> Behind the $1.99 IAP (community gallery + creator earnings). Daily challenge system
+> is free-to-play (drives retention without requiring IAP). Requires content moderation
+> queue (can be manual at launch). Deferred until core game is launched and stable.
 
-- ⬜ Publishing flow: level → 24h review queue → public gallery
+### Replayability loops (maps to endless play)
+
+Three loops keep the game alive after the 48-level campaign is cleared:
+
+1. **Campaign replay (3-star hunting):** Par scores are designed so 3-star requires
+   near-perfect play; most players clear on 1–2 stars. Returns to existing content.
+   Implementation: already covered by star rating system (M1.2, M1.4). ✅
+
+2. **Daily Challenge (free):** One hand-picked level per day (rotated from approved
+   community pool, or Bubble Reef Rush Team picks from existing levels). Player sees
+   "Today's Challenge" on main menu. Completion logged — no replays counted.
+   No new content engine needed — just a server-side JSON file: `daily.json` with
+   `{ "date": "2026-06-08", "level_id": "z2-l4" }`.
+
+3. **Build Mode + Community Gallery (Creator Pass):** Infinite community-generated
+   content. Players create, publish, and play others' levels. This is the true
+   "endless" loop — functions exactly like Geometry Dash user levels.
+
+- ⬜ `daily.json` endpoint (can be a static GitHub Pages file initially — no backend needed)
+  - Format: `{ "date": "YYYY-MM-DD", "level_id": "z1-l5", "title": "Staff Pick" }`
+  - GameManager checks on app launch; caches so offline play still shows yesterday's challenge
+  - "Daily Challenge" button on MainMenu → `GameManager.start_level(daily_level_id)` with daily flag
+  - Daily completion saved in SaveSystem: `set_flag("daily_2026-06-08", true)` → show ✓ badge
+- ⬜ MainMenu: add "Daily Challenge" button (below PLAY, above BUILD) — stub first
+- ⬜ Publishing flow: level → 24h review queue → public gallery (Creator Pass)
 - ⬜ Community gallery browse screen (filter by zone style, difficulty, newest)
 - ⬜ Creator earnings: 10 coins per unique completion (capped 200/month/level)
 - ⬜ Moderation: admin panel or email queue for community content review
+- ⬜ Featured level: one community level per week highlighted in gallery + main menu banner
 
 ---
 
