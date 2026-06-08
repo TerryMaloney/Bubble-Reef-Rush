@@ -17,9 +17,9 @@ extends Node
 
 ## Result of a single timing judgement.
 enum TimingResult {
-	PERFECT,  ## Input within ±50 ms of the beat centre.
-	GOOD,     ## Input within ±101–150 ms of the beat centre.
-	MISS      ## Input more than ±150 ms from the nearest beat, or missed entirely.
+	PERFECT,  ## Input within ±80 ms of the beat centre.
+	GOOD,     ## Input within ±81–160 ms of the beat centre.
+	MISS      ## Input more than ±160 ms from the nearest beat, or missed entirely.
 }
 
 # ---------------------------------------------------------------------------
@@ -41,20 +41,12 @@ signal combo_updated(count: int)
 # ---------------------------------------------------------------------------
 
 ## Half-width of the PERFECT window in milliseconds.
-const PERFECT_HALF_MS: float = 50.0
+## Research baseline: osu! OD0 = ±78ms. Widened to ±80ms for kids 6-12.
+const PERFECT_HALF_MS: float = 80.0
 
-## Inner boundary of the GOOD window (gap between PERFECT outer edge and GOOD start).
-## GDD states ±101–150 ms, so GOOD begins at 101 ms, not at 51 ms. The range
-## 51–100 ms is intentionally ungated — any input there is still judged PERFECT
-## because the window is symmetric ±50 ms and GOOD starts at 101 ms.
-## Reading the GDD carefully: PERFECT = ±50, GOOD = ±101-150.
-## This means 51–100 ms gap is treated as GOOD per practical implementation
-## (GDD values are exclusive lower bounds for the GOOD window; see note below).
-##
-## NOTE: The GDD lists GOOD as "±101–150 ms". In playtesting context this is
-## shorthand for "more than 50 ms but no more than 150 ms from the beat."
-## We treat it as: |offset| <= 150 ms AND |offset| > 50 ms = GOOD.
-const GOOD_OUTER_HALF_MS: float = 150.0
+## Outer edge of the GOOD window. 2× PERFECT = ±160ms (osu! OD0 territory).
+## Any input outside this is a MISS.
+const GOOD_OUTER_HALF_MS: float = 160.0
 
 ## High-BPM threshold above which timing windows compress slightly.
 ## At 180 BPM the GOOD window shrinks by up to 20 %.

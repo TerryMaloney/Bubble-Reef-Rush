@@ -6,7 +6,53 @@
 >
 > **Legend:** ✅ Done · 🔄 In progress · ⬜ Not started · 🔒 Blocked (dependency noted)
 >
-> Last updated: 2026-06-07 (M2 complete)
+> Last updated: 2026-06-08 (physics + timing calibration applied)
+
+---
+
+## Technical Design Standards (research-derived, do not change without re-deriving)
+
+These constants are grounded in published rhythm-game research and must not be
+eyeballed. Re-derive from source formulas if any underlying value changes.
+
+### Player physics (PlayerController.gd)
+
+| Parameter | Value | Formula / Source |
+|-----------|-------|-----------------|
+| `float_force` | 480 px/s² | Tuned feel — net buoyancy at rest |
+| `drag` | 0.983 | `1 - (float_force/fps) / terminal_float` = 1-(480/60)/480 |
+| `max_float_speed` | 480 px/s | Terminal float velocity (drag formula target) |
+| `dive_force` | 1220 px/s² | Gives net terminal dive ~720 px/s vs float 480 |
+| `max_dive_speed` | 720 px/s | Terminal dive velocity |
+| `dive_impulse` | 480 px/s | SET (not +=); equals float terminal → instant reversal |
+| Player height | 56 px | CapsuleShape2D radius=20, height=56 in Player.tscn |
+
+**Movement budget per 2-beat window at 100 BPM (1.2 s):**
+- Max upward travel: 480 × 1.2 = 576 px = 0.30 normalized on 1920px screen
+- Max downward travel: 720 × 1.2 = 864 px = 0.45 normalized
+
+All gate-to-gate transitions in authored charts must stay within these limits.
+
+### Gate geometry (ObstacleSpawner.gd)
+
+| Constant | Value | Source |
+|----------|-------|--------|
+| `GAP_MAX_PX` | 280 px | 5× player height (Easy difficulty, Geometry Dash research) |
+| `GAP_MIN_PX` | 200 px | 3.6× player height (Normal/hard — Z1 ceiling) |
+| `SKIP_INTENSITY` | 0.08 | Rest-beat threshold (open water, no gate spawned) |
+
+### Timing windows (TimingJudge.gd)
+
+| Window | Value | Source |
+|--------|-------|--------|
+| `PERFECT_HALF_MS` | ±80 ms | osu! OD0 = ±78ms; widened 2ms for kids 6–12 |
+| `GOOD_OUTER_HALF_MS` | ±160 ms | 2× PERFECT (standard rhythm-game ratio) |
+
+### Spawn lookahead (ObstacleSpawner.gd, CollectibleSpawner.gd)
+
+`SPAWN_LOOKAHEAD_BEATS = 4.0` → 2400ms at 100 BPM = osu! AR3 equivalent.
+Player at x=200, spawn at x=viewport+100 (≈1180). At 408 px/s scroll = 2.4s = 4
+beats. **Perfectly calibrated — do not change.**
 
 ---
 

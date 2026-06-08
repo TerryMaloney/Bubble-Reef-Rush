@@ -4,14 +4,15 @@ extends CharacterBody2D
 class_name PlayerController
 
 @export var float_force: float = 480.0
-@export var dive_force: float = 900.0
-@export var max_float_speed: float = 320.0
-@export var max_dive_speed: float = 640.0
-@export var drag: float = 0.92
+@export var dive_force: float = 1220.0
+@export var max_float_speed: float = 480.0
+@export var max_dive_speed: float = 720.0
+# drag = 1 - (float_force/fps) / terminal_float_speed = 1 - (480/60)/480 = 0.983
+@export var drag: float = 0.983
 
-## Instant downward velocity kick applied the moment a tap begins, so quick
-## taps feel responsive instead of mushy. Hold-to-dive still accelerates on top.
-@export var dive_impulse: float = 280.0
+## On tap, velocity is SET (not added) to this value — guarantees immediate
+## direction reversal with identical feel every time (Flappy Bird-style).
+@export var dive_impulse: float = 480.0
 
 var diving: bool = false
 var alive: bool = true
@@ -29,8 +30,7 @@ func _input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed("swim_dive"):
 		diving = true
-		# Immediate impulse so the tap is felt right away (clamped next frame).
-		velocity.y += dive_impulse
+		velocity.y = dive_impulse
 		timing_judge.judge_input(BeatConductor.get_current_beat_time_ms())
 	elif event.is_action_released("swim_dive"):
 		diving = false
