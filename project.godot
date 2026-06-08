@@ -15,6 +15,7 @@ GameManager="*res://src/core/GameManager.gd"
 EventBus="*res://src/core/EventBus.gd"
 SaveSystem="*res://src/core/SaveSystem.gd"
 BeatConductor="*res://src/rhythm/BeatConductor.gd"
+SFXManager="*res://src/audio/SFXManager.gd"
 
 [display]
 

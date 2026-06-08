@@ -23,6 +23,8 @@ var consecutive_deaths: int = 0
 ## Stored at level completion so ResultsScreen can read them without a signal.
 var last_score: int = 0
 var last_stars: int = 0
+## Personal best score from BEFORE this run, so ResultsScreen can show "New Best!".
+var last_prev_best_score: int = 0
 
 var _active_profile: String = ""
 
@@ -57,6 +59,9 @@ func finish_level(score: int, stars: int) -> void:
 	last_stars = stars
 	current_state = State.RESULTS
 	_active_profile = SaveSystem.get_active_profile_id()
+	# Snapshot the previous best before overwriting so ResultsScreen can show "New Best!".
+	var prev_results: Dictionary = SaveSystem.get_all_level_results(_active_profile)
+	last_prev_best_score = int((prev_results.get(current_level_id, {}) as Dictionary).get("best_score", 0))
 	SaveSystem.update_level_result(_active_profile, current_level_id, score, stars)
 	get_tree().change_scene_to_file(RESULTS_SCENE)
 

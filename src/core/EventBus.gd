@@ -11,3 +11,6 @@ signal buildmode_level_saved(path: String)
 signal active_profile_changed(profile_id: String)
 signal level_load_requested(level_id_or_path: String)
 signal retry_requested
+## Emitted by HUDController after every timing judgement so SFXManager can
+## play the appropriate sound without coupling to TimingJudge directly.
+signal beat_judged(result: int)

@@ -72,6 +72,7 @@ func _on_input_judged(result: TimingJudge.TimingResult, _offset_ms: float, _beat
 		TimingJudge.TimingResult.MISS:
 			pass  # no text — with no audio cue, a MISS label is just noise
 
+	EventBus.beat_judged.emit(int(result))
 	_update_score_label()
 
 
