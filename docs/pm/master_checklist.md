@@ -6,7 +6,7 @@
 >
 > **Legend:** ✅ Done · 🔄 In progress · ⬜ Not started · 🔒 Blocked (dependency noted)
 >
-> Last updated: 2026-06-08 (Z2-L1 + Z2-L2 authored; movement checker; schema fixes)
+> Last updated: 2026-06-08 (Z2-L1–L8 fully authored; KelpCurtain+BubbleMine obstacle tests; ObstacleSpawner routing fix)
 
 ---
 
@@ -230,8 +230,9 @@ requires precise timing, appropriate only for L7–L8.
 - ✅ `src/gameplay/obstacles/KelpCurtain.gd` — complete
 - ✅ `scenes/obstacles/KelpCurtain.tscn` — root Node2D only (blades built in code)
 - ✅ Added to `ObstacleSpawner.OBSTACLE_SCENE_MAP` as `"kelp_curtain"`
+- ✅ Headless test: `tests/integration/obstacle_test.gd` — blade hit, gap no-hit, WARNING state, contact detonation
 - ⬜ Playtest in Z2-L1: verify gap is threadable at default sway (should be — 44 px clearance)
-- ⬜ Authored in Z2 BRL files (Milestone 10.1)
+- ✅ Authored in Z2 BRL files (Milestone 10.1) — Z2-L1 through Z2-L8
 
 ### 3.4 BubbleMine (Z2)
 
@@ -266,8 +267,9 @@ pulses orange `Color(1.0, ~0.8, ~0.2)` in WARNING; flashes bright orange on EXPL
 - ✅ `scenes/obstacles/BubbleMine.tscn` — Area2D with CircleShape2D(r = 56) + Polygon2D
 - ✅ `PlayerController._ready()` — added `add_to_group("player")` for mine distance check
 - ✅ Added to `ObstacleSpawner.OBSTACLE_SCENE_MAP` as `"bubble_mine"`
+- ✅ Headless test: WARNING state + contact detonation covered in `tests/integration/obstacle_test.gd`
 - ⬜ Playtest in Z2-L1: confirm WARNING triggers before collision at arm_radius 160 px
-- ⬜ Authored in Z2 BRL files (Milestone 10.1)
+- ✅ Authored in Z2 BRL files (Milestone 10.1) — Z2-L1 through Z2-L8
 
 ### 3.5 ObstacleSpawner routing table
 
@@ -545,15 +547,19 @@ physics constraint checker (≤0.30 norm up / ≤0.45 norm down per 2-beat windo
 ### 10.1 Zone 2 — Kelp Forest Canyon
 
 **Zone-level design rules:**
-- BPM: 120 (L1–L4) rising to 130 (L5–L8). Use `bpm_variable: false`; same WAV covers the zone.
+- BPM: 120 (L1–L4), 125 (L5–L6), 130 (L7–L8). Use `bpm_variable: false`; same WAV covers the zone.
 - Intro levels (L1–L2): introduce BubbleMine and KelpCurtain separately (not together).
 - Mid levels (L3–L5): combine obstacles; use pressure_wall + BubbleMine in same measure.
 - Late levels (L6–L8): tighter gates, higher sway_speed (2.5–3.0), larger arm_radius (200–240).
 - Always include a rest gate or open-water beat every 8 beats (intensity ≤ 0.08 for pressure_wall).
 - KelpCurtain `gap_y_normalized` range: 0.30–0.70 (outside this the blades don't fill screen edge).
 - BubbleMine lane_position: 0.20–0.80 (mines near screen edges are nearly unavoidable — unfair).
-- Movement budget at 120 BPM (0.5s/beat): max up = 480×0.5/1920 = 0.125 norm; max down = 0.188 norm.
-  **Recalculate gate transitions for Z2 — tighter budget than Z1's 0.30/0.45 at 100 BPM.**
+- Movement budget per **2-beat window** (what `check_movements.py` enforces):
+  - 120 BPM (1.0 s/window): max up = 480×1.0/1920 = **0.250** norm; max down = 720×1.0/1920 = **0.375** norm
+  - 125 BPM (0.960 s/window): max up = **0.240** norm; max down = **0.360** norm
+  - 130 BPM (0.923 s/window): max up = **0.231** norm; max down = **0.346** norm
+  - 1-beat transitions at 130 BPM: max up = **0.115** / max down = **0.173** (used in L7–L8 finale)
+  All values are tighter than Z1's 0.300/0.450 at 100 BPM. Stay within these or `check_movements.py` will flag a FAIL.
 
 **Obstacle sway_speed ↔ BPM alignment note:**
 At 120 BPM (0.5s/beat) with sway_speed=2.0 rad/s, the blade travels 1.0 rad per beat.
@@ -667,14 +673,14 @@ These apply to every coding session regardless of milestone:
 
 ## Content Pipeline Status
 
-| Zone | BRL Files | Obstacles Ready | Art | Audio |
-|------|-----------|-----------------|-----|-------|
-| Z1 | 8/8 ✅ full charts | 2/2 needed | ⬜ | 🔄 WAV generated, needs editor import |
-| Z2 | 0/8 | 0/4 needed | ⬜ | ⬜ |
-| Z3 | 0/8 | 0/7 needed | ⬜ | ⬜ |
-| Z4 | 0/8 | 0/6 needed | ⬜ | 🔒 IAP |
-| Z5 | 0/8 | 0/7 needed | ⬜ | 🔒 IAP |
-| Z6 | 0/8 | 0/8 needed | ⬜ | 🔒 earned |
+| Zone | BRL Files | Obstacles Coded | Playtested | Art | Audio |
+|------|-----------|-----------------|------------|-----|-------|
+| Z1 | 8/8 ✅ | 2/2 ✅ (pressure_wall, jellyfish_drift) | ⬜ gate-nav unverified | ⬜ | 🔄 WAV done, needs Godot import |
+| Z2 | 8/8 ✅ | 4/4 ✅ (+ bubble_mine, kelp_curtain) | ⬜ never run on device | ⬜ | 🔄 WAV done, needs Godot import |
+| Z3 | 0/8 | 0/3 new needed | ⬜ | ⬜ | ⬜ |
+| Z4 | 0/8 | 0/4 new needed | ⬜ | ⬜ | 🔒 IAP |
+| Z5 | 0/8 | 0/5 new needed | ⬜ | ⬜ | 🔒 IAP |
+| Z6 | 0/8 | 0/6 new needed | ⬜ | ⬜ | 🔒 earned |
 
 ---
 

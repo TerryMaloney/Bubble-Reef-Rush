@@ -60,9 +60,10 @@ func _spawn_obstacle(entry: Dictionary, _current_beat: float) -> void:
 	var obstacle_type: String = str(entry.get("obstacle_type", ""))
 	var params: Dictionary = entry.get("parameters", {}) as Dictionary
 
-	# A "pressure_wall" entry, or any entry that carries gap parameters, becomes
-	# a difficulty-driven gate (top + bottom spike with a gap to fly through).
-	if obstacle_type == "pressure_wall" or params.has("gap_y_normalized"):
+	# A "pressure_wall" entry becomes a difficulty-driven gate.
+	# NOTE: kelp_curtain also has gap_y_normalized in params — do NOT use params.has()
+	# as the gate condition or kelp curtains will be silently routed here instead.
+	if obstacle_type == "pressure_wall":
 		_spawn_gate(entry, params)
 		return
 
