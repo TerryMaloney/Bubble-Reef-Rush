@@ -118,6 +118,11 @@ def main() -> None:
         gen_click_track(bpm=100, total_beats=40),
     )
 
+    write_wav(
+        os.path.join(music_dir, "zone_2_kelp_forest.wav"),
+        gen_click_track(bpm=120, total_beats=60),
+    )
+
     sfx = {
         "timing_perfect.wav":    chord_burst([880, 1109, 1319], 0.25, 0.07),
         "timing_good.wav":       sine_burst(660, 0.18, 0.09),

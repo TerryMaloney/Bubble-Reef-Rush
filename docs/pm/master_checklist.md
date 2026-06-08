@@ -562,18 +562,18 @@ This is intentional — players must watch the flash cue, not just the blade pos
 
 - ✅ Z2-L1 `.brl` — "Pressure Zone": 32 beats, BPM 120. 13 active gates + 4 mines (arm_radius 160/200). Mine placed in same lane as preceding gate gap — teaches gate-then-dodge pattern.
 - ✅ Z2-L2 `.brl` — "Kelp Veil": 32 beats, BPM 120. 9 gates + 3 curtains (sway_speed 1.5→2.0) + 2 jellyfish. Curtains introduced one at a time with 4-beat gap to absorb lesson.
-- ⬜ Z2-L3 `.brl` — combined: mines + curtains. 36 beats, BPM 120.
-- ⬜ Z2-L4 `.brl` — pace increase. 40 beats, BPM 120. Unlock gate: complete Z1-L4 (any star).
-- ⬜ Z2-L5 `.brl` — 44 beats, BPM 125. sway_speed 2.5 on 2 curtains.
-- ⬜ Z2-L6 `.brl` — 48 beats, BPM 125. arm_radius 200 on 3 mines.
-- ⬜ Z2-L7 `.brl` — 52 beats, BPM 130. sway_speed 3.0 on late curtains.
-- ⬜ Z2-L8 `.brl` — 56 beats, BPM 130. arm_radius 240 on boss mines. Unlock Z3.
-- ⬜ Validate all Z2 BRL files: `python3 tools/validate_brl.py assets/levels/z2-*.brl`
-- ✅ `tools/check_movements.py` — movement constraint checker supports all BPMs; all 10 levels pass
+- ✅ Z2-L3 `.brl` — "Two Worlds": 36 beats, BPM 120. First combined level (mines + curtains). 13 gates + 4 mines + 4 curtains. Mine in different lane than gate at B13 — teaches variety.
+- ✅ Z2-L4 `.brl` — "Deep Pressure": 40 beats, BPM 120. Dense mine coverage (10 mines, r=200). 4 KelpCurtains (sway_speed 2.0–2.5). All transitions ≤0.20 < 0.250 budget.
+- ✅ Z2-L5 `.brl` — "Canyon Depths": 44 beats, BPM 125. 4 curtains (sway_speed 2.0–2.5), 9 mines. Increased tempo introduced. All transitions ≤0.15 < 0.240 budget.
+- ✅ Z2-L6 `.brl` — "Mine Sweeper": 48 beats, BPM 125. 4 curtains (sway_speed 2.0–2.5), 11 mines (r=200). Dense mine-on-every-other-beat pattern in finale.
+- ✅ Z2-L7 `.brl` — "Kelp Storm": 52 beats, BPM 130. 5 curtains (sway_speed 2.5–3.0), 8 mines (r=200). 6-gate 1-beat alternating run (B41–B50, Δ=0.10 < 0.1154 budget).
+- ✅ Z2-L8 `.brl` — "Abyss Edge": 56 beats, BPM 130. 5 curtains (sway_speed 2.5–3.0), 10 mines (r=240). 6-gate gauntlet (B40–B45) then 4-beat finale. Unlocks Z3.
+- ✅ Validate all Z2 BRL files: 16/16 pass `validate_brl.py` + `check_movements.py`
+- ✅ `tools/check_movements.py` — movement constraint checker supports all BPMs; all 16 levels pass
   (schema epsilon fix applied for exact-boundary 1-beat transitions in Z1-L7/L8)
 - ⬜ Kelp Tunnel zone mechanic (GDD): lane restriction 50% for 8–16 beats (deferred to L5+)
 - ⬜ Zone 2 background art `bg_kelp_forest_scroll.png`
-- ⬜ Zone 2 music track (BPM 120–130; WAV placeholder: regenerate gen_audio.py at 120 BPM)
+- ✅ Zone 2 music placeholder `zone_2_kelp_forest.wav` — 120 BPM click track, 30 s. Added to `tools/gen_audio.py`.
 
 ### 10.2 Zone 3 — Shipwreck Alley
 
