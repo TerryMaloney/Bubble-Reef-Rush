@@ -22,6 +22,11 @@ const GAP_MIN_PX: float = 200.0
 # (open water) — this is how rests and heavy assist produce breathing room.
 const SKIP_INTENSITY: float = 0.08
 const SPIKE_WIDTH: float = 60.0
+# Fixed logical resolution — must match project.godot viewport_width/height.
+# get_visible_rect() returns the render-target size which varies by window/DPI;
+# all gameplay positions are authored in the 1080×1920 canvas coordinate space.
+const CANVAS_W: float = 1080.0
+const CANVAS_H: float = 1920.0
 
 var _pending: Array[Dictionary] = []
 var _rhythm_map: RhythmMap
@@ -80,9 +85,8 @@ func _spawn_obstacle(entry: Dictionary, _current_beat: float) -> void:
 	var obstacle: Node2D = packed.instantiate() as Node2D
 
 	# Spawn off the right edge; Y is the normalized lane position × screen height.
-	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
-	obstacle.position.x = viewport_size.x + 100.0
-	obstacle.position.y = float(entry.get("lane_position", 0.5)) * viewport_size.y
+	obstacle.position.x = CANVAS_W + 100.0
+	obstacle.position.y = float(entry.get("lane_position", 0.5)) * CANVAS_H
 
 	# Parent to the gameplay root (two levels up from this node).
 	get_parent().add_child(obstacle)
@@ -106,9 +110,8 @@ func _spawn_gate(entry: Dictionary, params: Dictionary) -> void:
 	if effective <= SKIP_INTENSITY:
 		return
 
-	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
-	var screen_h: float = viewport_size.y
-	var spawn_x: float = viewport_size.x + 100.0
+	var screen_h: float = CANVAS_H
+	var spawn_x: float = CANVAS_W + 100.0
 
 	var gap_px: float = lerpf(GAP_MAX_PX, GAP_MIN_PX, clampf(effective, 0.0, 1.0))
 	var gap_center_norm: float = float(params.get("gap_y_normalized", entry.get("lane_position", 0.5)))

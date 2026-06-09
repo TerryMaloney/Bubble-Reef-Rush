@@ -7,6 +7,7 @@ const BLADE_W: float = 24.0
 const BLADE_H: float = 180.0
 const GAP_HALF: float = 60.0   ## Half the 120 px navigable gap
 const MAX_SWAY: float = 0.2    ## Radians (~11.5 deg); gives 84 px effective gap at extremes
+const CANVAS_H: float = 1920.0
 
 var _sway_speed: float = 2.0
 var _blades: Array[Node2D] = []
@@ -26,8 +27,7 @@ func setup(entry: Dictionary) -> void:
 
 	# Root at top of screen; blade positions are in local screen-coordinate space.
 	position.y = 0.0
-	var screen_h: float = get_viewport().get_visible_rect().size.y
-	_build_blades(gap_y_norm * screen_h, screen_h)
+	_build_blades(gap_y_norm * CANVAS_H, CANVAS_H)
 
 
 func _build_blades(gap_center_y: float, screen_h: float) -> void:

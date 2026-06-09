@@ -5,6 +5,8 @@ class_name CollectibleSpawner
 
 const PEARL_SCENE: String = "res://scenes/collectibles/Pearl.tscn"
 const SPAWN_LOOKAHEAD_BEATS: float = 4.0
+const CANVAS_W: float = 1080.0
+const CANVAS_H: float = 1920.0
 
 var _pending: Array[Dictionary] = []
 var _rhythm_map: RhythmMap
@@ -44,9 +46,8 @@ func _spawn_collectible(entry: Dictionary) -> void:
 	var packed: PackedScene = load(PEARL_SCENE) as PackedScene
 	var collectible: Node2D = packed.instantiate() as Node2D
 
-	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
-	collectible.position.x = viewport_size.x + 100.0
-	collectible.position.y = float(entry.get("lane_position", 0.5)) * viewport_size.y
+	collectible.position.x = CANVAS_W + 100.0
+	collectible.position.y = float(entry.get("lane_position", 0.5)) * CANVAS_H
 
 	get_parent().add_child(collectible)
 
