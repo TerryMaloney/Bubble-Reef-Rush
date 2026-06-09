@@ -14,6 +14,11 @@ class_name PlayerController
 ## direction reversal with identical feel every time (Flappy Bird-style).
 @export var dive_impulse: float = 480.0
 
+# Fixed logical canvas height — matches project.godot viewport_height. Gameplay
+# coordinates are always in the 1080×1920 space; never query the viewport for
+# bounds (its size varies with window/DPI and breaks the clamp).
+const CANVAS_H: float = 1920.0
+
 var diving: bool = false
 var alive: bool = true
 
@@ -29,7 +34,10 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if not alive:
 		return
-	if event.is_action_pressed("swim_dive"):
+	# `not diving` guard: one physical tap arrives as TWO events (the raw
+	# mouse/touch event plus its emulated counterpart, both bound to swim_dive),
+	# which would double-judge every input and double-apply the impulse.
+	if event.is_action_pressed("swim_dive") and not diving:
 		diving = true
 		velocity.y = dive_impulse
 		timing_judge.judge_input(BeatConductor.get_current_beat_time_ms())
@@ -57,8 +65,7 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 	# Clamp player within screen bounds with a small margin.
-	var screen_height: float = get_viewport_rect().size.y
-	global_position.y = clamp(global_position.y, 60.0, screen_height - 60.0)
+	global_position.y = clamp(global_position.y, 60.0, CANVAS_H - 60.0)
 
 
 func on_hit() -> void:

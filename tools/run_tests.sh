@@ -35,6 +35,7 @@ run_stage "Smoke test"      "tests/smoke/run_smoke_tests.gd"              "SMOKE
 run_stage "Director test"   "tests/integration/director_test.gd"         "DIRECTOR_OK"
 run_stage "Collision test"  "tests/integration/collision_test.gd"        "COLLISION_OK"
 run_stage "Obstacle test"   "tests/integration/obstacle_test.gd"         "OBSTACLE_OK"
+run_stage "Geometry test"   "tests/integration/geometry_test.gd"         "GEOMETRY_OK"
 run_stage "Game flow test"  "tests/integration/game_flow_test.gd"         "GAME_FLOW_OK"
 run_stage "Playtest"        "tests/integration/playtest.gd"               "PLAYTEST_OK"
 

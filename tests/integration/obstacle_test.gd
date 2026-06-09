@@ -54,7 +54,10 @@ func _test_kelp_blade_hit() -> bool:
 	var holder: Node2D = Node2D.new()
 	root.add_child(holder)
 
-	var kc: KelpCurtain = load("res://scenes/obstacles/KelpCurtain.tscn").instantiate() as KelpCurtain
+	# Untyped on purpose: a KelpCurtain annotation makes that script a
+	# compile-time dependency of this one, and its BeatConductor autoload
+	# reference cannot resolve while the --script main is being compiled.
+	var kc = load("res://scenes/obstacles/KelpCurtain.tscn").instantiate()
 	kc.position = Vector2.ZERO
 	holder.add_child(kc)
 	kc.set_process(false)  # keep it from scrolling during the test
@@ -80,7 +83,7 @@ func _test_kelp_gap_no_hit() -> bool:
 	var holder: Node2D = Node2D.new()
 	root.add_child(holder)
 
-	var kc: KelpCurtain = load("res://scenes/obstacles/KelpCurtain.tscn").instantiate() as KelpCurtain
+	var kc = load("res://scenes/obstacles/KelpCurtain.tscn").instantiate()
 	kc.position = Vector2.ZERO
 	holder.add_child(kc)
 	kc.set_process(false)
