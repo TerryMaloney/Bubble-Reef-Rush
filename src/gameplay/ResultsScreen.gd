@@ -13,6 +13,12 @@ func _ready() -> void:
 	$ScoreLabel.text = "Score: %d" % score
 	$BestScoreLabel.text = _best_score_text(score)
 
+	# Show coins earned this run if any.
+	if has_node("CoinsLabel"):
+		var coins: int = GameManager.last_coins_earned
+		$CoinsLabel.text = "+" + str(coins) + " coins" if coins > 0 else ""
+		$CoinsLabel.visible = coins > 0
+
 	_setup_next_level_button()
 
 	$RetryButton.pressed.connect(_on_retry_pressed)

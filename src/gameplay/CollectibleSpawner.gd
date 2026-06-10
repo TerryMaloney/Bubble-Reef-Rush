@@ -4,6 +4,7 @@ extends Node
 class_name CollectibleSpawner
 
 const PEARL_SCENE: String = "res://scenes/collectibles/Pearl.tscn"
+const TREASURE_COIN_SCENE: String = "res://scenes/collectibles/TreasureCoin.tscn"
 const SPAWN_LOOKAHEAD_BEATS: float = 4.0
 const CANVAS_W: float = 1080.0
 const CANVAS_H: float = 1920.0
@@ -41,11 +42,16 @@ func _process(_delta: float) -> void:
 
 
 func _spawn_collectible(entry: Dictionary) -> void:
-	if not ResourceLoader.exists(PEARL_SCENE):
-		push_warning("CollectibleSpawner: Pearl scene not found at '%s' — skipping." % PEARL_SCENE)
+	var ctype: String = str(entry.get("type", "pearl"))
+	var scene_path: String = PEARL_SCENE
+	if ctype == "treasure_coin":
+		scene_path = TREASURE_COIN_SCENE
+
+	if not ResourceLoader.exists(scene_path):
+		push_warning("CollectibleSpawner: Scene not found at '%s' — skipping." % scene_path)
 		return
 
-	var packed: PackedScene = load(PEARL_SCENE) as PackedScene
+	var packed: PackedScene = load(scene_path) as PackedScene
 	var collectible: Node2D = packed.instantiate() as Node2D
 
 	var beat_idx: float = float(entry.get("beat_index", 0))

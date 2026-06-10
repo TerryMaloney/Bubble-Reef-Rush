@@ -1,0 +1,29 @@
+{
+  "achievements": [
+    {"id": "first_run",      "name": "First Splash",       "desc": "Complete your first level.",            "rule": "levels_cleared",      "threshold": 1},
+    {"id": "z1_complete",    "name": "Shallows Clear",      "desc": "Clear all 8 Sunlit Shallows levels.",   "rule": "zone_cleared",        "zone": "z1"},
+    {"id": "z2_complete",    "name": "Kelp Force",          "desc": "Clear all 8 Kelp Forest levels.",       "rule": "zone_cleared",        "zone": "z2"},
+    {"id": "z3_complete",    "name": "Wreck Survivor",      "desc": "Clear all 8 Shipwreck Alley levels.",   "rule": "zone_cleared",        "zone": "z3"},
+    {"id": "z4_complete",    "name": "Vent Runner",         "desc": "Clear all 8 Volcanic Vent levels.",     "rule": "zone_cleared",        "zone": "z4"},
+    {"id": "z5_complete",    "name": "Twilight Swimmer",    "desc": "Clear all 8 Twilight Trench levels.",   "rule": "zone_cleared",        "zone": "z5"},
+    {"id": "stars_10",       "name": "Rising Star",         "desc": "Earn 10 stars total.",                  "rule": "stars_total",         "threshold": 10},
+    {"id": "stars_25",       "name": "Star Collector",      "desc": "Earn 25 stars total.",                  "rule": "stars_total",         "threshold": 25},
+    {"id": "stars_50",       "name": "Star Power",          "desc": "Earn 50 stars total.",                  "rule": "stars_total",         "threshold": 50},
+    {"id": "stars_120",      "name": "Legend of the Reef",  "desc": "Earn 120 stars total.",                 "rule": "stars_total",         "threshold": 120},
+    {"id": "combo_master",   "name": "Fever Dream",         "desc": "Reach combo 30 to enter fever mode.",   "rule": "combo_reached",       "threshold": 30},
+    {"id": "three_star_z1",  "name": "Z1 Perfectionist",    "desc": "3-star all Zone 1 levels.",             "rule": "three_star_zone",     "zone": "z1"},
+    {"id": "three_star_z2",  "name": "Z2 Perfectionist",    "desc": "3-star all Zone 2 levels.",             "rule": "three_star_zone",     "zone": "z2"},
+    {"id": "coin_finder",    "name": "Treasure Hunter",     "desc": "Collect 5 treasure coins.",             "rule": "treasure_coins_total","threshold": 5},
+    {"id": "coin_hoarder",   "name": "Coin Hoarder",        "desc": "Collect 20 treasure coins.",            "rule": "treasure_coins_total","threshold": 20}
+  ],
+  "characters": [
+    {"id": "default_fish", "name": "Reef",    "desc": "Your trusty reef fish. Always with you.",       "rule": "default"},
+    {"id": "zap",          "name": "Zap",     "desc": "Fast and electric. Clear Zone 2.",              "rule": "zone_cleared",    "zone": "z2"},
+    {"id": "pip",          "name": "Pip",     "desc": "Tiny but fierce. 3-star all Zone 1.",           "rule": "three_star_zone", "zone": "z1"},
+    {"id": "crusher",      "name": "Crusher", "desc": "Built tough. Earn 4 three-stars in Zone 3.",   "rule": "three_star_count","threshold": 4, "zone": "z3"},
+    {"id": "finn",         "name": "Finn",    "desc": "The brave explorer. Clear Zone 4.",             "rule": "zone_cleared",    "zone": "z4"},
+    {"id": "lumina",       "name": "Lumina",  "desc": "Glows in the deep. Clear Zone 5.",              "rule": "zone_cleared",    "zone": "z5"},
+    {"id": "mochi",        "name": "Mochi",   "desc": "Soft and bouncy. Earn 50 stars.",               "rule": "stars_total",     "threshold": 50},
+    {"id": "grumble",      "name": "Grumble", "desc": "The cave boss. 3-star all Zone 6.",             "rule": "three_star_zone", "zone": "z6"}
+  ]
+}

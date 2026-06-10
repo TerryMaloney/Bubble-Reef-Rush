@@ -29,3 +29,8 @@ signal score_bonus(amount: int)
 signal practice_checkpoint_saved
 ## Practice mode: emitted by LevelLoader.restart_from_beat() so fever/NMD reset.
 signal practice_respawned
+## Economy and meta-progression signals.
+signal coins_changed(profile_id: String, new_total: int)
+signal achievement_unlocked(achievement_id: String, name: String)
+signal character_unlocked(char_id: String)
+signal treasure_coin_collected(level_id: String, coin_idx: int)

@@ -23,6 +23,10 @@ ScrollService="*res://src/gameplay/ScrollService.gd"
 FXFactory="*res://src/gameplay/FXFactory.gd"
 TransitionLayer="*res://src/core/TransitionLayer.gd"
 SFXManager="*res://src/audio/SFXManager.gd"
+EconomyService="*res://src/core/EconomyService.gd"
+AchievementSystem="*res://src/core/AchievementSystem.gd"
+AchievementToast="*res://src/ui/AchievementToast.gd"
+PlayerSkin="*res://src/gameplay/PlayerSkin.gd"
 
 [display]
 

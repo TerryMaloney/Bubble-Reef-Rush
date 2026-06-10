@@ -256,6 +256,158 @@ func set_setting(profile_id: String, key: String, value: Variant) -> void:
 	save_progress(profile_id, data)
 
 
+# ── Coins ────────────────────────────────────────────────────────────────────
+
+func get_coins(profile_id: String) -> int:
+	var data: Dictionary = load_progress(profile_id)
+	return int(data.get("coins", 0))
+
+
+func add_coins(profile_id: String, amount: int) -> void:
+	if amount <= 0:
+		return
+	var data: Dictionary = load_progress(profile_id)
+	data["coins"] = int(data.get("coins", 0)) + amount
+	save_progress(profile_id, data)
+	EventBus.coins_changed.emit(profile_id, data["coins"])
+
+
+## Returns true if deduction succeeded; false if insufficient funds.
+func spend_coins(profile_id: String, amount: int) -> bool:
+	var data: Dictionary = load_progress(profile_id)
+	var current: int = int(data.get("coins", 0))
+	if current < amount:
+		return false
+	data["coins"] = current - amount
+	save_progress(profile_id, data)
+	EventBus.coins_changed.emit(profile_id, data["coins"])
+	return true
+
+
+## Atomic purchase: deducts coins AND adds cosmetic in one save.
+func buy_cosmetic(profile_id: String, item_id: String, cost: int) -> bool:
+	var data: Dictionary = load_progress(profile_id)
+	var current_coins: int = int(data.get("coins", 0))
+	if current_coins < cost:
+		return false
+	data["coins"] = current_coins - cost
+	if not data.has("cosmetics"):
+		data["cosmetics"] = {"owned": [], "equipped": {"trail": "", "ring": "", "palette": ""}}
+	var owned: Array = (data["cosmetics"] as Dictionary).get("owned", []) as Array
+	if not (item_id in owned):
+		owned.append(item_id)
+	(data["cosmetics"] as Dictionary)["owned"] = owned
+	save_progress(profile_id, data)
+	EventBus.coins_changed.emit(profile_id, data["coins"])
+	return true
+
+
+# ── Achievements ──────────────────────────────────────────────────────────────
+
+func get_achievement(profile_id: String, achievement_id: String) -> bool:
+	var data: Dictionary = load_progress(profile_id)
+	return bool((data.get("achievements", {}) as Dictionary).get(achievement_id, false))
+
+
+func set_achievement(profile_id: String, achievement_id: String) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if not data.has("achievements"):
+		data["achievements"] = {}
+	(data["achievements"] as Dictionary)[achievement_id] = true
+	save_progress(profile_id, data)
+
+
+# ── Characters ────────────────────────────────────────────────────────────────
+
+func get_character_unlocked(profile_id: String, char_id: String) -> bool:
+	var data: Dictionary = load_progress(profile_id)
+	return bool((data.get("characters", {}) as Dictionary).get(char_id, false))
+
+
+func set_character_unlocked(profile_id: String, char_id: String) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if not data.has("characters"):
+		data["characters"] = {}
+	(data["characters"] as Dictionary)[char_id] = true
+	save_progress(profile_id, data)
+	EventBus.character_unlocked.emit(char_id)
+
+
+func get_equipped_character(profile_id: String) -> String:
+	var data: Dictionary = load_progress(profile_id)
+	return str((data.get("cosmetics", {}) as Dictionary).get("equipped_character", "default_fish"))
+
+
+func set_equipped_character(profile_id: String, char_id: String) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if not data.has("cosmetics"):
+		data["cosmetics"] = {}
+	(data["cosmetics"] as Dictionary)["equipped_character"] = char_id
+	save_progress(profile_id, data)
+
+
+# ── Cosmetics ─────────────────────────────────────────────────────────────────
+
+func get_cosmetic_owned(profile_id: String, item_id: String) -> bool:
+	var data: Dictionary = load_progress(profile_id)
+	var owned: Array = ((data.get("cosmetics", {}) as Dictionary).get("owned", []) as Array)
+	return item_id in owned
+
+
+func get_equipped_cosmetic(profile_id: String, slot: String) -> String:
+	var data: Dictionary = load_progress(profile_id)
+	var equipped: Dictionary = (data.get("cosmetics", {}) as Dictionary).get("equipped", {}) as Dictionary
+	return str(equipped.get(slot, ""))
+
+
+func set_equipped_cosmetic(profile_id: String, slot: String, item_id: String) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if not data.has("cosmetics"):
+		data["cosmetics"] = {}
+	if not (data["cosmetics"] as Dictionary).has("equipped"):
+		(data["cosmetics"] as Dictionary)["equipped"] = {}
+	((data["cosmetics"] as Dictionary)["equipped"] as Dictionary)[slot] = item_id
+	save_progress(profile_id, data)
+
+
+# ── Treasure coins ────────────────────────────────────────────────────────────
+
+func get_treasure_coin(profile_id: String, level_id: String, coin_idx: int) -> bool:
+	var data: Dictionary = load_progress(profile_id)
+	var level_data: Dictionary = (data.get("levels", {}) as Dictionary).get(level_id, {}) as Dictionary
+	var coins: Array = level_data.get("treasure_coins", [false, false, false]) as Array
+	if coin_idx < 0 or coin_idx >= coins.size():
+		return false
+	return bool(coins[coin_idx])
+
+
+func set_treasure_coin(profile_id: String, level_id: String, coin_idx: int) -> void:
+	if coin_idx < 0 or coin_idx > 2:
+		return
+	var data: Dictionary = load_progress(profile_id)
+	var levels: Dictionary = data.get("levels", {}) as Dictionary
+	var level_data: Dictionary = _ensure_level_entry(levels, level_id)
+	if not level_data.has("treasure_coins"):
+		level_data["treasure_coins"] = [false, false, false]
+	(level_data["treasure_coins"] as Array)[coin_idx] = true
+	levels[level_id] = level_data
+	data["levels"] = levels
+	save_progress(profile_id, data)
+	EventBus.treasure_coin_collected.emit(level_id, coin_idx)
+
+
+func count_treasure_coins(profile_id: String) -> int:
+	var data: Dictionary = load_progress(profile_id)
+	var levels: Dictionary = data.get("levels", {}) as Dictionary
+	var total: int = 0
+	for level_data: Variant in levels.values():
+		var coins: Array = (level_data as Dictionary).get("treasure_coins", []) as Array
+		for c: Variant in coins:
+			if bool(c):
+				total += 1
+	return total
+
+
 func _ensure_level_entry(levels: Dictionary, level_id: String) -> Dictionary:
 	if levels.has(level_id):
 		return levels[level_id] as Dictionary

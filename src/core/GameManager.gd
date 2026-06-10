@@ -64,6 +64,9 @@ func go_to_menu() -> void:
 	TransitionLayer.go_to(MAIN_MENU_SCENE)
 
 
+## Coins earned this run — stored so ResultsScreen can show the reward breakdown.
+var last_coins_earned: int = 0
+
 func finish_level(score: int, stars: int) -> void:
 	last_score = score
 	last_stars = stars
@@ -71,7 +74,11 @@ func finish_level(score: int, stars: int) -> void:
 	_active_profile = SaveSystem.get_active_profile_id()
 	var prev_results: Dictionary = SaveSystem.get_all_level_results(_active_profile)
 	last_prev_best_score = int((prev_results.get(current_level_id, {}) as Dictionary).get("best_score", 0))
+	# Economy grants BEFORE update so improvement check sees previous best score.
+	last_coins_earned = EconomyService.process_run_completed(current_level_id, score, stars)
 	SaveSystem.update_level_result(_active_profile, current_level_id, score, stars)
+	# Evaluate achievements AFTER update so level results are current.
+	AchievementSystem.evaluate_run(_active_profile, current_level_id, score, stars)
 	TransitionLayer.go_to(RESULTS_SCENE)
 
 
