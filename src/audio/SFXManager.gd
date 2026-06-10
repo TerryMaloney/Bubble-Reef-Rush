@@ -1,18 +1,7 @@
 # Autoload singleton. Plays all in-game sound effects by listening to EventBus.
-# Audio files live in assets/audio/sfx/. Missing files are silently skipped —
-# the game remains fully playable without them (see Milestone 4).
+# Audio files resolve through AssetRegistry (manifest key → fallback path chain).
+# Missing files are silently skipped — the game is fully playable without them.
 extends Node
-
-const SFX_DIR: String = "res://assets/audio/sfx/"
-
-# Maps event key → filename inside SFX_DIR.
-const SFX_FILES: Dictionary = {
-	"timing_perfect":    "timing_perfect.wav",
-	"timing_good":       "timing_good.wav",
-	"timing_miss":       "timing_miss.wav",
-	"collectible_pearl": "collectible_pearl.wav",
-	"player_hit":        "player_hit.wav",
-}
 
 # PERFECT / GOOD / MISS enum values from TimingJudge — using int to avoid
 # circular autoload dependency (TimingJudge is not an autoload).
@@ -31,11 +20,24 @@ func _ready() -> void:
 
 
 func _load_sounds() -> void:
-	for key: String in SFX_FILES:
-		var path: String = SFX_DIR + SFX_FILES[key]
-		if not ResourceLoader.exists(path):
-			continue
-		var stream: AudioStream = load(path) as AudioStream
+	var keys: Array[String] = [
+		"sfx/timing_perfect",
+		"sfx/timing_good",
+		"sfx/timing_miss",
+		"sfx/collectible_pearl",
+		"sfx/player_hit",
+		"sfx/fever_start",
+		"sfx/fever_end",
+		"sfx/near_miss",
+		"sfx/checkpoint_set",
+		"sfx/checkpoint_respawn",
+		"sfx/coin_collect",
+		"sfx/achievement",
+		"sfx/ui_select",
+		"sfx/ui_back",
+	]
+	for key: String in keys:
+		var stream: AudioStream = AssetRegistry.get_stream(key)
 		if stream == null:
 			continue
 		var player: AudioStreamPlayer = AudioStreamPlayer.new()
@@ -46,18 +48,22 @@ func _load_sounds() -> void:
 
 
 func _on_collectible_taken(_value: int) -> void:
-	_play("collectible_pearl")
+	_play("sfx/collectible_pearl")
 
 
 func _on_player_hit() -> void:
-	_play("player_hit")
+	_play("sfx/player_hit")
 
 
 func _on_beat_judged(result: int) -> void:
 	match result:
-		RESULT_PERFECT: _play("timing_perfect")
-		RESULT_GOOD:    _play("timing_good")
-		RESULT_MISS:    _play("timing_miss")
+		RESULT_PERFECT: _play("sfx/timing_perfect")
+		RESULT_GOOD:    _play("sfx/timing_good")
+		RESULT_MISS:    _play("sfx/timing_miss")
+
+
+func play_sfx(key: String) -> void:
+	_play(key)
 
 
 func _play(key: String) -> void:

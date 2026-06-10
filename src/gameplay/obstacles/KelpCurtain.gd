@@ -58,16 +58,7 @@ func _create_blade(local_y: float) -> void:
 	col.shape = rect
 	blade.add_child(col)
 
-	var vis: Polygon2D = Polygon2D.new()
-	var hw: float = BLADE_W * 0.5
-	var hh: float = BLADE_H * 0.5
-	vis.polygon = PackedVector2Array([
-		Vector2(-hw, -hh),
-		Vector2(hw,  -hh),
-		Vector2(hw,   hh),
-		Vector2(-hw,  hh),
-	])
-	vis.color = Color(0.1, 0.5, 0.2)
+	var vis: Polygon2D = _build_blade_placeholder()
 	blade.add_child(vis)
 
 	blade.body_entered.connect(func(body: Node2D) -> void:
@@ -78,6 +69,23 @@ func _create_blade(local_y: float) -> void:
 	add_child(blade)
 	_blades.append(blade)
 	_blade_visuals.append(vis)
+
+
+## Placeholder visual for a single kelp blade.
+## When "sprite/obstacle/kelp_blade" is added to the manifest, replace this
+## with VisualFactory.build_visual("sprite/obstacle/kelp_blade", _build_blade_placeholder).
+func _build_blade_placeholder() -> Polygon2D:
+	var vis: Polygon2D = Polygon2D.new()
+	var hw: float = BLADE_W * 0.5
+	var hh: float = BLADE_H * 0.5
+	vis.polygon = PackedVector2Array([
+		Vector2(-hw, -hh),
+		Vector2(hw,  -hh),
+		Vector2(hw,   hh),
+		Vector2(-hw,  hh),
+	])
+	vis.color = Color(0.1, 0.5, 0.2)
+	return vis
 
 
 func _process(delta: float) -> void:

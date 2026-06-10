@@ -10,7 +10,7 @@
 # Exits non-zero if any stage fails.
 set -euo pipefail
 
-GODOT="${GODOT:-godot}"
+GODOT="${GODOT:-/tmp/Godot_v4.6.3-stable_linux.x86_64}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
@@ -49,6 +49,7 @@ run_stage "Geometry test"   "tests/integration/geometry_test.gd"         "GEOMET
 run_stage "Game flow test"  "tests/integration/game_flow_test.gd"        "GAME_FLOW_OK"
 run_stage "Save test"       "tests/integration/save_test.gd"             "SAVE_OK"
 run_stage "Settings test"   "tests/integration/settings_test.gd"        "SETTINGS_OK"
+run_stage "Registry test"   "tests/integration/registry_test.gd"        "REGISTRY_OK"
 run_stage "Playtest"        "tests/integration/playtest.gd"              "PLAYTEST_OK"
 
 echo "==> All tests passed."

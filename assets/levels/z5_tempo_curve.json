@@ -1,0 +1,15 @@
+{
+  "_comment": "Canonical Zone 5 variable-BPM tempo curve. Shared between gen_audio.py (generates zone_5_twilight_trench.wav click track) and z5-lX.brl level files (bpm_changes array). Edit here, re-run gen_audio.py, re-export music. Levels and music cannot drift apart.",
+  "base_bpm": 110,
+  "total_beats": 256,
+  "bpm_changes": [
+    { "beat_index": 0,   "new_bpm": 110, "transition_beats": 0 },
+    { "beat_index": 32,  "new_bpm": 95,  "transition_beats": 8 },
+    { "beat_index": 64,  "new_bpm": 80,  "transition_beats": 4 },
+    { "beat_index": 96,  "new_bpm": 100, "transition_beats": 8 },
+    { "beat_index": 128, "new_bpm": 125, "transition_beats": 8 },
+    { "beat_index": 160, "new_bpm": 150, "transition_beats": 4 },
+    { "beat_index": 192, "new_bpm": 165, "transition_beats": 8 },
+    { "beat_index": 224, "new_bpm": 155, "transition_beats": 8 }
+  ]
+}

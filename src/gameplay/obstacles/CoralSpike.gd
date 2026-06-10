@@ -41,12 +41,22 @@ func _configure(attachment: String, height: float) -> void:
 	var shape: RectangleShape2D = RectangleShape2D.new()
 	shape.size = Vector2(SPIKE_WIDTH, height)
 
-	var half_w: float = SPIKE_WIDTH * 0.5
-
 	if attachment == "top":
-		# Node sits at the top wall; spike points down into the field.
 		_collision.shape = shape
 		_collision.position = Vector2(0.0, height * 0.5)
+	else:
+		_collision.shape = shape
+		_collision.position = Vector2(0.0, -height * 0.5)
+
+	_build_placeholder(attachment, height)
+
+
+## Placeholder visual: tapered spike polygon.
+## Called by VisualFactory when no real sprite is available.
+## Swap for a sprite by adding "sprite/obstacle/coral_spike" to asset_manifest.json.
+func _build_placeholder(attachment: String, height: float) -> void:
+	var half_w: float = SPIKE_WIDTH * 0.5
+	if attachment == "top":
 		_visual.polygon = PackedVector2Array([
 			Vector2(-half_w, 0.0),
 			Vector2(half_w, 0.0),
@@ -55,9 +65,6 @@ func _configure(attachment: String, height: float) -> void:
 			Vector2(-half_w, height - 30.0),
 		])
 	else:
-		# Default "bottom": node sits at the bottom wall; spike points up.
-		_collision.shape = shape
-		_collision.position = Vector2(0.0, -height * 0.5)
 		_visual.polygon = PackedVector2Array([
 			Vector2(-half_w, 0.0),
 			Vector2(half_w, 0.0),
