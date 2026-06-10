@@ -85,6 +85,13 @@ var _beat_map_timestamps: Array[float] = []
 ## Current index into _beat_map_timestamps used during variable-BPM playback.
 var _vbpm_next_beat_map_idx: int = 0
 
+## Playback-position threshold (seconds) at which the pending half-beat fires.
+## −1.0 means no half-beat is pending.
+var _vbpm_next_half_ts: float = -1.0
+
+## Beat index (float, e.g. 4.5) to emit when _vbpm_next_half_ts passes.
+var _vbpm_pending_half_beat: float = -1.0
+
 ## AudioStreamPlayer that owns the current level's music.
 var _music_player: AudioStreamPlayer = null
 
@@ -340,6 +347,12 @@ func _process_variable_bpm(now: float) -> void:
 	else:
 		playback_pos = _music_player.get_playback_position()
 
+	# Fire pending half-beat when its playback-position threshold is crossed.
+	# Checked first so a half-beat between two rapid beats in the same frame is not lost.
+	if _vbpm_next_half_ts >= 0.0 and playback_pos >= _vbpm_next_half_ts:
+		half_beat_fired.emit(_vbpm_pending_half_beat)
+		_vbpm_next_half_ts = -1.0
+
 	# Fire all beats whose timestamp has been passed since last frame.
 	while _vbpm_next_beat_map_idx < _beat_map_timestamps.size():
 		var beat_ts: float = _beat_map_timestamps[_vbpm_next_beat_map_idx]
@@ -347,19 +360,13 @@ func _process_variable_bpm(now: float) -> void:
 			break
 		_fire_beat()
 
-		# Emit half-beat between this beat and the next, if there is a next.
-		if _vbpm_next_beat_map_idx + 1 < _beat_map_timestamps.size():
-			var next_ts: float = _beat_map_timestamps[_vbpm_next_beat_map_idx + 1]
-			var half_ts: float = beat_ts + (next_ts - beat_ts) * 0.5
-			# Schedule a deferred half-beat using a timer so it fires mid-interval.
-			var timer_duration: float = maxf(0.001, half_ts - playback_pos)
-			var timer: SceneTreeTimer = get_tree().create_timer(timer_duration)
-			var captured_index: int = _beat_index - 1  # beat just fired
-			timer.timeout.connect(
-				func() -> void:
-					if _running and not _paused:
-						half_beat_fired.emit(float(captured_index) + 0.5)
-			)
+		# Arm half-beat via playback-position threshold (survives pause/seek unlike SceneTreeTimer).
+		var next_idx: int = _vbpm_next_beat_map_idx + 1
+		if next_idx < _beat_map_timestamps.size():
+			_vbpm_next_half_ts = beat_ts + (_beat_map_timestamps[next_idx] - beat_ts) * 0.5
+			_vbpm_pending_half_beat = float(_beat_index - 1) + 0.5
+		else:
+			_vbpm_next_half_ts = -1.0
 
 		_vbpm_next_beat_map_idx += 1
 
@@ -401,6 +408,8 @@ func _resync_variable_bpm() -> void:
 			break
 	_beat_index = _vbpm_next_beat_map_idx
 	_bar_number = _beat_index / 4
+	_vbpm_next_half_ts = -1.0
+	_vbpm_pending_half_beat = -1.0
 
 
 ## Shared teardown used by both stop_level and start_level (restart).
@@ -414,4 +423,6 @@ func _stop_internal() -> void:
 	_next_beat_time_sec = 0.0
 	_next_half_beat_time_sec = 0.0
 	_vbpm_next_beat_map_idx = 0
+	_vbpm_next_half_ts = -1.0
+	_vbpm_pending_half_beat = -1.0
 	_beat_map_timestamps.clear()

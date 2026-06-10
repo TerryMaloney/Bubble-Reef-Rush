@@ -13,6 +13,8 @@ const OBSTACLE_SCENE_MAP: Dictionary = {
 	"anchor_chain": "res://scenes/obstacles/AnchorChain.tscn",
 	"eel_snap": "res://scenes/obstacles/EelSnap.tscn",
 	"lava_burst": "res://scenes/obstacles/LavaBurst.tscn",
+	"dark_void": "res://scenes/obstacles/DarkVoid.tscn",
+	"mirror_fish": "res://scenes/obstacles/MirrorFish.tscn",
 }
 const PRESSURE_WAVE_SCENE: String = "res://scenes/obstacles/PressureWave.tscn"
 const CORAL_SPIKE_SCENE: String = "res://scenes/obstacles/CoralSpike.tscn"
@@ -95,10 +97,14 @@ func _spawn_obstacle(entry: Dictionary, _current_beat: float) -> void:
 	var packed: PackedScene = load(scene_path) as PackedScene
 	var obstacle: Node2D = packed.instantiate() as Node2D
 
-	# X: place far enough right so the obstacle arrives at JUDGMENT_X on the correct beat.
-	var beat_idx: float = float(entry.get("beat_index", 0))
-	obstacle.position.x = ScrollService.JUDGMENT_X + ScrollService.distance_until_beat(beat_idx)
-	obstacle.position.y = float(entry.get("lane_position", 0.5)) * CANVAS_H
+	if obstacle_type == "dark_void":
+		# Screen-anchored overlay: world position is irrelevant; activate on beat via signal.
+		obstacle.position = Vector2.ZERO
+	else:
+		# X: place far enough right so the obstacle arrives at JUDGMENT_X on the correct beat.
+		var beat_idx: float = float(entry.get("beat_index", 0))
+		obstacle.position.x = ScrollService.JUDGMENT_X + ScrollService.distance_until_beat(beat_idx)
+		obstacle.position.y = float(entry.get("lane_position", 0.5)) * CANVAS_H
 
 	# Parent to the gameplay root (two levels up from this node).
 	get_parent().add_child(obstacle)

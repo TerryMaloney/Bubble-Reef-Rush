@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.1",
+  "metadata": {
+    "id": "z5-l7",
+    "name": "The Descent",
+    "description": "Floor falls away. 165 BPM in the dark. Finn has been here before.",
+    "zone": 5,
+    "level_index": 7,
+    "bpm": 130,
+    "bpm_variable": true,
+    "bpm_changes": [
+      { "beat_index": 12, "new_bpm": 145, "transition_beats": 4 },
+      { "beat_index": 28, "new_bpm": 165, "transition_beats": 4 }
+    ],
+    "difficulty": 8,
+    "difficulty_tag": "Expert",
+    "author": "Bubble Reef Rush Team",
+    "created_at": "2026-06-10T00:00:00Z",
+    "is_official": true,
+    "total_beats": 44,
+    "tags": ["mirror_fish", "dark_void", "variable_bpm"]
+  },
+  "music": {
+    "filename": "zone_5_twilight_trench.wav",
+    "loop": false,
+    "loop_start_beat": 0,
+    "preview_start_beat": 4,
+    "preview_duration_beats": 8,
+    "beat_offset_ms": 0,
+    "volume_db": 0
+  },
+  "beat_map": [
+    { "beat_index": 4,  "beat_subdivision": "quarter", "obstacle_type": "pressure_wall",  "lane_position": 0.50, "parameters": { "gap_y_normalized": 0.50, "intensity": 0.32 } },
+    { "beat_index": 6,  "beat_subdivision": "quarter", "obstacle_type": "mirror_fish",    "lane_position": 0.50, "parameters": { "delay_frames": 30, "approach_speed_bonus": 150 } },
+    { "beat_index": 8,  "beat_subdivision": "quarter", "obstacle_type": "dark_void",      "lane_position": 0.50, "parameters": { "duration_beats": 4, "pulse_with_beat": true } },
+    { "beat_index": 10, "beat_subdivision": "quarter", "obstacle_type": "coral_spike",    "lane_position": 0.15, "parameters": { "wall_attachment": "top",    "height": 180 } },
+    { "beat_index": 12, "beat_subdivision": "quarter", "obstacle_type": "current_jet",    "lane_position": 0.40, "parameters": { "origin_wall": "left",  "cycle_beats": 2 } },
+    { "beat_index": 14, "beat_subdivision": "quarter", "obstacle_type": "pressure_wall",  "lane_position": 0.48, "parameters": { "gap_y_normalized": 0.48, "gap_height": 160, "travel_speed": 450, "entry_side": "right" } },
+    { "beat_index": 16, "beat_subdivision": "quarter", "obstacle_type": "mirror_fish",    "lane_position": 0.50, "parameters": { "delay_frames": 30, "approach_speed_bonus": 150 } },
+    { "beat_index": 18, "beat_subdivision": "quarter", "obstacle_type": "coral_spike",    "lane_position": 0.85, "parameters": { "wall_attachment": "bottom", "height": 180 } },
+    { "beat_index": 20, "beat_subdivision": "quarter", "obstacle_type": "dark_void",      "lane_position": 0.50, "parameters": { "duration_beats": 4, "pulse_with_beat": true } },
+    { "beat_index": 22, "beat_subdivision": "quarter", "obstacle_type": "pressure_wall",  "lane_position": 0.52, "parameters": { "gap_y_normalized": 0.52, "intensity": 0.36 } },
+    { "beat_index": 24, "beat_subdivision": "quarter", "obstacle_type": "current_jet",    "lane_position": 0.60, "parameters": { "origin_wall": "right", "cycle_beats": 2 } },
+    { "beat_index": 26, "beat_subdivision": "quarter", "obstacle_type": "mirror_fish",    "lane_position": 0.50, "parameters": { "delay_frames": 30, "approach_speed_bonus": 150 } },
+    { "beat_index": 28, "beat_subdivision": "quarter", "obstacle_type": "pressure_wall",  "lane_position": 0.50, "parameters": { "gap_y_normalized": 0.50, "gap_height": 160, "travel_speed": 600, "entry_side": "right" } },
+    { "beat_index": 30, "beat_subdivision": "quarter", "obstacle_type": "coral_spike",    "lane_position": 0.15, "parameters": { "wall_attachment": "top",    "height": 180 } },
+    { "beat_index": 32, "beat_subdivision": "quarter", "obstacle_type": "dark_void",      "lane_position": 0.50, "parameters": { "duration_beats": 4, "pulse_with_beat": true } },
+    { "beat_index": 34, "beat_subdivision": "quarter", "obstacle_type": "pressure_wall",  "lane_position": 0.50, "parameters": { "gap_y_normalized": 0.50, "intensity": 0.38 } },
+    { "beat_index": 36, "beat_subdivision": "quarter", "obstacle_type": "mirror_fish",    "lane_position": 0.50, "parameters": { "delay_frames": 30, "approach_speed_bonus": 150 } },
+    { "beat_index": 38, "beat_subdivision": "quarter", "obstacle_type": "coral_spike",    "lane_position": 0.85, "parameters": { "wall_attachment": "bottom", "height": 180 } },
+    { "beat_index": 40, "beat_subdivision": "quarter", "obstacle_type": "pressure_wall",  "lane_position": 0.50, "parameters": { "gap_y_normalized": 0.50, "intensity": 0.40 } },
+    { "beat_index": 42, "beat_subdivision": "quarter", "obstacle_type": "bubble_mine",    "lane_position": 0.50, "parameters": { "arm_radius": 200 } }
+  ],
+  "collectibles": [
+    { "beat_index": 5,  "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.50, "value": 10 },
+    { "beat_index": 11, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.50, "value": 15 },
+    { "beat_index": 17, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.50, "value": 15 },
+    { "beat_index": 23, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.50, "value": 15 },
+    { "beat_index": 29, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.50, "value": 20 },
+    { "beat_index": 35, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.50, "value": 20 },
+    { "beat_index": 41, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.50, "value": 25 }
+  ],
+  "speed_zones": [
+    { "start_beat": 0, "end_beat": 44, "speed_multiplier": 1.0, "transition_beats": 0, "label": "Accelerating descent" }
+  ],
+  "background": {
+    "asset_key": "bg_twilight_trench",
+    "parallax_enabled": true,
+    "color_override": null,
+    "shader_key": "depth_distort",
+    "ambient_particle_key": "deep_sea_motes"
+  },
+  "unlock_requirements": {
+    "min_stars_zone_previous": null,
+    "required_level_id": "z5-l6",
+    "required_level_stars": 1,
+    "requires_full_reef_iap": false,
+    "requires_creator_pass": false,
+    "min_total_stars": null
+  },
+  "par_score": { "one_star": 290, "two_star": 1060, "three_star": 1720, "max_possible": 2500 }
+}
