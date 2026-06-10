@@ -2,7 +2,6 @@ extends Area2D
 
 class_name JellyfishDrift
 
-const SCROLL_SPEED: float = 408.0
 const DRIFT_AMPLITUDE: float = 60.0
 const DRIFT_SPEED: float = 2.0
 
@@ -17,7 +16,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
-	position.x -= SCROLL_SPEED * delta
+	position.x -= ScrollService.speed_now() * delta
 	position.y = _start_y + sin(_time * DRIFT_SPEED) * DRIFT_AMPLITUDE
 	if position.x < -200.0:
 		queue_free()

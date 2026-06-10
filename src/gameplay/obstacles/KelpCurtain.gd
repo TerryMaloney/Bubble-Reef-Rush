@@ -2,7 +2,6 @@ extends Node2D
 
 class_name KelpCurtain
 
-const SCROLL_SPEED: float = 408.0
 const BLADE_W: float = 24.0
 const BLADE_H: float = 180.0
 const GAP_HALF: float = 60.0   ## Half the 120 px navigable gap
@@ -90,7 +89,7 @@ func _build_blade_placeholder() -> Polygon2D:
 
 func _process(delta: float) -> void:
 	_time += delta
-	position.x -= SCROLL_SPEED * delta
+	position.x -= ScrollService.speed_now() * delta
 	if position.x < -200.0:
 		queue_free()
 		return

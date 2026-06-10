@@ -115,7 +115,9 @@ func _test_mine_warning() -> bool:
 	player.set_physics_process(false)
 	holder.add_child(player)
 
-	var mine: BubbleMine = load("res://scenes/obstacles/BubbleMine.tscn").instantiate() as BubbleMine
+	# Untyped: BubbleMine.gd now references ScrollService (autoload) which isn't
+	# resolvable at compile time from --script mode. Duck-type to avoid the dependency.
+	var mine = load("res://scenes/obstacles/BubbleMine.tscn").instantiate()
 	mine.position = Vector2(400.0, 400.0)
 	mine.arm_radius = 160.0
 	holder.add_child(mine)
@@ -124,7 +126,7 @@ func _test_mine_warning() -> bool:
 	for _i: int in range(4):
 		await process_frame
 
-	var in_warning: bool = (mine._state == BubbleMine.State.WARNING)
+	var in_warning: bool = (mine._state == mine.State.WARNING)
 	mine.set_process(false)  # stop before queue_free to prevent any deferred scrolling
 
 	holder.queue_free()
@@ -142,7 +144,7 @@ func _test_mine_hit() -> bool:
 	player.set_physics_process(false)
 	holder.add_child(player)
 
-	var mine: BubbleMine = load("res://scenes/obstacles/BubbleMine.tscn").instantiate() as BubbleMine
+	var mine = load("res://scenes/obstacles/BubbleMine.tscn").instantiate()
 	mine.position = Vector2(400.0, 400.0)
 	mine.set_process(false)  # prevent scrolling while waiting for physics
 	holder.add_child(mine)

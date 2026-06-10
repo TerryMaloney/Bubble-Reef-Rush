@@ -84,8 +84,9 @@ func _spawn_obstacle(entry: Dictionary, _current_beat: float) -> void:
 	var packed: PackedScene = load(scene_path) as PackedScene
 	var obstacle: Node2D = packed.instantiate() as Node2D
 
-	# Spawn off the right edge; Y is the normalized lane position × screen height.
-	obstacle.position.x = CANVAS_W + 100.0
+	# X: place far enough right so the obstacle arrives at JUDGMENT_X on the correct beat.
+	var beat_idx: float = float(entry.get("beat_index", 0))
+	obstacle.position.x = ScrollService.JUDGMENT_X + ScrollService.distance_until_beat(beat_idx)
 	obstacle.position.y = float(entry.get("lane_position", 0.5)) * CANVAS_H
 
 	# Parent to the gameplay root (two levels up from this node).
@@ -111,7 +112,8 @@ func _spawn_gate(entry: Dictionary, params: Dictionary) -> void:
 		return
 
 	var screen_h: float = CANVAS_H
-	var spawn_x: float = CANVAS_W + 100.0
+	var entry_beat: float = float(entry.get("beat_index", 0))
+	var spawn_x: float = ScrollService.JUDGMENT_X + ScrollService.distance_until_beat(entry_beat)
 
 	var gap_px: float = lerpf(GAP_MAX_PX, GAP_MIN_PX, clampf(effective, 0.0, 1.0))
 	var gap_center_norm: float = float(params.get("gap_y_normalized", entry.get("lane_position", 0.5)))

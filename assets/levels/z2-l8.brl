@@ -14,7 +14,13 @@
     "created_at": "2026-06-08T00:00:00Z",
     "is_official": true,
     "total_beats": 56,
-    "tags": ["kelp_curtain", "bubble_mine", "130bpm", "1beat_run", "zone_finale"]
+    "tags": [
+      "kelp_curtain",
+      "bubble_mine",
+      "130bpm",
+      "1beat_run",
+      "zone_finale"
+    ]
   },
   "music": {
     "filename": "zone_2_kelp_forest.wav",
@@ -30,280 +36,509 @@
       "beat_index": 4,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.50,
-      "parameters": { "gap_y_normalized": 0.50, "intensity": 0.32, "section": "intro" }
+      "lane_position": 0.5,
+      "parameters": {
+        "gap_y_normalized": 0.5,
+        "intensity": 0.32,
+        "section": "intro"
+      }
     },
     {
       "beat_index": 6,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.50,
-      "parameters": { "gap_y_normalized": 0.50, "intensity": 0.34, "section": "intro" }
+      "lane_position": 0.5,
+      "parameters": {
+        "gap_y_normalized": 0.5,
+        "intensity": 0.34,
+        "section": "intro"
+      }
     },
     {
       "beat_index": 8,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
       "lane_position": 0.45,
-      "parameters": { "gap_y_normalized": 0.45, "intensity": 0.36, "section": "mine-intro" }
+      "parameters": {
+        "gap_y_normalized": 0.45,
+        "intensity": 0.36,
+        "section": "mine-intro"
+      }
     },
     {
       "beat_index": 9,
       "beat_subdivision": "quarter",
       "obstacle_type": "bubble_mine",
       "lane_position": 0.55,
-      "parameters": { "arm_radius": 240 }
+      "parameters": {
+        "arm_radius": 240
+      }
     },
     {
       "beat_index": 10,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.60,
-      "parameters": { "gap_y_normalized": 0.60, "intensity": 0.38, "section": "mine-intro" }
+      "lane_position": 0.6,
+      "parameters": {
+        "gap_y_normalized": 0.6,
+        "intensity": 0.38,
+        "section": "mine-intro"
+      }
     },
     {
       "beat_index": 11,
       "beat_subdivision": "quarter",
       "obstacle_type": "bubble_mine",
-      "lane_position": 0.40,
-      "parameters": { "arm_radius": 240 }
+      "lane_position": 0.4,
+      "parameters": {
+        "arm_radius": 240
+      }
     },
     {
       "beat_index": 12,
       "beat_subdivision": "quarter",
       "obstacle_type": "kelp_curtain",
-      "lane_position": 0.50,
-      "parameters": { "gap_y_normalized": 0.50, "sway_speed": 2.5, "section": "curtain-1" }
+      "lane_position": 0.5,
+      "parameters": {
+        "gap_y_normalized": 0.5,
+        "sway_speed": 2.5,
+        "section": "curtain-1"
+      }
     },
     {
       "beat_index": 14,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.40,
-      "parameters": { "gap_y_normalized": 0.40, "intensity": 0.40, "section": "build" }
+      "lane_position": 0.4,
+      "parameters": {
+        "gap_y_normalized": 0.4,
+        "intensity": 0.4,
+        "section": "build"
+      }
     },
     {
       "beat_index": 15,
       "beat_subdivision": "quarter",
       "obstacle_type": "bubble_mine",
-      "lane_position": 0.60,
-      "parameters": { "arm_radius": 240 }
+      "lane_position": 0.6,
+      "parameters": {
+        "arm_radius": 240
+      }
     },
     {
       "beat_index": 16,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
       "lane_position": 0.58,
-      "parameters": { "gap_y_normalized": 0.58, "intensity": 0.42, "section": "build" }
+      "parameters": {
+        "gap_y_normalized": 0.58,
+        "intensity": 0.42,
+        "section": "build"
+      }
     },
     {
       "beat_index": 18,
       "beat_subdivision": "quarter",
       "obstacle_type": "kelp_curtain",
       "lane_position": 0.45,
-      "parameters": { "gap_y_normalized": 0.45, "sway_speed": 3.0, "section": "curtain-2" }
+      "parameters": {
+        "gap_y_normalized": 0.45,
+        "sway_speed": 3.0,
+        "section": "curtain-2"
+      }
     },
     {
       "beat_index": 19,
       "beat_subdivision": "quarter",
       "obstacle_type": "bubble_mine",
       "lane_position": 0.58,
-      "parameters": { "arm_radius": 240 }
+      "parameters": {
+        "arm_radius": 240
+      }
     },
     {
       "beat_index": 20,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
       "lane_position": 0.55,
-      "parameters": { "gap_y_normalized": 0.55, "intensity": 0.44, "section": "build-2" }
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "intensity": 0.44,
+        "section": "build-2"
+      }
     },
     {
       "beat_index": 22,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.50,
-      "parameters": { "gap_y_normalized": 0.50, "intensity": 0.04, "section": "rest" }
+      "lane_position": 0.5,
+      "parameters": {
+        "gap_y_normalized": 0.5,
+        "intensity": 0.04,
+        "section": "rest"
+      }
     },
     {
       "beat_index": 24,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.40,
-      "parameters": { "gap_y_normalized": 0.40, "intensity": 0.46, "section": "build-3" }
+      "lane_position": 0.4,
+      "parameters": {
+        "gap_y_normalized": 0.4,
+        "intensity": 0.46,
+        "section": "build-3"
+      }
     },
     {
       "beat_index": 25,
       "beat_subdivision": "quarter",
       "obstacle_type": "bubble_mine",
-      "lane_position": 0.60,
-      "parameters": { "arm_radius": 240 }
+      "lane_position": 0.6,
+      "parameters": {
+        "arm_radius": 240
+      }
     },
     {
       "beat_index": 26,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.60,
-      "parameters": { "gap_y_normalized": 0.60, "intensity": 0.48, "section": "build-3" }
+      "lane_position": 0.6,
+      "parameters": {
+        "gap_y_normalized": 0.6,
+        "intensity": 0.48,
+        "section": "build-3"
+      }
     },
     {
       "beat_index": 28,
       "beat_subdivision": "quarter",
       "obstacle_type": "kelp_curtain",
       "lane_position": 0.45,
-      "parameters": { "gap_y_normalized": 0.45, "sway_speed": 3.0, "section": "curtain-3" }
+      "parameters": {
+        "gap_y_normalized": 0.45,
+        "sway_speed": 3.0,
+        "section": "curtain-3"
+      }
     },
     {
       "beat_index": 29,
       "beat_subdivision": "quarter",
       "obstacle_type": "bubble_mine",
-      "lane_position": 0.60,
-      "parameters": { "arm_radius": 240 }
+      "lane_position": 0.6,
+      "parameters": {
+        "arm_radius": 240
+      }
     },
     {
       "beat_index": 30,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
       "lane_position": 0.55,
-      "parameters": { "gap_y_normalized": 0.55, "intensity": 0.50, "section": "climax" }
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "intensity": 0.5,
+        "section": "climax"
+      }
     },
     {
       "beat_index": 31,
       "beat_subdivision": "quarter",
       "obstacle_type": "bubble_mine",
       "lane_position": 0.45,
-      "parameters": { "arm_radius": 240 }
+      "parameters": {
+        "arm_radius": 240
+      }
     },
     {
       "beat_index": 32,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.40,
-      "parameters": { "gap_y_normalized": 0.40, "intensity": 0.52, "section": "climax" }
+      "lane_position": 0.4,
+      "parameters": {
+        "gap_y_normalized": 0.4,
+        "intensity": 0.52,
+        "section": "climax"
+      }
     },
     {
       "beat_index": 34,
       "beat_subdivision": "quarter",
       "obstacle_type": "kelp_curtain",
       "lane_position": 0.55,
-      "parameters": { "gap_y_normalized": 0.55, "sway_speed": 3.0, "section": "curtain-4" }
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "sway_speed": 3.0,
+        "section": "curtain-4"
+      }
     },
     {
       "beat_index": 35,
       "beat_subdivision": "quarter",
       "obstacle_type": "bubble_mine",
-      "lane_position": 0.40,
-      "parameters": { "arm_radius": 240 }
+      "lane_position": 0.4,
+      "parameters": {
+        "arm_radius": 240
+      }
     },
     {
       "beat_index": 36,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
       "lane_position": 0.45,
-      "parameters": { "gap_y_normalized": 0.45, "intensity": 0.54, "section": "pre-gauntlet" }
+      "parameters": {
+        "gap_y_normalized": 0.45,
+        "intensity": 0.54,
+        "section": "pre-gauntlet"
+      }
     },
     {
       "beat_index": 38,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
       "lane_position": 0.58,
-      "parameters": { "gap_y_normalized": 0.58, "intensity": 0.56, "section": "pre-gauntlet" }
+      "parameters": {
+        "gap_y_normalized": 0.58,
+        "intensity": 0.56,
+        "section": "pre-gauntlet"
+      }
     },
     {
       "beat_index": 40,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
       "lane_position": 0.45,
-      "parameters": { "gap_y_normalized": 0.45, "intensity": 0.58, "section": "gauntlet" }
+      "parameters": {
+        "gap_y_normalized": 0.45,
+        "intensity": 0.58,
+        "section": "gauntlet"
+      }
     },
     {
       "beat_index": 41,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
       "lane_position": 0.55,
-      "parameters": { "gap_y_normalized": 0.55, "intensity": 0.60, "section": "gauntlet" }
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "intensity": 0.6,
+        "section": "gauntlet"
+      }
     },
     {
       "beat_index": 42,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
       "lane_position": 0.45,
-      "parameters": { "gap_y_normalized": 0.45, "intensity": 0.62, "section": "gauntlet" }
+      "parameters": {
+        "gap_y_normalized": 0.45,
+        "intensity": 0.62,
+        "section": "gauntlet"
+      }
     },
     {
       "beat_index": 43,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
       "lane_position": 0.55,
-      "parameters": { "gap_y_normalized": 0.55, "intensity": 0.64, "section": "gauntlet" }
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "intensity": 0.64,
+        "section": "gauntlet"
+      }
     },
     {
       "beat_index": 44,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
       "lane_position": 0.45,
-      "parameters": { "gap_y_normalized": 0.45, "intensity": 0.66, "section": "gauntlet" }
+      "parameters": {
+        "gap_y_normalized": 0.45,
+        "intensity": 0.66,
+        "section": "gauntlet"
+      }
     },
     {
       "beat_index": 45,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
       "lane_position": 0.55,
-      "parameters": { "gap_y_normalized": 0.55, "intensity": 0.68, "section": "gauntlet" }
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "intensity": 0.68,
+        "section": "gauntlet"
+      }
     },
     {
       "beat_index": 46,
       "beat_subdivision": "quarter",
       "obstacle_type": "kelp_curtain",
-      "lane_position": 0.50,
-      "parameters": { "gap_y_normalized": 0.50, "sway_speed": 3.0, "section": "curtain-5" }
+      "lane_position": 0.5,
+      "parameters": {
+        "gap_y_normalized": 0.5,
+        "sway_speed": 3.0,
+        "section": "curtain-5"
+      }
     },
     {
       "beat_index": 48,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.40,
-      "parameters": { "gap_y_normalized": 0.40, "intensity": 0.70, "section": "finale" }
+      "lane_position": 0.4,
+      "parameters": {
+        "gap_y_normalized": 0.4,
+        "intensity": 0.7,
+        "section": "finale"
+      }
     },
     {
       "beat_index": 50,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.60,
-      "parameters": { "gap_y_normalized": 0.60, "intensity": 0.72, "section": "finale" }
+      "lane_position": 0.6,
+      "parameters": {
+        "gap_y_normalized": 0.6,
+        "intensity": 0.72,
+        "section": "finale"
+      }
     },
     {
       "beat_index": 52,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
       "lane_position": 0.45,
-      "parameters": { "gap_y_normalized": 0.45, "intensity": 0.74, "section": "finale" }
+      "parameters": {
+        "gap_y_normalized": 0.45,
+        "intensity": 0.74,
+        "section": "finale"
+      }
     },
     {
       "beat_index": 54,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
       "lane_position": 0.55,
-      "parameters": { "gap_y_normalized": 0.55, "intensity": 0.76, "section": "finale" }
+      "parameters": {
+        "gap_y_normalized": 0.55,
+        "intensity": 0.76,
+        "section": "finale"
+      }
     }
   ],
   "collectibles": [
-    { "beat_index": 5,  "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.50, "value": 10 },
-    { "beat_index": 7,  "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.50, "value": 10 },
-    { "beat_index": 13, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.40, "value": 10 },
-    { "beat_index": 17, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.58, "value": 15 },
-    { "beat_index": 21, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.55, "value": 15 },
-    { "beat_index": 23, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.50, "value": 15 },
-    { "beat_index": 27, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.60, "value": 15 },
-    { "beat_index": 33, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.55, "value": 15 },
-    { "beat_index": 37, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.45, "value": 20 },
-    { "beat_index": 39, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.58, "value": 20 },
-    { "beat_index": 47, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.50, "value": 20 },
-    { "beat_index": 49, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.40, "value": 20 },
-    { "beat_index": 53, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.45, "value": 25 },
-    { "beat_index": 55, "beat_subdivision": "quarter", "collectible_type": "pearl", "lane_position": 0.55, "value": 25 }
+    {
+      "beat_index": 5,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.5,
+      "value": 10
+    },
+    {
+      "beat_index": 7,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.5,
+      "value": 10
+    },
+    {
+      "beat_index": 13,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.4,
+      "value": 10
+    },
+    {
+      "beat_index": 17,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.58,
+      "value": 15
+    },
+    {
+      "beat_index": 21,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.55,
+      "value": 15
+    },
+    {
+      "beat_index": 23,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.5,
+      "value": 15
+    },
+    {
+      "beat_index": 27,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.6,
+      "value": 15
+    },
+    {
+      "beat_index": 33,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.55,
+      "value": 15
+    },
+    {
+      "beat_index": 37,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.45,
+      "value": 20
+    },
+    {
+      "beat_index": 39,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.58,
+      "value": 20
+    },
+    {
+      "beat_index": 47,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.5,
+      "value": 20
+    },
+    {
+      "beat_index": 49,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.4,
+      "value": 20
+    },
+    {
+      "beat_index": 53,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.45,
+      "value": 25
+    },
+    {
+      "beat_index": 55,
+      "beat_subdivision": "quarter",
+      "collectible_type": "pearl",
+      "lane_position": 0.55,
+      "value": 25
+    }
   ],
   "speed_zones": [
-    { "start_beat": 0, "end_beat": 56, "speed_multiplier": 1.0, "transition_beats": 0, "label": "Normal cruise throughout" }
+    {
+      "start_beat": 0,
+      "end_beat": 40,
+      "speed_multiplier": 1.0,
+      "transition_beats": 0,
+      "label": "Build"
+    },
+    {
+      "start_beat": 40,
+      "end_beat": 56,
+      "speed_multiplier": 1.1,
+      "transition_beats": 4,
+      "label": "Finale escalation"
+    }
   ],
   "background": {
     "asset_key": "bg_kelp_forest",
@@ -320,5 +555,10 @@
     "requires_creator_pass": false,
     "min_total_stars": null
   },
-  "par_score": { "one_star": 300, "two_star": 950, "three_star": 1500, "max_possible": 2500 }
+  "par_score": {
+    "one_star": 300,
+    "two_star": 950,
+    "three_star": 1500,
+    "max_possible": 2500
+  }
 }

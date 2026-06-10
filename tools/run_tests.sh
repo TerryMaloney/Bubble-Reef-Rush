@@ -50,6 +50,7 @@ run_stage "Game flow test"  "tests/integration/game_flow_test.gd"        "GAME_F
 run_stage "Save test"       "tests/integration/save_test.gd"             "SAVE_OK"
 run_stage "Settings test"   "tests/integration/settings_test.gd"        "SETTINGS_OK"
 run_stage "Registry test"   "tests/integration/registry_test.gd"        "REGISTRY_OK"
+run_stage "Speed zone test" "tests/integration/speed_zone_test.gd"       "SPEED_ZONE_OK"
 run_stage "Playtest"        "tests/integration/playtest.gd"              "PLAYTEST_OK"
 
 echo "==> All tests passed."

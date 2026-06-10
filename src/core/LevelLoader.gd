@@ -48,6 +48,8 @@ func _on_map_loaded(level_id: String) -> void:
 	else:
 		BeatConductor.start_level(bpm, music_stream)
 
+	ScrollService.activate(rhythm_map)
+
 	# Cache level-end data and arm the completion detector.
 	_total_beats = int(meta.get("total_beats", 32))
 	_level_id_meta = level_id
@@ -73,6 +75,7 @@ func _check_level_end(beat_index: int) -> void:
 		EventBus.run_progress.emit(_level_id_meta, pct)
 	if beat_index >= _total_beats - 1:
 		_result_emitted = true
+		ScrollService.deactivate()
 		EventBus.run_progress.emit(_level_id_meta, 100.0)
 		level_ended.emit(_level_id_meta)
 
@@ -80,6 +83,7 @@ func _check_level_end(beat_index: int) -> void:
 func _on_run_aborted(_level_id: String, _score: int) -> void:
 	# run_failed fired first — suppress level_ended so we don't double-transition.
 	_result_emitted = true
+	ScrollService.deactivate()
 
 
 func _on_map_load_failed(error: String) -> void:

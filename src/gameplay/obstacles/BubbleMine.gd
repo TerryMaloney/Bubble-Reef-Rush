@@ -2,7 +2,6 @@ extends Area2D
 
 class_name BubbleMine
 
-const SCROLL_SPEED: float = 408.0
 const COLLISION_RADIUS: float = 56.0
 const EXPLODE_DURATION: float = 0.2
 
@@ -30,7 +29,7 @@ func setup(entry: Dictionary) -> void:
 
 
 func _process(delta: float) -> void:
-	position.x -= SCROLL_SPEED * delta
+	position.x -= ScrollService.speed_now() * delta
 	if position.x < -200.0:
 		queue_free()
 		return

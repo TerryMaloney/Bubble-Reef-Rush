@@ -15,8 +15,11 @@ const CANVAS_H: float = 1920.0
 # ---------------------------------------------------------------------------
 
 ## Base horizontal scroll speed in canvas px/s. All obstacles move left at this
-## rate unless a ScrollService speed-zone multiplier is active (Phase 4).
+## rate unless a ScrollService speed-zone multiplier is active.
 const SCROLL_SPEED: float = 408.0
+
+## Fixed x position (canvas px) of the player / rhythm judgment line.
+const JUDGMENT_X: float = 200.0
 
 # ---------------------------------------------------------------------------
 # Player physics (research-derived, never change without full re-tuning)

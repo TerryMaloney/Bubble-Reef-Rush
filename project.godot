@@ -19,6 +19,7 @@ Accessibility="*res://src/core/Accessibility.gd"
 GameConstants="*res://src/core/GameConstants.gd"
 AssetRegistry="*res://src/core/AssetRegistry.gd"
 VisualFactory="*res://src/core/VisualFactory.gd"
+ScrollService="*res://src/gameplay/ScrollService.gd"
 SFXManager="*res://src/audio/SFXManager.gd"
 
 [display]

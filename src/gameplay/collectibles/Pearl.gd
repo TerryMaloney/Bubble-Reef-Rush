@@ -2,8 +2,6 @@ extends Area2D
 
 class_name Pearl
 
-const SCROLL_SPEED: float = 408.0
-
 var _value: int = 10
 
 
@@ -12,7 +10,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	position.x -= SCROLL_SPEED * delta
+	position.x -= ScrollService.speed_now() * delta
 	if position.x < -200.0:
 		queue_free()
 

@@ -46,7 +46,8 @@ func _spawn_collectible(entry: Dictionary) -> void:
 	var packed: PackedScene = load(PEARL_SCENE) as PackedScene
 	var collectible: Node2D = packed.instantiate() as Node2D
 
-	collectible.position.x = CANVAS_W + 100.0
+	var beat_idx: float = float(entry.get("beat_index", 0))
+	collectible.position.x = ScrollService.JUDGMENT_X + ScrollService.distance_until_beat(beat_idx)
 	collectible.position.y = float(entry.get("lane_position", 0.5)) * CANVAS_H
 
 	get_parent().add_child(collectible)

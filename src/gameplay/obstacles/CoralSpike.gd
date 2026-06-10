@@ -2,7 +2,6 @@ extends Area2D
 
 class_name CoralSpike
 
-const SCROLL_SPEED: float = 408.0
 const SPIKE_WIDTH: float = 60.0
 
 @onready var _collision: CollisionShape2D = $CollisionShape2D
@@ -14,7 +13,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	position.x -= SCROLL_SPEED * delta
+	position.x -= ScrollService.speed_now() * delta
 	if position.x < -200.0:
 		queue_free()
 
