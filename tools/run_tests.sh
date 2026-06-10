@@ -53,6 +53,8 @@ run_stage "Registry test"   "tests/integration/registry_test.gd"        "REGISTR
 run_stage "Speed zone test" "tests/integration/speed_zone_test.gd"       "SPEED_ZONE_OK"
 run_stage "Juice test"       "tests/integration/juice_test.gd"            "JUICE_OK"
 run_stage "Checkpoint test" "tests/integration/checkpoint_test.gd"      "CHECKPOINT_OK"
+run_stage "Economy test"   "tests/integration/economy_test.gd"          "ECONOMY_OK"
+run_stage "Obstacle Z3 test" "tests/integration/obstacle_z3_test.gd"    "OBSTACLE_Z3_OK"
 run_stage "Playtest"        "tests/integration/playtest.gd"              "PLAYTEST_OK"
 
 echo "==> All tests passed."

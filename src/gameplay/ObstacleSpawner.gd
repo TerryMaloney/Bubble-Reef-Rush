@@ -9,6 +9,9 @@ const OBSTACLE_SCENE_MAP: Dictionary = {
 	"jellyfish_drift": "res://scenes/obstacles/JellyfishDrift.tscn",
 	"kelp_curtain": "res://scenes/obstacles/KelpCurtain.tscn",
 	"bubble_mine": "res://scenes/obstacles/BubbleMine.tscn",
+	"current_jet": "res://scenes/obstacles/CurrentJet.tscn",
+	"anchor_chain": "res://scenes/obstacles/AnchorChain.tscn",
+	"eel_snap": "res://scenes/obstacles/EelSnap.tscn",
 }
 const CORAL_SPIKE_SCENE: String = "res://scenes/obstacles/CoralSpike.tscn"
 
