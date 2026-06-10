@@ -11,6 +11,8 @@ func _ready() -> void:
 
 
 func _on_run_failed(_level_id: String, _score: int) -> void:
+	if GameManager.is_practice_mode:
+		return  # PracticeController respawns instead
 	if auto_retry:
 		_auto_retry_after_delay()
 

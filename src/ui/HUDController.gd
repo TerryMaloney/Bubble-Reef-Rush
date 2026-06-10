@@ -9,6 +9,7 @@ class_name HUDController
 @export var retry_button: Button
 @export var progress_bar: ProgressBar
 @export var attempt_label: Label
+@export var drop_cp_button: Button
 
 var score: int = 0
 
@@ -28,11 +29,15 @@ func _ready() -> void:
 	EventBus.score_bonus.connect(_on_score_bonus)
 	EventBus.fever_started.connect(_on_fever_started)
 	EventBus.fever_ended.connect(_on_fever_ended)
+	EventBus.practice_checkpoint_saved.connect(_on_checkpoint_saved)
 	BeatConductor.beat_fired.connect(_on_beat_fired)
 
 	if retry_button != null:
 		retry_button.pressed.connect(_on_retry_pressed)
 		retry_button.hide()
+
+	if drop_cp_button != null:
+		drop_cp_button.visible = GameManager.is_practice_mode
 
 
 ## Call this from LevelRoot once the TimingJudge child is ready.
@@ -70,8 +75,20 @@ func _on_run_progress(_level_id: String, pct: float) -> void:
 
 
 func _on_run_failed_hud(_level_id: String, _score: int) -> void:
+	if GameManager.is_practice_mode:
+		return  # practice respawn; no retry button
 	if retry_button != null:
 		retry_button.show()
+
+
+## Restore score after a practice checkpoint respawn.
+func set_score(new_score: int) -> void:
+	score = new_score
+	_update_score_label()
+
+
+func _on_checkpoint_saved() -> void:
+	_flash_judgment("CP SAVED", Color(0.2, 0.9, 0.4))
 
 
 func _on_collectible_taken(value: int) -> void:

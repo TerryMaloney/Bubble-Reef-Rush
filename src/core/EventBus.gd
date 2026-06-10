@@ -25,3 +25,7 @@ signal fever_ended
 signal near_miss
 ## Additional score to add, emitted by FeverController for fever bonuses.
 signal score_bonus(amount: int)
+## Practice mode: checkpoint saved by PracticeController.
+signal practice_checkpoint_saved
+## Practice mode: emitted by LevelLoader.restart_from_beat() so fever/NMD reset.
+signal practice_respawned

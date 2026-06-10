@@ -16,6 +16,7 @@ var _beat_flash: float = 0.0   ## Decays 5/s after each beat_fired; drives teal 
 
 
 func _ready() -> void:
+	add_to_group("scrolling")
 	BeatConductor.beat_fired.connect(_on_beat_fired)
 
 

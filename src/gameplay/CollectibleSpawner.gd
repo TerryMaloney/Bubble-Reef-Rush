@@ -12,14 +12,16 @@ var _pending: Array[Dictionary] = []
 var _rhythm_map: RhythmMap
 
 
-func setup(rhythm_map: RhythmMap) -> void:
+func setup(rhythm_map: RhythmMap, start_beat: float = 0.0) -> void:
 	_rhythm_map = rhythm_map
 	_pending.clear()
 
-	# Copy all collectibles entries and sort ascending by beat_index.
+	# Copy collectible entries at or after start_beat and sort ascending.
 	var raw: Dictionary = _rhythm_map.get_raw_data()
 	var collectibles: Array = raw.get("collectibles", []) as Array
 	for entry: Variant in collectibles:
+		if float((entry as Dictionary).get("beat_index", 0)) < start_beat:
+			continue
 		_pending.append(entry as Dictionary)
 
 	_pending.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:

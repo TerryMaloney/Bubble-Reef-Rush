@@ -129,9 +129,10 @@ func _process(_delta: float) -> void:
 
 ## Start a fixed-BPM level.
 ## bpm: the level's BPM (from level metadata).
-## music_stream: the AudioStream resource to play.
+## music_stream: the AudioStream resource to play (null = headless/wall-clock mode).
+## from_beat: optional seek point; 0.0 = level start, 16.0 = checkpoint mid-level.
 ## For Zone 5 variable-BPM, call start_level_variable_bpm() instead.
-func start_level(bpm: float, music_stream: AudioStream) -> void:
+func start_level(bpm: float, music_stream: AudioStream, from_beat: float = 0.0) -> void:
 	_stop_internal()
 
 	_current_bpm = bpm
@@ -139,22 +140,25 @@ func start_level(bpm: float, music_stream: AudioStream) -> void:
 	_variable_bpm_mode = false
 	_beat_map_timestamps.clear()
 
+	var seek_sec: float = from_beat * _beat_duration_sec
 	if music_stream != null:
 		_music_player.stream = music_stream
-		_music_player.play()
+		_music_player.play(seek_sec)
 		_use_wall_clock = false
+		_wall_clock_start_msec = 0
 	else:
 		_use_wall_clock = true
-	_wall_clock_start_msec = Time.get_ticks_msec()
+		# Offset wall clock so _get_corrected_time() returns seek_sec immediately.
+		_wall_clock_start_msec = Time.get_ticks_msec() - int(seek_sec * 1000.0)
 
-	# Anchor the first beat slightly ahead of now so we never fire beat 0
-	# before the audio output has actually started.
 	var now: float = _get_corrected_time()
-	_level_start_time_sec = now
-	_next_beat_time_sec = now + _beat_duration_sec
-	_next_half_beat_time_sec = now + (_beat_duration_sec * 0.5)
-	_beat_index = 0
-	_bar_number = 0
+	# Anchor epoch so get_current_beat_position() returns from_beat right after start.
+	_level_start_time_sec = now - seek_sec
+	_beat_index = int(from_beat)
+	_bar_number = _beat_index / 4
+	var frac: float = fmod(from_beat, 1.0)
+	_next_beat_time_sec = now + (1.0 - frac) * _beat_duration_sec
+	_next_half_beat_time_sec = now + ((0.5 - frac) if frac < 0.5 else (1.5 - frac)) * _beat_duration_sec
 	_running = true
 	_paused = false
 
@@ -162,24 +166,34 @@ func start_level(bpm: float, music_stream: AudioStream) -> void:
 
 
 ## Start a variable-BPM level (Zone 5).
-## music_stream: the full Zone 5 audio track (zone_5_twilight_trench.ogg).
+## music_stream: the full Zone 5 audio track (null = headless/wall-clock mode).
 ## beat_timestamps: array of playback-position floats (seconds from track start),
-##   one entry per beat, in ascending order. Authored once and stored in the
-##   level's companion resource file (zone_5_beat_map.tres or loaded from JSON).
-func start_level_variable_bpm(music_stream: AudioStream, beat_timestamps: Array[float]) -> void:
+##   one entry per beat, in ascending order.
+## from_beat: optional seek point (integer beats only for vbpm).
+func start_level_variable_bpm(music_stream: AudioStream, beat_timestamps: Array[float], from_beat: float = 0.0) -> void:
 	_stop_internal()
 
 	_variable_bpm_mode = true
 	_beat_map_timestamps = beat_timestamps.duplicate()
-	_vbpm_next_beat_map_idx = 0
+	_vbpm_next_beat_map_idx = maxi(0, int(from_beat))
 
-	_music_player.stream = music_stream
-	_music_player.play()
+	var seek_sec: float = 0.0
+	if _vbpm_next_beat_map_idx < _beat_map_timestamps.size():
+		seek_sec = _beat_map_timestamps[_vbpm_next_beat_map_idx]
+
+	if music_stream != null:
+		_music_player.stream = music_stream
+		_music_player.play(seek_sec)
+		_use_wall_clock = false
+		_wall_clock_start_msec = 0
+	else:
+		_use_wall_clock = true
+		_wall_clock_start_msec = Time.get_ticks_msec() - int(seek_sec * 1000.0)
 
 	var now: float = _get_corrected_time()
-	_level_start_time_sec = now
-	_beat_index = 0
-	_bar_number = 0
+	_level_start_time_sec = now - seek_sec
+	_beat_index = int(from_beat)
+	_bar_number = _beat_index / 4
 	_running = true
 	_paused = false
 
@@ -320,7 +334,11 @@ func _process_variable_bpm(now: float) -> void:
 	if _beat_map_timestamps.is_empty():
 		return
 
-	var playback_pos: float = _music_player.get_playback_position()
+	var playback_pos: float
+	if _use_wall_clock:
+		playback_pos = now - _level_start_time_sec
+	else:
+		playback_pos = _music_player.get_playback_position()
 
 	# Fire all beats whose timestamp has been passed since last frame.
 	while _vbpm_next_beat_map_idx < _beat_map_timestamps.size():
@@ -350,7 +368,11 @@ func _process_variable_bpm(now: float) -> void:
 func _get_vbpm_beat_position() -> float:
 	if _beat_map_timestamps.is_empty():
 		return 0.0
-	var pos: float = _music_player.get_playback_position()
+	var pos: float
+	if _use_wall_clock:
+		pos = _get_corrected_time() - _level_start_time_sec
+	else:
+		pos = _music_player.get_playback_position()
 	var idx: int = _vbpm_next_beat_map_idx
 	if idx == 0:
 		return 0.0
@@ -366,7 +388,11 @@ func _get_vbpm_beat_position() -> float:
 
 ## Resync beat cursor for variable-BPM after app resume.
 func _resync_variable_bpm() -> void:
-	var pos: float = _music_player.get_playback_position()
+	var pos: float
+	if _use_wall_clock:
+		pos = _get_corrected_time() - _level_start_time_sec
+	else:
+		pos = _music_player.get_playback_position()
 	_vbpm_next_beat_map_idx = 0
 	for i: int in range(_beat_map_timestamps.size()):
 		if _beat_map_timestamps[i] <= pos:

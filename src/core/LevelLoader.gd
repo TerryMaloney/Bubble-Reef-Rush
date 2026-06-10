@@ -16,6 +16,12 @@ var _total_beats: int = 0
 var _level_id_meta: String = ""
 var _result_emitted: bool = false
 
+## Stored after map load so restart_from_beat() can re-start the conductor.
+var _bpm: float = 0.0
+var _is_variable: bool = false
+var _music_stream: AudioStream = null
+var _beat_timestamps: Array[float] = []
+
 
 func load_level(level_id_or_path: String) -> void:
 	rhythm_map = RhythmMap.new()
@@ -41,11 +47,16 @@ func _on_map_loaded(level_id: String) -> void:
 	else:
 		push_warning("LevelLoader: Music file not found at '%s'. Audio will be silent." % music_path)
 
+	_bpm = bpm
+	_is_variable = is_variable
+	_music_stream = music_stream
+
 	if is_variable:
 		var total_beats: int = int(meta.get("total_beats", 32))
-		var timestamps: Array[float] = _build_beat_timestamps(rhythm_map, total_beats)
-		BeatConductor.start_level_variable_bpm(music_stream, timestamps)
+		_beat_timestamps = _build_beat_timestamps(rhythm_map, total_beats)
+		BeatConductor.start_level_variable_bpm(music_stream, _beat_timestamps)
 	else:
+		_beat_timestamps.clear()
 		BeatConductor.start_level(bpm, music_stream)
 
 	ScrollService.activate(rhythm_map)
@@ -64,6 +75,36 @@ func _on_map_loaded(level_id: String) -> void:
 
 	if collectible_spawner != null and collectible_spawner.has_method("setup"):
 		collectible_spawner.setup(rhythm_map)
+
+
+## Restart the level from a checkpoint beat. Called by PracticeController.
+## Despawns all scrolling entities, re-seeds spawners, re-starts conductor.
+func restart_from_beat(from_beat: float) -> void:
+	# Detach beat-end listener so it re-arms cleanly.
+	if BeatConductor.beat_fired.is_connected(_check_level_end):
+		BeatConductor.beat_fired.disconnect(_check_level_end)
+	_result_emitted = false
+
+	# Despawn all live scrolling entities (obstacles + collectibles).
+	for node: Node in get_tree().get_nodes_in_group("scrolling"):
+		node.queue_free()
+
+	# Re-start conductor from checkpoint.
+	if _is_variable:
+		BeatConductor.start_level_variable_bpm(_music_stream, _beat_timestamps, from_beat)
+	else:
+		BeatConductor.start_level(_bpm, _music_stream, from_beat)
+
+	ScrollService.activate(rhythm_map)
+
+	# Re-arm beat-end listener and re-seed spawners from the checkpoint beat.
+	BeatConductor.beat_fired.connect(_check_level_end)
+	if obstacle_spawner != null and obstacle_spawner.has_method("setup"):
+		obstacle_spawner.setup(rhythm_map, from_beat)
+	if collectible_spawner != null and collectible_spawner.has_method("setup"):
+		collectible_spawner.setup(rhythm_map, from_beat)
+
+	EventBus.practice_respawned.emit()
 
 
 func _check_level_end(beat_index: int) -> void:

@@ -16,6 +16,7 @@ func _ready() -> void:
 	EventBus.beat_judged.connect(_on_beat_judged)
 	EventBus.collectible_taken.connect(_on_collectible_taken)
 	EventBus.run_started.connect(_reset)
+	EventBus.practice_respawned.connect(_reset.bind(""))
 
 
 func is_fever() -> bool:

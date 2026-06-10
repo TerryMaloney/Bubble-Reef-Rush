@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/LevelRoot.gd" id="1"]
 [ext_resource type="Script" path="res://src/core/LevelLoader.gd" id="2"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://src/gameplay/JuiceDirector.gd" id="10"]
 [ext_resource type="Script" path="res://src/gameplay/FeverController.gd" id="11"]
 [ext_resource type="Script" path="res://src/gameplay/BackgroundController.gd" id="12"]
+[ext_resource type="Script" path="res://src/gameplay/PracticeController.gd" id="13"]
 
 [node name="LevelRoot" type="Node2D"]
 script = ExtResource("1")
@@ -47,6 +48,9 @@ script = ExtResource("11")
 
 [node name="BackgroundController" type="Node" parent="."]
 script = ExtResource("12")
+
+[node name="PracticeController" type="Node" parent="."]
+script = ExtResource("13")
 
 [node name="Player" parent="." instance=ExtResource("7")]
 position = Vector2(200, 960)
@@ -110,6 +114,18 @@ offset_top = 60.0
 offset_right = 160.0
 offset_bottom = 140.0
 text = "RETRY"
+visible = false
+
+[node name="DropCPButton" type="Button" parent="HUD"]
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 0.0
+offset_left = -96.0
+offset_top = 1740.0
+offset_right = 96.0
+offset_bottom = 1836.0
+text = "DROP CP"
 visible = false
 
 [node name="PauseMenu" parent="." instance=ExtResource("9")]

@@ -18,6 +18,7 @@ func _ready() -> void:
 	area_exited.connect(_on_area_exited)
 	EventBus.player_hit.connect(_on_player_hit)
 	EventBus.run_started.connect(_reset)
+	EventBus.practice_respawned.connect(_reset.bind(""))
 
 
 func _on_area_entered(area: Area2D) -> void:

@@ -9,6 +9,7 @@ const SPIKE_WIDTH: float = 60.0
 
 
 func _ready() -> void:
+	add_to_group("scrolling")
 	body_entered.connect(_on_body_entered)
 
 

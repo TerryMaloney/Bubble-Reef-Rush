@@ -28,6 +28,9 @@ func _ready() -> void:
 	retry_btn.pressed.connect(func() -> void: EventBus.retry_requested.emit())
 	retry_btn.hide()
 
+	var drop_cp_btn: Button = $HUD/DropCPButton
+	_hud_controller.drop_cp_button = drop_cp_btn
+
 	var player: PlayerController = $Player
 	_hud_controller.connect_timing_judge(player.timing_judge)
 	player.timing_judge.combo_updated.connect(director.on_combo_updated)
@@ -37,6 +40,14 @@ func _ready() -> void:
 
 	($JuiceDirector as JuiceDirector).setup($Camera2D as Camera2D)
 	($BackgroundController as BackgroundController).setup($Background as ColorRect)
+
+	var practice: PracticeController = $PracticeController
+	practice.setup(player, _hud_controller, _level_loader)
+	if GameManager.is_practice_mode:
+		drop_cp_btn.pressed.connect(practice.drop_checkpoint)
+		drop_cp_btn.show()
+	else:
+		drop_cp_btn.hide()
 
 	_level_loader.level_ended.connect(_on_level_ended)
 	_level_loader.load_level(GameManager.current_level_id)

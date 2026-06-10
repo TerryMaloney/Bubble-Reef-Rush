@@ -6,6 +6,7 @@ var _value: int = 10
 
 
 func _ready() -> void:
+	add_to_group("scrolling")
 	body_entered.connect(_on_body_entered)
 
 

@@ -35,14 +35,16 @@ var _rhythm_map: RhythmMap
 var director: DifficultyDirector = null
 
 
-func setup(rhythm_map: RhythmMap) -> void:
+func setup(rhythm_map: RhythmMap, start_beat: float = 0.0) -> void:
 	_rhythm_map = rhythm_map
 	_pending.clear()
 
-	# Copy all beat_map entries and sort ascending by beat_index.
+	# Copy beat_map entries at or after start_beat and sort ascending by beat_index.
 	var raw: Dictionary = _rhythm_map.get_raw_data()
 	var beat_map: Array = raw.get("beat_map", []) as Array
 	for entry: Variant in beat_map:
+		if float((entry as Dictionary).get("beat_index", 0)) < start_beat:
+			continue
 		_pending.append(entry as Dictionary)
 
 	_pending.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:

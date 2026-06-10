@@ -33,6 +33,10 @@ var _last_progress_pct: float = 0.0
 ## Scene to return to after closing SettingsScreen.
 var _settings_return_scene: String = MAIN_MENU_SCENE
 
+## Set true by LevelSelect when launching a practice run.
+## Suppresses SaveSystem writes and auto-retry; PracticeController handles respawn.
+var is_practice_mode: bool = false
+
 
 func _ready() -> void:
 	EventBus.run_failed.connect(_on_run_failed)
@@ -101,6 +105,8 @@ func _on_run_progress(_level_id: String, pct: float) -> void:
 
 
 func _on_run_failed(level_id: String, _score: int) -> void:
+	if is_practice_mode:
+		return  # PracticeController handles respawn; no death/progress tracking
 	# RetryController handles the prompt; GameManager just records state.
 	current_state = State.PLAYING
 	consecutive_deaths += 1
