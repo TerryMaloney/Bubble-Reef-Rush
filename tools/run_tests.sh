@@ -48,6 +48,7 @@ run_stage "Obstacle test"   "tests/integration/obstacle_test.gd"         "OBSTAC
 run_stage "Geometry test"   "tests/integration/geometry_test.gd"         "GEOMETRY_OK"
 run_stage "Game flow test"  "tests/integration/game_flow_test.gd"        "GAME_FLOW_OK"
 run_stage "Save test"       "tests/integration/save_test.gd"             "SAVE_OK"
+run_stage "Settings test"   "tests/integration/settings_test.gd"        "SETTINGS_OK"
 run_stage "Playtest"        "tests/integration/playtest.gd"              "PLAYTEST_OK"
 
 echo "==> All tests passed."

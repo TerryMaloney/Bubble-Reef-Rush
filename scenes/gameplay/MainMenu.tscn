@@ -38,6 +38,11 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 80)
 text = "PLAY"
 
+[node name="SettingsButton" type="Button" parent="Layout"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 80)
+text = "SETTINGS"
+
 [node name="BuildLabel" type="Label" parent="."]
 anchor_top = 1.0
 anchor_right = 1.0

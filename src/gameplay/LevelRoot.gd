@@ -36,6 +36,10 @@ func _ready() -> void:
 	# Feed combo state to the director so expert play raises the pressure.
 	player.timing_judge.combo_updated.connect(director.on_combo_updated)
 
+	# Apply persisted settings before the level clock starts.
+	BeatConductor.user_latency_offset_ms = Accessibility.timing_offset_ms()
+	player.timing_judge.window_scale = 1.25 if Accessibility.wide_timing_windows() else 1.0
+
 	_level_loader.level_ended.connect(_on_level_ended)
 	_level_loader.load_level(GameManager.current_level_id)
 

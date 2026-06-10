@@ -82,14 +82,15 @@ func _on_collectible_taken(value: int) -> void:
 
 func _on_input_judged(result: TimingJudge.TimingResult, _offset_ms: float, _beat_index: int) -> void:
 	var combo_mult: int = _combo_multiplier(_combo)
+	var colorblind: bool = Accessibility.colorblind_judgements()
 
 	match result:
 		TimingJudge.TimingResult.PERFECT:
 			score += 100 * combo_mult
-			_flash_judgment("PERFECT", Color(1.0, 0.85, 0.0))
+			_flash_judgment("◆ PERFECT" if colorblind else "PERFECT", Color(1.0, 0.85, 0.0))
 		TimingJudge.TimingResult.GOOD:
 			score += 60 * combo_mult
-			_flash_judgment("GOOD", Color(0.2, 0.6, 1.0))
+			_flash_judgment("● GOOD" if colorblind else "GOOD", Color(0.2, 0.6, 1.0))
 		TimingJudge.TimingResult.MISS:
 			pass  # no text — with no audio cue, a MISS label is just noise
 

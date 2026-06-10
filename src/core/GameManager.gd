@@ -10,6 +10,7 @@ const RESULTS_SCENE: String = "res://scenes/gameplay/ResultsScreen.tscn"
 const BUILD_MODE_SCENE: String = "res://scenes/buildmode/BuildModeRoot.tscn"
 const ZONE_SELECT_SCENE: String = "res://scenes/gameplay/ZoneSelect.tscn"
 const LEVEL_SELECT_SCENE: String = "res://scenes/gameplay/LevelSelect.tscn"
+const SETTINGS_SCENE: String = "res://scenes/gameplay/SettingsScreen.tscn"
 
 var current_state: State = State.MENU
 var current_level_id: String = ""
@@ -29,6 +30,8 @@ var last_prev_best_score: int = 0
 var _active_profile: String = ""
 ## Latest progress percentage emitted during the current run, used by run_failed handler.
 var _last_progress_pct: float = 0.0
+## Scene to return to after closing SettingsScreen.
+var _settings_return_scene: String = MAIN_MENU_SCENE
 
 
 func _ready() -> void:
@@ -84,6 +87,15 @@ func go_to_level_select(zone_id: String) -> void:
 func open_build_mode() -> void:
 	current_state = State.BUILD_MODE
 	get_tree().change_scene_to_file(BUILD_MODE_SCENE)
+
+
+func go_to_settings(return_scene: String = MAIN_MENU_SCENE) -> void:
+	_settings_return_scene = return_scene
+	get_tree().change_scene_to_file(SETTINGS_SCENE)
+
+
+func return_from_settings() -> void:
+	get_tree().change_scene_to_file(_settings_return_scene)
 
 
 func _on_run_progress(_level_id: String, pct: float) -> void:

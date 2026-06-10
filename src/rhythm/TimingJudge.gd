@@ -76,6 +76,10 @@ var _combo_count: int = 0
 ## Whether combo was just started (used to gate combo_start SFX in external listener).
 var _combo_was_active: bool = false
 
+## Multiplier applied to both PERFECT and GOOD half-widths.
+## 1.0 = standard (±80/±160ms).  Set to 1.25 for wide-timing-windows mode (±100/±200ms).
+var window_scale: float = 1.0
+
 # ---------------------------------------------------------------------------
 # Node lifecycle
 # ---------------------------------------------------------------------------
@@ -100,7 +104,7 @@ func _exit_tree() -> void:
 ## Returns the TimingResult enum value.
 func judge_input(input_time_ms: float) -> TimingResult:
 	var window: float = get_current_window_ms()
-	var good_outer: float = GOOD_OUTER_HALF_MS
+	var good_outer: float = GOOD_OUTER_HALF_MS * window_scale
 
 	# Apply BPM compression to both windows at high tempo.
 	var bpm: float = BeatConductor.get_bpm_at_beat(float(_current_beat_index))
@@ -139,13 +143,15 @@ func judge_input(input_time_ms: float) -> TimingResult:
 
 
 ## Returns the half-width of the PERFECT timing window in milliseconds,
-## adjusted for current BPM. At BPM >= HIGH_BPM_THRESHOLD the window shrinks.
+## adjusted for current BPM and window_scale. At BPM >= HIGH_BPM_THRESHOLD
+## the window shrinks by up to HIGH_BPM_COMPRESSION.
 func get_current_window_ms() -> float:
 	var bpm: float = BeatConductor.get_bpm_at_beat(float(_current_beat_index))
+	var base: float = PERFECT_HALF_MS * window_scale
 	if bpm < HIGH_BPM_THRESHOLD:
-		return PERFECT_HALF_MS
+		return base
 	var t: float = clampf((bpm - HIGH_BPM_THRESHOLD) / (180.0 - HIGH_BPM_THRESHOLD), 0.0, 1.0)
-	return lerpf(PERFECT_HALF_MS, PERFECT_HALF_MS * HIGH_BPM_COMPRESSION, t)
+	return lerpf(base, base * HIGH_BPM_COMPRESSION, t)
 
 
 ## Reset all state. Call at level start, retry, or fail.
