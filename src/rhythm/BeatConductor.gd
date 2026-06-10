@@ -226,6 +226,26 @@ func get_bpm_at_beat(beat_index: float) -> float:
 	return 60.0 / dt
 
 
+## Pause or resume the conductor from gameplay (e.g. pause menu).
+## Unlike the app-lifecycle notification path, this is called explicitly by
+## PauseMenu so the in-game pause button and Esc key work correctly.
+func set_paused(paused: bool) -> void:
+	if not _running:
+		return
+	if paused == _paused:
+		return
+	_paused = paused
+	if _paused:
+		AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"), true)
+		_music_player.stream_paused = true
+		conductor_stopped.emit()
+	else:
+		AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"), false)
+		_music_player.stream_paused = false
+		resync_to_playback_position()
+		conductor_started.emit()
+
+
 ## Resync the beat clock to the current audio playback position.
 ## Call this after app resume (NOTIFICATION_APPLICATION_RESUMED) to avoid a
 ## wall of catch-up beats when the clock was frozen during backgrounding.

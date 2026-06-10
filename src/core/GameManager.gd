@@ -27,11 +27,14 @@ var last_stars: int = 0
 var last_prev_best_score: int = 0
 
 var _active_profile: String = ""
+## Latest progress percentage emitted during the current run, used by run_failed handler.
+var _last_progress_pct: float = 0.0
 
 
 func _ready() -> void:
 	EventBus.run_failed.connect(_on_run_failed)
 	EventBus.run_completed.connect(_on_run_completed)
+	EventBus.run_progress.connect(_on_run_progress)
 	EventBus.retry_requested.connect(retry_level)
 	EventBus.level_load_requested.connect(start_level)
 	_active_profile = SaveSystem.get_active_profile_id()
@@ -40,6 +43,7 @@ func _ready() -> void:
 func start_level(level_id: String) -> void:
 	current_state = State.LOADING
 	current_level_id = level_id
+	_last_progress_pct = 0.0
 	# A deliberately-chosen level starts fresh — clear the carried-death assist.
 	consecutive_deaths = 0
 	get_tree().change_scene_to_file(LEVEL_ROOT_SCENE)
@@ -82,12 +86,21 @@ func open_build_mode() -> void:
 	get_tree().change_scene_to_file(BUILD_MODE_SCENE)
 
 
-func _on_run_failed(_level_id: String, _score: int) -> void:
+func _on_run_progress(_level_id: String, pct: float) -> void:
+	_last_progress_pct = pct
+
+
+func _on_run_failed(level_id: String, _score: int) -> void:
 	# RetryController handles the prompt; GameManager just records state.
 	current_state = State.PLAYING
 	consecutive_deaths += 1
+	_active_profile = SaveSystem.get_active_profile_id()
+	SaveSystem.record_attempt(_active_profile, level_id)
+	SaveSystem.record_progress_pct(_active_profile, level_id, _last_progress_pct)
 
 
 func _on_run_completed(level_id: String, score: int, stars: int) -> void:
 	consecutive_deaths = 0
+	_active_profile = SaveSystem.get_active_profile_id()
+	SaveSystem.record_attempt(_active_profile, level_id)
 	finish_level(score, stars)

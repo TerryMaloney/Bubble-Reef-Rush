@@ -22,6 +22,8 @@ func _ready() -> void:
 	_hud_controller.score_label = $HUD/ScoreLabel
 	_hud_controller.combo_label = $HUD/ComboLabel
 	_hud_controller.judgment_label = $HUD/JudgmentLabel
+	_hud_controller.progress_bar = $HUD/ProgressBar
+	_hud_controller.attempt_label = $HUD/AttemptLabel
 
 	# Wire retry button here since HUDController._ready() ran before we set export vars.
 	var retry_btn: Button = $HUD/RetryButton

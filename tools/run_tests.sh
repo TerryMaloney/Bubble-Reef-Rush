@@ -5,8 +5,8 @@
 #   GODOT=/path/to/godot ./tools/run_tests.sh
 # If GODOT is unset, falls back to `godot` on PATH.
 #
-# Runs the project import once (to build the global class cache), then the
-# smoke test, the collision-contract test, and the full playtest harness.
+# Stage 0: Python validators (schema + movement budgets) over all .brl files.
+# Stages 1-8: Godot headless unit/integration tests.
 # Exits non-zero if any stage fails.
 set -euo pipefail
 
@@ -14,6 +14,16 @@ GODOT="${GODOT:-godot}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+# ── Stage 0: Python validators ───────────────────────────────────────────────
+echo "==> Stage 0: BRL schema validation"
+python3 tools/validate_brl.py assets/levels/
+echo "    PASS: BRL schema validation"
+
+echo "==> Stage 0: Movement budget check"
+python3 tools/check_movements.py assets/levels/
+echo "    PASS: Movement budget check"
+
+# ── Godot headless stages ────────────────────────────────────────────────────
 echo "==> Importing project (building class cache)…"
 "$GODOT" --headless --import >/dev/null 2>&1 || true
 
@@ -36,7 +46,8 @@ run_stage "Director test"   "tests/integration/director_test.gd"         "DIRECT
 run_stage "Collision test"  "tests/integration/collision_test.gd"        "COLLISION_OK"
 run_stage "Obstacle test"   "tests/integration/obstacle_test.gd"         "OBSTACLE_OK"
 run_stage "Geometry test"   "tests/integration/geometry_test.gd"         "GEOMETRY_OK"
-run_stage "Game flow test"  "tests/integration/game_flow_test.gd"         "GAME_FLOW_OK"
-run_stage "Playtest"        "tests/integration/playtest.gd"               "PLAYTEST_OK"
+run_stage "Game flow test"  "tests/integration/game_flow_test.gd"        "GAME_FLOW_OK"
+run_stage "Save test"       "tests/integration/save_test.gd"             "SAVE_OK"
+run_stage "Playtest"        "tests/integration/playtest.gd"              "PLAYTEST_OK"
 
 echo "==> All tests passed."

@@ -1,6 +1,7 @@
 # Autoload node that manages local family profiles and per-profile level progress persistence.
 extends Node
 
+const SAVE_VERSION: int = 2
 
 const PROFILE_INDEX_PATH: String = "user://profiles/index.cfg"
 const LEVELS_DIR_TEMPLATE: String = "user://profiles/%s/levels/"
@@ -22,16 +23,7 @@ func ensure_profile(profile_id: String) -> void:
 		DirAccess.make_dir_recursive_absolute(levels_dir)
 
 	if not FileAccess.file_exists(progress_path):
-		var initial_progress: Dictionary = {
-			"version": 1,
-			"profile_id": profile_id,
-			"total_stars": 0,
-			"coins": 0,
-			"levels": {},
-			"characters": {"default_fish": true},
-			"settings": {"timing_offset_ms": 0.0}
-		}
-		_write_json(progress_path, initial_progress)
+		_write_json(progress_path, _fresh_v2_profile(profile_id))
 
 	# Ensure this profile is registered in the index.
 	var cfg: ConfigFile = ConfigFile.new()
@@ -74,6 +66,74 @@ func list_profiles() -> Array[String]:
 	return result
 
 
+func _fresh_v2_profile(profile_id: String) -> Dictionary:
+	return {
+		"version": SAVE_VERSION,
+		"profile_id": profile_id,
+		"total_stars": 0,
+		"coins": 0,
+		"levels": {},
+		"characters": {"default_fish": true},
+		"cosmetics": {"owned": [], "equipped": {"trail": "", "ring": "", "palette": ""}},
+		"achievements": {},
+		"settings": {
+			"timing_offset_ms": 0.0,
+			"reduced_motion": false,
+			"wide_timing_windows": false,
+			"text_scale": 1.0,
+			"colorblind_judgements": false,
+			"volume_master": 1.0,
+			"volume_music": 1.0,
+			"volume_sfx": 1.0,
+		}
+	}
+
+
+func _migrate(data: Dictionary) -> Dictionary:
+	var ver: int = int(data.get("version", 1))
+	if ver >= SAVE_VERSION:
+		return data
+
+	# Write a backup before migrating.
+	var profile_id: String = str(data.get("profile_id", "player1"))
+	var bak_path: String = "user://profiles/%s/progress.json.bak" % profile_id
+	_write_json(bak_path, data)
+
+	# v1 → v2: add economy, achievement, cosmetics, per-level new fields, new settings.
+	var fresh: Dictionary = _fresh_v2_profile(profile_id)
+
+	# Carry over existing fields.
+	fresh["total_stars"] = int(data.get("total_stars", 0))
+	fresh["coins"] = int(data.get("coins", 0))
+	fresh["characters"] = data.get("characters", {"default_fish": true}) as Dictionary
+
+	# Carry over settings, merging new keys over old.
+	var old_settings: Dictionary = data.get("settings", {}) as Dictionary
+	var new_settings: Dictionary = fresh["settings"] as Dictionary
+	for k: String in old_settings.keys():
+		new_settings[k] = old_settings[k]
+	fresh["settings"] = new_settings
+
+	# Carry over per-level data, adding new per-level fields where absent.
+	var old_levels: Dictionary = data.get("levels", {}) as Dictionary
+	var new_levels: Dictionary = {}
+	for lid: String in old_levels.keys():
+		var old_entry: Dictionary = old_levels[lid] as Dictionary
+		var new_entry: Dictionary = {
+			"best_score": int(old_entry.get("best_score", 0)),
+			"best_stars": int(old_entry.get("best_stars", 0)),
+			"attempts": int(old_entry.get("attempts", 1)),
+			"best_progress_pct": float(old_entry.get("best_progress_pct", 100.0)),
+			"treasure_coins": old_entry.get("treasure_coins", [false, false, false]) as Array,
+			"practice_best_pct": float(old_entry.get("practice_best_pct", 0.0)),
+		}
+		new_levels[lid] = new_entry
+	fresh["levels"] = new_levels
+	fresh["version"] = SAVE_VERSION
+
+	return fresh
+
+
 func load_progress(profile_id: String) -> Dictionary:
 	var progress_path: String = "user://profiles/%s/progress.json" % profile_id
 	if not FileAccess.file_exists(progress_path):
@@ -88,7 +148,7 @@ func load_progress(profile_id: String) -> Dictionary:
 	if parsed == null or not (parsed is Dictionary):
 		push_warning("SaveSystem: Failed to parse progress JSON for profile '%s'." % profile_id)
 		return {}
-	return parsed as Dictionary
+	return _migrate(parsed as Dictionary)
 
 
 func save_progress(profile_id: String, data: Dictionary) -> void:
@@ -103,25 +163,71 @@ func update_level_result(profile_id: String, level_id: String, score: int, stars
 		data = load_progress(profile_id)
 
 	var levels: Dictionary = data.get("levels", {}) as Dictionary
-	var existing: Dictionary = levels.get(level_id, {}) as Dictionary
-	var existing_score: int = existing.get("best_score", 0) as int
+	var existing: Dictionary = _ensure_level_entry(levels, level_id)
+	var existing_score: int = int(existing.get("best_score", 0))
 
 	if score > existing_score:
 		existing["best_score"] = score
 		existing["best_stars"] = stars
-		levels[level_id] = existing
+		existing["best_progress_pct"] = 100.0
+	levels[level_id] = existing
+	data["levels"] = levels
+	# Recalculate total_stars across all level records.
+	var total: int = 0
+	for entry: Variant in levels.values():
+		total += int((entry as Dictionary).get("best_stars", 0))
+	data["total_stars"] = total
+	save_progress(profile_id, data)
+
+
+## Record that a run attempt started (called on run_failed or run_completed).
+func record_attempt(profile_id: String, level_id: String) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if data.is_empty():
+		ensure_profile(profile_id)
+		data = load_progress(profile_id)
+	var levels: Dictionary = data.get("levels", {}) as Dictionary
+	var entry: Dictionary = _ensure_level_entry(levels, level_id)
+	entry["attempts"] = int(entry.get("attempts", 0)) + 1
+	levels[level_id] = entry
+	data["levels"] = levels
+	save_progress(profile_id, data)
+
+
+## Record the furthest progress reached this run (0.0–100.0 percent of level).
+func record_progress_pct(profile_id: String, level_id: String, pct: float) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if data.is_empty():
+		ensure_profile(profile_id)
+		data = load_progress(profile_id)
+	var levels: Dictionary = data.get("levels", {}) as Dictionary
+	var entry: Dictionary = _ensure_level_entry(levels, level_id)
+	var best: float = float(entry.get("best_progress_pct", 0.0))
+	if pct > best:
+		entry["best_progress_pct"] = pct
+		levels[level_id] = entry
 		data["levels"] = levels
-		# Recalculate total_stars across all level records.
-		var total: int = 0
-		for entry: Variant in levels.values():
-			total += int((entry as Dictionary).get("best_stars", 0))
-		data["total_stars"] = total
 		save_progress(profile_id, data)
 
 
 func get_best_stars(profile_id: String, level_id: String) -> int:
 	var data: Dictionary = load_progress(profile_id)
 	return int(((data.get("levels", {}) as Dictionary).get(level_id, {}) as Dictionary).get("best_stars", 0))
+
+
+func get_best_progress_pct(profile_id: String, level_id: String) -> float:
+	var data: Dictionary = load_progress(profile_id)
+	return float(((data.get("levels", {}) as Dictionary).get(level_id, {}) as Dictionary).get("best_progress_pct", 0.0))
+
+
+func get_attempts(profile_id: String, level_id: String) -> int:
+	var data: Dictionary = load_progress(profile_id)
+	return int(((data.get("levels", {}) as Dictionary).get(level_id, {}) as Dictionary).get("attempts", 0))
+
+
+func get_total_stars(profile_id: String) -> int:
+	var data: Dictionary = load_progress(profile_id)
+	return int(data.get("total_stars", 0))
 
 
 func is_level_cleared(profile_id: String, level_id: String) -> bool:
@@ -132,6 +238,35 @@ func is_level_cleared(profile_id: String, level_id: String) -> bool:
 func get_all_level_results(profile_id: String) -> Dictionary:
 	var data: Dictionary = load_progress(profile_id)
 	return data.get("levels", {}) as Dictionary
+
+
+func get_setting(profile_id: String, key: String, default: Variant) -> Variant:
+	var data: Dictionary = load_progress(profile_id)
+	return (data.get("settings", {}) as Dictionary).get(key, default)
+
+
+func set_setting(profile_id: String, key: String, value: Variant) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if data.is_empty():
+		ensure_profile(profile_id)
+		data = load_progress(profile_id)
+	var settings: Dictionary = data.get("settings", {}) as Dictionary
+	settings[key] = value
+	data["settings"] = settings
+	save_progress(profile_id, data)
+
+
+func _ensure_level_entry(levels: Dictionary, level_id: String) -> Dictionary:
+	if levels.has(level_id):
+		return levels[level_id] as Dictionary
+	return {
+		"best_score": 0,
+		"best_stars": 0,
+		"attempts": 0,
+		"best_progress_pct": 0.0,
+		"treasure_coins": [false, false, false],
+		"practice_best_pct": 0.0,
+	}
 
 
 func _write_json(path: String, payload: Dictionary) -> void:

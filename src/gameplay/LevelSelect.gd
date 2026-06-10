@@ -52,8 +52,15 @@ func _build_level_list(zone_id: String) -> void:
 			btn.text = "L%d  %s  [soon]" % [i + 1, level_name]
 			btn.disabled = true
 		else:
-			var stars: int = int((results.get(level_id, {}) as Dictionary).get("best_stars", 0))
-			btn.text = "L%d  %s  %s" % [i + 1, level_name, _stars_text(stars)]
+			var entry: Dictionary = results.get(level_id, {}) as Dictionary
+			var stars: int = int(entry.get("best_stars", 0))
+			var best_pct: float = float(entry.get("best_progress_pct", 0.0))
+			var pct_text: String = ""
+			if stars > 0:
+				pct_text = "  best 100%"
+			elif best_pct > 0.0:
+				pct_text = "  best %.0f%%" % best_pct
+			btn.text = "L%d  %s  %s%s" % [i + 1, level_name, _stars_text(stars), pct_text]
 			var lid: String = level_id
 			btn.pressed.connect(func() -> void: GameManager.start_level(lid))
 

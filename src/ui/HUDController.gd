@@ -7,6 +7,8 @@ class_name HUDController
 @export var combo_label: Label
 @export var judgment_label: Label
 @export var retry_button: Button
+@export var progress_bar: ProgressBar
+@export var attempt_label: Label
 
 var score: int = 0
 
@@ -21,6 +23,8 @@ var timing_judge: TimingJudge = null
 func _ready() -> void:
 	EventBus.collectible_taken.connect(_on_collectible_taken)
 	EventBus.run_started.connect(_on_run_started)
+	EventBus.run_progress.connect(_on_run_progress)
+	EventBus.run_failed.connect(_on_run_failed_hud)
 	BeatConductor.beat_fired.connect(_on_beat_fired)
 
 	if retry_button != null:
@@ -39,7 +43,7 @@ func connect_timing_judge(judge: TimingJudge) -> void:
 # EventBus handlers
 # ---------------------------------------------------------------------------
 
-func _on_run_started(_level_id: String) -> void:
+func _on_run_started(level_id: String) -> void:
 	score = 0
 	_combo = 0
 	_update_score_label()
@@ -48,6 +52,23 @@ func _on_run_started(_level_id: String) -> void:
 		judgment_label.text = ""
 	if retry_button != null:
 		retry_button.hide()
+	if progress_bar != null:
+		progress_bar.value = 0.0
+	# Show total attempts for this level so far (this run will be recorded on fail/complete).
+	if attempt_label != null:
+		var profile: String = SaveSystem.get_active_profile_id()
+		var attempts: int = SaveSystem.get_attempts(profile, level_id)
+		attempt_label.text = "Attempt %d" % (attempts + 1)
+
+
+func _on_run_progress(_level_id: String, pct: float) -> void:
+	if progress_bar != null:
+		progress_bar.value = pct
+
+
+func _on_run_failed_hud(_level_id: String, _score: int) -> void:
+	if retry_button != null:
+		retry_button.show()
 
 
 func _on_collectible_taken(value: int) -> void:

@@ -2,12 +2,16 @@ extends Control
 
 class_name ZoneSelect
 
+# Z6 secret unlocks at 120 total stars; a hint shows at 100 stars.
+const Z6_UNLOCK_STARS: int = 120
+const Z6_HINT_STARS: int = 100
+
 const ZONES: Array = [
 	{"id": "z1", "name": "1. Sunlit Shallows", "bpm": "100-115 BPM"},
 	{"id": "z2", "name": "2. Kelp Forest Canyon", "bpm": "120-130 BPM", "requires": "z1-l4"},
 	{"id": "z3", "name": "3. Shipwreck Alley", "bpm": "130-145 BPM", "requires": "z2-l4"},
-	{"id": "z4", "name": "4. Volcanic Vent Fields", "bpm": "145-165 BPM", "iap": true},
-	{"id": "z5", "name": "5. Twilight Trench", "bpm": "80-165 BPM", "iap": true},
+	{"id": "z4", "name": "4. Volcanic Vent Fields", "bpm": "145-165 BPM", "requires": "z3-l4"},
+	{"id": "z5", "name": "5. Twilight Trench", "bpm": "80-165 BPM", "requires": "z4-l4"},
 	{"id": "z6", "name": "6. Crystal Caves", "bpm": "170-180 BPM", "secret": true},
 ]
 
@@ -21,21 +25,26 @@ func _ready() -> void:
 
 
 func _build_zone_list() -> void:
+	var total_stars: int = SaveSystem.get_total_stars(_profile)
 	for zone: Variant in ZONES:
 		var z: Dictionary = zone as Dictionary
 		var btn: Button = Button.new()
 		btn.custom_minimum_size = Vector2(0, 100)
-		var locked: bool = not _is_unlocked(z)
+		var locked: bool = not _is_unlocked(z, total_stars)
 
 		if locked:
-			var why: String = ""
-			if z.get("iap", false):
-				why = "  (Full Reef required)"
-			elif z.get("secret", false):
-				why = "  (earn 3 stars on all levels)"
+			if z.get("secret", false):
+				if total_stars >= Z6_HINT_STARS:
+					btn.text = "???   (almost there…)"
+				else:
+					btn.text = "???"
 			elif z.has("requires"):
-				why = "  (complete %s)" % (z["requires"] as String).to_upper()
-			btn.text = "[LOCKED] %s%s" % [z["name"] as String, why]
+				btn.text = "[LOCKED] %s  (complete %s)" % [
+					z["name"] as String,
+					(z["requires"] as String).to_upper()
+				]
+			else:
+				btn.text = "[LOCKED] %s" % (z["name"] as String)
 			btn.disabled = true
 		else:
 			btn.text = "%s   %s" % [z["name"] as String, z.get("bpm", "") as String]
@@ -45,9 +54,9 @@ func _build_zone_list() -> void:
 		$ZoneContainer.add_child(btn)
 
 
-func _is_unlocked(zone: Dictionary) -> bool:
-	if zone.get("iap", false) or zone.get("secret", false):
-		return false
+func _is_unlocked(zone: Dictionary, total_stars: int) -> bool:
+	if zone.get("secret", false):
+		return total_stars >= Z6_UNLOCK_STARS
 	if zone.has("requires"):
 		return SaveSystem.is_level_cleared(_profile, zone["requires"] as String)
 	return true

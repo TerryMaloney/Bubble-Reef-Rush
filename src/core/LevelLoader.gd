@@ -67,8 +67,13 @@ func _on_map_loaded(level_id: String) -> void:
 func _check_level_end(beat_index: int) -> void:
 	if _result_emitted:
 		return
+	# Emit progress (clamped to 99% until the level actually ends).
+	if _total_beats > 0:
+		var pct: float = minf(float(beat_index) / float(_total_beats) * 100.0, 99.0)
+		EventBus.run_progress.emit(_level_id_meta, pct)
 	if beat_index >= _total_beats - 1:
 		_result_emitted = true
+		EventBus.run_progress.emit(_level_id_meta, 100.0)
 		level_ended.emit(_level_id_meta)
 
 

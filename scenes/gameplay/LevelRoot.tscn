@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/LevelRoot.gd" id="1"]
 [ext_resource type="Script" path="res://src/core/LevelLoader.gd" id="2"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://src/ui/HUDController.gd" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="7"]
 [ext_resource type="Script" path="res://src/gameplay/DifficultyDirector.gd" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/gameplay/PauseMenu.tscn" id="9"]
 
 [node name="LevelRoot" type="Node2D"]
 script = ExtResource("1")
@@ -67,6 +68,23 @@ offset_bottom = 40.0
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="ProgressBar" type="ProgressBar" parent="HUD"]
+anchor_right = 1.0
+offset_top = 1860.0
+offset_bottom = 1900.0
+min_value = 0.0
+max_value = 100.0
+value = 0.0
+show_percentage = false
+
+[node name="AttemptLabel" type="Label" parent="HUD"]
+offset_left = 20.0
+offset_top = 1810.0
+offset_right = 540.0
+offset_bottom = 1860.0
+text = "Attempt 1"
+modulate = Color(1, 1, 1, 0.7)
+
 [node name="RetryButton" type="Button" parent="HUD"]
 anchor_left = 0.5
 anchor_top = 0.5
@@ -78,3 +96,5 @@ offset_right = 160.0
 offset_bottom = 140.0
 text = "RETRY"
 visible = false
+
+[node name="PauseMenu" parent="." instance=ExtResource("9")]
