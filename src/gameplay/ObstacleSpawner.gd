@@ -12,7 +12,9 @@ const OBSTACLE_SCENE_MAP: Dictionary = {
 	"current_jet": "res://scenes/obstacles/CurrentJet.tscn",
 	"anchor_chain": "res://scenes/obstacles/AnchorChain.tscn",
 	"eel_snap": "res://scenes/obstacles/EelSnap.tscn",
+	"lava_burst": "res://scenes/obstacles/LavaBurst.tscn",
 }
+const PRESSURE_WAVE_SCENE: String = "res://scenes/obstacles/PressureWave.tscn"
 const CORAL_SPIKE_SCENE: String = "res://scenes/obstacles/CoralSpike.tscn"
 
 # Gate geometry: gap width in pixels at the easiest vs hardest intensity.
@@ -70,11 +72,15 @@ func _spawn_obstacle(entry: Dictionary, _current_beat: float) -> void:
 	var obstacle_type: String = str(entry.get("obstacle_type", ""))
 	var params: Dictionary = entry.get("parameters", {}) as Dictionary
 
-	# A "pressure_wall" entry becomes a difficulty-driven gate.
-	# NOTE: kelp_curtain also has gap_y_normalized in params — do NOT use params.has()
-	# as the gate condition or kelp curtains will be silently routed here instead.
+	# A "pressure_wall" entry is either a static DDA gate (no travel_speed)
+	# or a moving PressureWave wall (travel_speed present).
+	# NOTE: kelp_curtain also has gap_y_normalized — do NOT use params.has("gap_y_normalized")
+	# as the dispatch condition or kelp curtains will be silently routed here.
 	if obstacle_type == "pressure_wall":
-		_spawn_gate(entry, params)
+		if params.has("travel_speed"):
+			_spawn_pressure_wave(entry, params)
+		else:
+			_spawn_gate(entry, params)
 		return
 
 	if not OBSTACLE_SCENE_MAP.has(obstacle_type):
@@ -134,6 +140,33 @@ func _spawn_gate(entry: Dictionary, params: Dictionary) -> void:
 	var bottom_height: float = screen_h - gap_bottom
 	if bottom_height > 20.0:
 		_spawn_spike("bottom", bottom_height, spawn_x, screen_h)
+
+
+## Spawn a PressureWave whose travel_speed is independent of ScrollService.
+## The wall spawns at the correct x so it reaches JUDGMENT_X at beat_index.
+func _spawn_pressure_wave(entry: Dictionary, params: Dictionary) -> void:
+	if not ResourceLoader.exists(PRESSURE_WAVE_SCENE):
+		push_warning("ObstacleSpawner: PressureWave scene missing — skipping.")
+		return
+	var packed: PackedScene = load(PRESSURE_WAVE_SCENE) as PackedScene
+	var wave: Node2D = packed.instantiate() as Node2D
+
+	var beat_idx: float = float(entry.get("beat_index", 0))
+	var travel_speed: float = float(params.get("travel_speed", 300))
+
+	# Scale spawn distance by travel_speed / scroll_speed to preserve arrival timing.
+	var base_dist: float = ScrollService.distance_until_beat(beat_idx)
+	var base_speed: float = ScrollService.speed_now()
+	var spawn_x: float
+	if base_speed > 0.0:
+		spawn_x = ScrollService.JUDGMENT_X + base_dist * (travel_speed / base_speed)
+	else:
+		spawn_x = ScrollService.JUDGMENT_X + base_dist
+
+	wave.position = Vector2(spawn_x, 0.0)
+	get_parent().add_child(wave)
+	if wave.has_method("setup"):
+		wave.setup(entry)
 
 
 func _spawn_spike(attachment: String, height: float, x: float, wall_y: float) -> void:
