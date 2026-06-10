@@ -47,18 +47,17 @@ func start_level(level_id: String) -> void:
 	current_state = State.LOADING
 	current_level_id = level_id
 	_last_progress_pct = 0.0
-	# A deliberately-chosen level starts fresh — clear the carried-death assist.
 	consecutive_deaths = 0
-	get_tree().change_scene_to_file(LEVEL_ROOT_SCENE)
+	TransitionLayer.go_to(LEVEL_ROOT_SCENE)
 
 
 func retry_level() -> void:
-	get_tree().change_scene_to_file(LEVEL_ROOT_SCENE)
+	TransitionLayer.go_to(LEVEL_ROOT_SCENE)
 
 
 func go_to_menu() -> void:
 	current_state = State.MENU
-	get_tree().change_scene_to_file(MAIN_MENU_SCENE)
+	TransitionLayer.go_to(MAIN_MENU_SCENE)
 
 
 func finish_level(score: int, stars: int) -> void:
@@ -66,36 +65,35 @@ func finish_level(score: int, stars: int) -> void:
 	last_stars = stars
 	current_state = State.RESULTS
 	_active_profile = SaveSystem.get_active_profile_id()
-	# Snapshot the previous best before overwriting so ResultsScreen can show "New Best!".
 	var prev_results: Dictionary = SaveSystem.get_all_level_results(_active_profile)
 	last_prev_best_score = int((prev_results.get(current_level_id, {}) as Dictionary).get("best_score", 0))
 	SaveSystem.update_level_result(_active_profile, current_level_id, score, stars)
-	get_tree().change_scene_to_file(RESULTS_SCENE)
+	TransitionLayer.go_to(RESULTS_SCENE)
 
 
 func go_to_zone_select() -> void:
 	current_state = State.MENU
-	get_tree().change_scene_to_file(ZONE_SELECT_SCENE)
+	TransitionLayer.go_to(ZONE_SELECT_SCENE)
 
 
 func go_to_level_select(zone_id: String) -> void:
 	current_zone_id = zone_id
 	current_state = State.MENU
-	get_tree().change_scene_to_file(LEVEL_SELECT_SCENE)
+	TransitionLayer.go_to(LEVEL_SELECT_SCENE)
 
 
 func open_build_mode() -> void:
 	current_state = State.BUILD_MODE
-	get_tree().change_scene_to_file(BUILD_MODE_SCENE)
+	TransitionLayer.go_to(BUILD_MODE_SCENE)
 
 
 func go_to_settings(return_scene: String = MAIN_MENU_SCENE) -> void:
 	_settings_return_scene = return_scene
-	get_tree().change_scene_to_file(SETTINGS_SCENE)
+	TransitionLayer.go_to(SETTINGS_SCENE)
 
 
 func return_from_settings() -> void:
-	get_tree().change_scene_to_file(_settings_return_scene)
+	TransitionLayer.go_to(_settings_return_scene)
 
 
 func _on_run_progress(_level_id: String, pct: float) -> void:

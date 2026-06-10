@@ -13,9 +13,7 @@ func _ready() -> void:
 	_level_loader.obstacle_spawner = $ObstacleSpawner
 	_level_loader.collectible_spawner = $CollectibleSpawner
 
-	# The spawner consults the director to size each gate's gap.
 	$ObstacleSpawner.director = director
-	# Carry the player's recent deaths in so a stuck level eases (practice mercy).
 	director.seed_from_deaths(GameManager.consecutive_deaths)
 
 	_hud_controller = $HUD/HUDController
@@ -25,7 +23,6 @@ func _ready() -> void:
 	_hud_controller.progress_bar = $HUD/ProgressBar
 	_hud_controller.attempt_label = $HUD/AttemptLabel
 
-	# Wire retry button here since HUDController._ready() ran before we set export vars.
 	var retry_btn: Button = $HUD/RetryButton
 	_hud_controller.retry_button = retry_btn
 	retry_btn.pressed.connect(func() -> void: EventBus.retry_requested.emit())
@@ -33,12 +30,13 @@ func _ready() -> void:
 
 	var player: PlayerController = $Player
 	_hud_controller.connect_timing_judge(player.timing_judge)
-	# Feed combo state to the director so expert play raises the pressure.
 	player.timing_judge.combo_updated.connect(director.on_combo_updated)
 
-	# Apply persisted settings before the level clock starts.
 	BeatConductor.user_latency_offset_ms = Accessibility.timing_offset_ms()
 	player.timing_judge.window_scale = 1.25 if Accessibility.wide_timing_windows() else 1.0
+
+	($JuiceDirector as JuiceDirector).setup($Camera2D as Camera2D)
+	($BackgroundController as BackgroundController).setup($Background as ColorRect)
 
 	_level_loader.level_ended.connect(_on_level_ended)
 	_level_loader.load_level(GameManager.current_level_id)

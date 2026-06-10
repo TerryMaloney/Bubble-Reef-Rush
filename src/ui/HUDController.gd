@@ -25,6 +25,9 @@ func _ready() -> void:
 	EventBus.run_started.connect(_on_run_started)
 	EventBus.run_progress.connect(_on_run_progress)
 	EventBus.run_failed.connect(_on_run_failed_hud)
+	EventBus.score_bonus.connect(_on_score_bonus)
+	EventBus.fever_started.connect(_on_fever_started)
+	EventBus.fever_ended.connect(_on_fever_ended)
 	BeatConductor.beat_fired.connect(_on_beat_fired)
 
 	if retry_button != null:
@@ -101,6 +104,21 @@ func _on_input_judged(result: TimingJudge.TimingResult, _offset_ms: float, _beat
 func _on_combo_updated(count: int) -> void:
 	_combo = count
 	_update_combo_label()
+
+
+func _on_score_bonus(amount: int) -> void:
+	score += amount
+	_update_score_label()
+
+
+func _on_fever_started() -> void:
+	if combo_label != null:
+		combo_label.modulate = Color(1.0, 0.8, 0.0)
+
+
+func _on_fever_ended() -> void:
+	if combo_label != null:
+		combo_label.modulate = Color.WHITE
 
 
 # ---------------------------------------------------------------------------

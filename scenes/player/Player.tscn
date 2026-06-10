@@ -1,12 +1,16 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/PlayerController.gd" id="1"]
 [ext_resource type="Script" path="res://src/rhythm/BeatVisualizer.gd" id="2"]
 [ext_resource type="Script" path="res://src/rhythm/TimingJudge.gd" id="3"]
+[ext_resource type="Script" path="res://src/gameplay/NearMissDetector.gd" id="4"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1"]
 radius = 20.0
 height = 56.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 80.0
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1")
@@ -23,3 +27,11 @@ script = ExtResource("2")
 
 [node name="TimingJudge" type="Node" parent="."]
 script = ExtResource("3")
+
+[node name="NearMissDetector" type="Area2D" parent="."]
+script = ExtResource("4")
+collision_layer = 2
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NearMissDetector"]
+shape = SubResource("CircleShape2D_1")
