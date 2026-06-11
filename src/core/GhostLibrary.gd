@@ -3,6 +3,10 @@
 ## Types: "personal_best", "family_champion", "imported"
 extends Node
 
+## Score of the ghost loaded for the current run; -1 if no ghost was shown.
+## Set by LevelRoot when spawning a GhostPlayer; read by ResultsScreen.
+var last_ghost_score: int = -1
+
 
 func _ghost_path(profile_id: String, level_id: String, ghost_type: String) -> String:
 	var safe_level: String = level_id.replace("/", "_").replace("\\", "_")

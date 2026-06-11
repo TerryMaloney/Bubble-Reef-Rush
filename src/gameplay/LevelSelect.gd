@@ -60,7 +60,10 @@ func _build_level_list(zone_id: String) -> void:
 				pct_text = "  best 100%"
 			elif best_pct > 0.0:
 				pct_text = "  best %.0f%%" % best_pct
-			btn.text = "L%d  %s  %s%s" % [i + 1, level_name, _stars_text(stars), pct_text]
+			var ghost_marker: String = ""
+			if not GhostLibrary.load_ghost(_profile, level_id, "personal_best").is_empty():
+				ghost_marker = " ★"
+			btn.text = "L%d  %s  %s%s%s" % [i + 1, level_name, _stars_text(stars), pct_text, ghost_marker]
 			var lid: String = level_id
 			btn.pressed.connect(func() -> void: GameManager.start_level(lid))
 

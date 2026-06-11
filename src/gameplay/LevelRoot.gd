@@ -147,6 +147,7 @@ func _on_run_completed_ghost(level_id: String, score: int, _stars: int) -> void:
 
 func _maybe_spawn_ghost_player(_player: PlayerController) -> void:
 	var ghost_type: String = GameManager.show_ghost
+	GhostLibrary.last_ghost_score = -1
 	if ghost_type.is_empty():
 		return
 	var ghost_data: Dictionary = {}
@@ -157,6 +158,7 @@ func _maybe_spawn_ghost_player(_player: PlayerController) -> void:
 		ghost_data = GhostLibrary.load_ghost(profile, GameManager.current_level_id, ghost_type)
 	if ghost_data.is_empty():
 		return
+	GhostLibrary.last_ghost_score = int(ghost_data.get("final_score", -1))
 	var gp: GhostPlayer = GHOST_PLAYER_SCENE.instantiate() as GhostPlayer
 	add_child(gp)
 	gp.setup(ghost_data)

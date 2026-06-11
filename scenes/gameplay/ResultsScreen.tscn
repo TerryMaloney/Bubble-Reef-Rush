@@ -97,6 +97,30 @@ offset_right = 160.0
 offset_bottom = 360.0
 text = "LEVELS"
 
+[node name="GhostDeltaLabel" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = 68.0
+offset_right = 240.0
+offset_bottom = 108.0
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 22
+modulate = Color(0.4, 0.8, 1.0, 1)
+
+[node name="RuleCardResults" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = 118.0
+offset_right = 240.0
+offset_bottom = 280.0
+
 [node name="MenuButton" type="Button" parent="."]
 anchor_left = 0.5
 anchor_top = 0.5

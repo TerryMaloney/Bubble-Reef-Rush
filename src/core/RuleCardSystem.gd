@@ -8,6 +8,7 @@ extends Node
 const CARDS_JSON: String = "res://assets/data/rule_cards.json"
 
 var active_rules: Array[String] = []
+var last_results: Array = []
 var _cards_by_id: Dictionary = {}
 
 
@@ -32,6 +33,7 @@ func evaluate_run(level_id: String, run_data: Dictionary) -> Dictionary:
 		EventBus.rule_card_result.emit(card_id, passed)
 		if not passed:
 			all_passed = false
+	last_results = results
 	return {"passed": all_passed, "results": results}
 
 

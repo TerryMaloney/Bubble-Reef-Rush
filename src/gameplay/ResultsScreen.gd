@@ -19,6 +19,8 @@ func _ready() -> void:
 		$CoinsLabel.text = "+" + str(coins) + " coins" if coins > 0 else ""
 		$CoinsLabel.visible = coins > 0
 
+	_show_ghost_delta(score)
+	_show_rule_card_results()
 	_setup_next_level_button()
 
 	$RetryButton.pressed.connect(_on_retry_pressed)
@@ -76,6 +78,43 @@ func _on_retry_pressed() -> void:
 func _on_levels_pressed() -> void:
 	var zone_id: String = GameManager.current_level_id.split("-")[0]
 	GameManager.go_to_level_select(zone_id)
+
+
+func _show_ghost_delta(score: int) -> void:
+	if not has_node("GhostDeltaLabel"):
+		return
+	var ghost_score: int = GhostLibrary.last_ghost_score
+	if ghost_score < 0:
+		$GhostDeltaLabel.visible = false
+		return
+	var delta: int = score - ghost_score
+	if delta > 0:
+		$GhostDeltaLabel.text = "Beat the ghost by %d!" % delta
+		$GhostDeltaLabel.modulate = Color(0.3, 1.0, 0.4, 1)
+	elif delta < 0:
+		$GhostDeltaLabel.text = "Ghost beat you by %d" % (-delta)
+		$GhostDeltaLabel.modulate = Color(0.4, 0.8, 1.0, 1)
+	else:
+		$GhostDeltaLabel.text = "Tied the ghost!"
+		$GhostDeltaLabel.modulate = Color(1, 1, 0.5, 1)
+
+
+func _show_rule_card_results() -> void:
+	if not has_node("RuleCardResults"):
+		return
+	var results: Array = RuleCardSystem.last_results
+	if results.is_empty():
+		$RuleCardResults.visible = false
+		return
+	for entry: Variant in results:
+		var d: Dictionary = entry as Dictionary
+		var card_id: String = str(d.get("card_id", ""))
+		var passed: bool = bool(d.get("passed", false))
+		var lbl: Label = Label.new()
+		lbl.text = ("%s  ✓" if passed else "%s  ✗") % card_id.replace("_", " ").capitalize()
+		lbl.modulate = Color(0.3, 1.0, 0.4) if passed else Color(1.0, 0.4, 0.4)
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		$RuleCardResults.add_child(lbl)
 
 
 func _on_menu_pressed() -> void:

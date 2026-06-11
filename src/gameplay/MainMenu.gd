@@ -11,6 +11,22 @@ func _ready() -> void:
 	$Layout/RadioShuffleButton.pressed.connect(_on_radio_shuffle_pressed)
 	$Layout/CollectionRoomButton.pressed.connect(_on_collection_room_pressed)
 	$SettingsButton.pressed.connect(_on_settings_pressed)
+	_animate_in()
+
+
+func _animate_in() -> void:
+	var title: Label = $Layout/Title
+	title.pivot_offset = title.size * 0.5
+	title.scale = Vector2(0.8, 0.8)
+	title.modulate.a = 0.0
+	var tween: Tween = create_tween()
+	tween.tween_property(title, "scale", Vector2.ONE, 0.35).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	tween.parallel().tween_property(title, "modulate:a", 1.0, 0.25)
+	var buttons: Array[Node] = $Layout.get_children().filter(func(n: Node) -> bool: return n is Button)
+	for i: int in range(buttons.size()):
+		var btn: Button = buttons[i] as Button
+		btn.modulate.a = 0.0
+		tween.tween_property(btn, "modulate:a", 1.0, 0.15).set_delay(0.04 * i)
 
 
 func _on_journey_pressed() -> void:
