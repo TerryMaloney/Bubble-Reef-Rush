@@ -1,6 +1,6 @@
 # Feature Status
 
-Last updated: 2026-06-11 (Phase 25 complete — ALL PHASES DONE)
+Last updated: 2026-06-11 (Production Readiness A/B/C complete)
 
 ## Phases 1–13 (Foundation) — ALL COMPLETE
 
@@ -36,6 +36,16 @@ Last updated: 2026-06-11 (Phase 25 complete — ALL PHASES DONE)
 | 23 | Daily Dive + Seeded Reef + Radio Shuffle | ✅ DONE | 33-stage suite green |
 | 24 | Co-Pilot Mode + Level Tennis | ✅ DONE | 35-stage suite green |
 | 25 | Reef Radio Architecture + Sticker Mode + Final Polish | ✅ DONE | 36-stage suite green; 73/73 BRL pass |
+
+## Production Readiness (Post Phase 25)
+
+| Phase | Work | Status | Notes |
+|-------|------|--------|-------|
+| A | Critical wiring (MainMenu hub, LevelRoot nodes, PowerButton, export config) | ✅ DONE | |
+| B | Stub UI scene layouts (CollectionRoom, DailyDive, RadioShuffle, CoPilot) | ✅ DONE | |
+| C | Results polish (ghost delta, Rule Card results, LevelSelect ghost ★, MainMenu animation) | ✅ DONE | |
+| D | Art & Audio integration | ⏳ Terry's task | Specs in STUB_ASSETS.md |
+| E | Android export + beta test | ⏳ Terry's task | Protocol in next_session_handoff.md |
 
 ## New Autoloads (Phase 14+)
 
