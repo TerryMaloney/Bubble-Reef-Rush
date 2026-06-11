@@ -2,5 +2,69 @@
 
 [ext_resource type="Script" path="res://src/ui/RadioShuffleScreen.gd" id="1"]
 
-[node name="RadioShuffleScreen" type="Node"]
+[node name="RadioShuffleScreen" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.0, 0.12, 0.32, 1.0)
+
+[node name="Panel" type="PanelContainer" parent="."]
+anchor_left = 0.05
+anchor_top = 0.05
+anchor_right = 0.95
+anchor_bottom = 0.95
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="Panel/VBox"]
+text = "Radio Shuffle"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 48
+
+[node name="SubtitleLabel" type="Label" parent="Panel/VBox"]
+text = "Choose your vibe:"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 24
+modulate = Color(1, 1, 1, 0.7)
+
+[node name="RelaxedButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 80)
+text = "Relaxed  (Zones 1–2)"
+theme_override_font_sizes/font_size = 28
+
+[node name="StandardButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 80)
+text = "Standard  (Zones 1–4)"
+theme_override_font_sizes/font_size = 28
+
+[node name="WildButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 80)
+text = "Wild  (All Zones)"
+theme_override_font_sizes/font_size = 28
+
+[node name="BossRushButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 80)
+text = "Boss Rush"
+theme_override_font_sizes/font_size = 28
+
+[node name="TreasureHuntButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 80)
+text = "Treasure Hunt"
+theme_override_font_sizes/font_size = 28
+
+[node name="Spacer" type="Control" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 16)
+
+[node name="CloseButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 64)
+text = "Back"
+theme_override_font_sizes/font_size = 24

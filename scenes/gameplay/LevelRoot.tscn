@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/LevelRoot.gd" id="1"]
 [ext_resource type="Script" path="res://src/core/LevelLoader.gd" id="2"]
@@ -13,6 +13,8 @@
 [ext_resource type="Script" path="res://src/gameplay/FeverController.gd" id="11"]
 [ext_resource type="Script" path="res://src/gameplay/BackgroundController.gd" id="12"]
 [ext_resource type="Script" path="res://src/gameplay/PracticeController.gd" id="13"]
+[ext_resource type="Script" path="res://src/gameplay/ResonanceController.gd" id="14"]
+[ext_resource type="Script" path="res://src/gameplay/GhostRecorder.gd" id="15"]
 
 [node name="LevelRoot" type="Node2D"]
 script = ExtResource("1")
@@ -127,5 +129,37 @@ offset_right = 96.0
 offset_bottom = 1836.0
 text = "DROP CP"
 visible = false
+
+[node name="ResonanceController" type="Node" parent="."]
+script = ExtResource("14")
+
+[node name="GhostRecorder" type="Node" parent="."]
+script = ExtResource("15")
+
+[node name="ResonanceChargeBar" type="ProgressBar" parent="HUD"]
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 56.0
+min_value = 0.0
+max_value = 100.0
+value = 0.0
+show_percentage = false
+
+[node name="PowerButton" type="Button" parent="HUD"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -240.0
+offset_right = -16.0
+offset_bottom = -56.0
+text = "⚡"
+theme_override_font_sizes/font_size = 56
 
 [node name="PauseMenu" parent="." instance=ExtResource("9")]

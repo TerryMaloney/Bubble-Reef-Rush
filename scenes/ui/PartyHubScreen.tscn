@@ -2,5 +2,66 @@
 
 [ext_resource type="Script" path="res://src/ui/PartyHubScreen.gd" id="1"]
 
-[node name="PartyHubScreen" type="Node"]
+[node name="PartyHubScreen" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.0, 0.18, 0.45, 0.96)
+
+[node name="Panel" type="PanelContainer" parent="."]
+anchor_left = 0.05
+anchor_top = 0.05
+anchor_right = 0.95
+anchor_bottom = 0.95
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="Panel/VBox"]
+text = "Party Modes"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 48
+
+[node name="Spacer" type="Control" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 20)
+
+[node name="PassAndPlayButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 80)
+text = "Pass & Play"
+theme_override_font_sizes/font_size = 28
+
+[node name="FamilyTournamentButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 80)
+text = "Family Tournament"
+theme_override_font_sizes/font_size = 28
+
+[node name="CoPilotButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 80)
+text = "Co-Pilot"
+theme_override_font_sizes/font_size = 28
+
+[node name="GhostChallengeButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 80)
+text = "Ghost Challenge"
+theme_override_font_sizes/font_size = 28
+
+[node name="FamilyChainBuildButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 80)
+text = "Family Chain Build"
+theme_override_font_sizes/font_size = 28
+
+[node name="Spacer2" type="Control" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 20)
+
+[node name="CloseButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 64)
+text = "Back"
+theme_override_font_sizes/font_size = 24

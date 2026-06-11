@@ -33,6 +33,7 @@ func _ready() -> void:
 	EventBus.fever_ended.connect(_on_fever_ended)
 	EventBus.practice_checkpoint_saved.connect(_on_checkpoint_saved)
 	BeatConductor.beat_fired.connect(_on_beat_fired)
+	EventBus.power_charged.connect(_on_power_charged)
 
 	if retry_button != null:
 		retry_button.pressed.connect(_on_retry_pressed)
@@ -209,4 +210,9 @@ func update_power_button_mode(mode: String) -> void:
 	if power_button == null:
 		return
 	power_button.visible = (mode != "disabled")
+
+
+func _on_power_charged(pct: float) -> void:
+	if resonance_bar != null:
+		resonance_bar.value = pct * 100.0
 

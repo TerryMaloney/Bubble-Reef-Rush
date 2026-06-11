@@ -1,10 +1,27 @@
 ## RadioShuffleScreen — builds playlists for the five Radio Shuffle modes.
 ## Boss Rush and Treasure Hunt return fixed ordered lists; the others are seeded-random.
-extends Node
+extends Control
 
 class_name RadioShuffleScreen
 
 const BOSS_LEVELS: Array[String] = ["boss_z3", "boss_z4", "boss_z5", "boss_z6"]
+
+
+func _ready() -> void:
+	$Panel/VBox/RelaxedButton.pressed.connect(func() -> void: _start_mode("relaxed"))
+	$Panel/VBox/StandardButton.pressed.connect(func() -> void: _start_mode("standard"))
+	$Panel/VBox/WildButton.pressed.connect(func() -> void: _start_mode("wild"))
+	$Panel/VBox/BossRushButton.pressed.connect(func() -> void: _start_mode("boss_rush"))
+	$Panel/VBox/TreasureHuntButton.pressed.connect(func() -> void: _start_mode("treasure_hunt"))
+	$Panel/VBox/CloseButton.pressed.connect(func() -> void: queue_free())
+
+
+func _start_mode(mode: String) -> void:
+	var levels: Array[String] = get_playlist(mode, 5)
+	if levels.is_empty():
+		return
+	GameManager.start_level(levels[0])
+	queue_free()
 
 
 ## Returns count level IDs for the given shuffle mode.

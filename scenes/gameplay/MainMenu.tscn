@@ -17,33 +17,74 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -220.0
-offset_top = -130.0
-offset_right = 220.0
-offset_bottom = 130.0
+offset_left = -260.0
+offset_top = -380.0
+offset_right = 260.0
+offset_bottom = 380.0
+theme_override_constants/separation = 16
 
 [node name="Title" type="Label" parent="Layout"]
 layout_mode = 2
 text = "BUBBLE REEF RUSH"
 horizontal_alignment = 1
 vertical_alignment = 1
+theme_override_font_sizes/font_size = 44
 autowrap_mode = 2
 
 [node name="Spacer" type="Control" parent="Layout"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 20)
 
-[node name="PlayButton" type="Button" parent="Layout"]
+[node name="JourneyButton" type="Button" parent="Layout"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 80)
-text = "PLAY"
+custom_minimum_size = Vector2(0, 88)
+text = "Journey"
+theme_override_font_sizes/font_size = 32
 
-[node name="SettingsButton" type="Button" parent="Layout"]
+[node name="CreateButton" type="Button" parent="Layout"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 80)
-text = "SETTINGS"
+custom_minimum_size = Vector2(0, 88)
+text = "Create"
+theme_override_font_sizes/font_size = 32
+
+[node name="ReefRivalsButton" type="Button" parent="Layout"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 88)
+text = "Reef Rivals"
+theme_override_font_sizes/font_size = 32
+
+[node name="PartyButton" type="Button" parent="Layout"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 88)
+text = "Party"
+theme_override_font_sizes/font_size = 32
+
+[node name="RadioShuffleButton" type="Button" parent="Layout"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 88)
+text = "Radio Shuffle"
+theme_override_font_sizes/font_size = 32
+
+[node name="CollectionRoomButton" type="Button" parent="Layout"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 88)
+text = "Collection Room"
+theme_override_font_sizes/font_size = 32
+
+[node name="SettingsButton" type="Button" parent="."]
+anchor_left = 0.0
+anchor_top = 1.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -80.0
+offset_right = 240.0
+offset_bottom = -16.0
+text = "Settings"
+theme_override_font_sizes/font_size = 24
 
 [node name="BuildLabel" type="Label" parent="."]
+anchor_left = 0.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -51,5 +92,6 @@ offset_left = 20.0
 offset_top = -50.0
 offset_right = -20.0
 offset_bottom = -16.0
-text = "build 2026-06-10a"
+text = "v0.14.0 / 2026-06-11"
+horizontal_alignment = 2
 modulate = Color(1, 1, 1, 0.55)

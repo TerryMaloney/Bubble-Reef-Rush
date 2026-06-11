@@ -2,5 +2,69 @@
 
 [ext_resource type="Script" path="res://src/ui/CollectionRoomScreen.gd" id="1"]
 
-[node name="CollectionRoomScreen" type="Node"]
+[node name="CollectionRoomScreen" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.0, 0.12, 0.32, 1.0)
+
+[node name="TitleLabel" type="Label" parent="."]
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_top = 40.0
+offset_bottom = 100.0
+text = "Collection Room"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 44
+
+[node name="TabContainer" type="TabContainer" parent="."]
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 110.0
+offset_bottom = -120.0
+
+[node name="Characters" type="ScrollContainer" parent="TabContainer"]
+
+[node name="CharacterGrid" type="GridContainer" parent="TabContainer/Characters"]
+anchor_right = 1.0
+columns = 3
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+
+[node name="Boss Trophies" type="ScrollContainer" parent="TabContainer"]
+
+[node name="TrophyGrid" type="GridContainer" parent="TabContainer/Boss Trophies"]
+anchor_right = 1.0
+columns = 2
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+
+[node name="Blueprints" type="ScrollContainer" parent="TabContainer"]
+
+[node name="BlueprintList" type="VBoxContainer" parent="TabContainer/Blueprints"]
+anchor_right = 1.0
+
+[node name="Records" type="ScrollContainer" parent="TabContainer"]
+
+[node name="RecordList" type="VBoxContainer" parent="TabContainer/Records"]
+anchor_right = 1.0
+
+[node name="CloseButton" type="Button" parent="."]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -160.0
+offset_top = -104.0
+offset_right = 160.0
+offset_bottom = -20.0
+text = "Close"
+theme_override_font_sizes/font_size = 28
