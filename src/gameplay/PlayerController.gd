@@ -71,6 +71,10 @@ func _physics_process(delta: float) -> void:
 func on_hit() -> void:
 	if not alive:
 		return
+	# Give ResonanceController a chance to absorb the hit with EchoShield.
+	var rc := get_tree().get_first_node_in_group("resonance_controller") as Node
+	if rc != null and rc.has_method("consume_shield") and rc.consume_shield():
+		return
 	alive = false
 	modulate = Color(1.0, 0.3, 0.3)
 	EventBus.player_hit.emit()

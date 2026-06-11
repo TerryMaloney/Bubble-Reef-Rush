@@ -6,7 +6,7 @@ Godot 4.6 (GDScript, typed). Portrait 1080×1920. Android-first, iOS secondary.
 ## Quick commands
 
 ```bash
-# Run full test suite (22 stages, ~2 min)
+# Run full test suite (23 stages, ~2 min)
 GODOT=/tmp/Godot_v4.6.3-stable_linux.x86_64 ./tools/run_tests.sh
 
 # Validate all 48 .brl level files (schema + movement budgets)
@@ -28,9 +28,11 @@ src/
   gameplay/       LevelRoot, ObstacleSpawner, CollectibleSpawner,
                   ScrollService, DifficultyDirector, PlayerController,
                   JuiceDirector, FXFactory, FeverController,
-                  NearMissDetector, PracticeController, BackgroundController
+                  NearMissDetector, PracticeController, BackgroundController,
+                  ResonanceController
   gameplay/obstacles/   All 12 obstacle scripts
   gameplay/collectibles/ Pearl, TreasureCoin
+  gameplay/powers/      BubbleBurst, EchoShield
   buildmode/      BuildSession, BrlSerializer, PlayabilityValidator,
                   DifficultyTagger, ObstacleParamSchema,
                   BuildModeRoot, TimelineView, PalettePanel,
@@ -41,6 +43,7 @@ src/
 scenes/
   gameplay/       LevelRoot, MainMenu, ZoneSelect, LevelSelect,
                   ResultsScreen, SettingsScreen
+  gameplay/powers/ BubbleBurst.tscn
   buildmode/      BuildModeRoot.tscn
   obstacles/      All 12 obstacle scenes
   player/         Player.tscn
@@ -53,9 +56,9 @@ assets/
 
 tests/
   smoke/          run_smoke_tests.gd
-  integration/    21 headless test scripts
+  integration/    22 headless test scripts
 tools/
-  run_tests.sh    21-stage headless suite runner
+  run_tests.sh    22-stage headless suite runner
   validate_brl.py JSON-schema validation for .brl files
   check_movements.py  Movement budget + speed-zone readability checks
   gen_audio.py    Procedural WAV click-track generator
@@ -83,7 +86,7 @@ tools/
 | `PlayerSkin` | `src/gameplay/PlayerSkin.gd` | Character + cosmetic equip state |
 | `MutatorSystem` | `src/core/MutatorSystem.gd` | Active mutators for current run; apply() at level load |
 
-## Test suite (22 stages)
+## Test suite (23 stages)
 
 | Stage | Script | Marker |
 |-------|--------|--------|
@@ -108,6 +111,7 @@ tools/
 | 18 | `tests/integration/buildmode_test.gd` | `BUILDMODE_OK` |
 | 19 | `tests/integration/playtest.gd` | `PLAYTEST_OK` |
 | 20 | `tests/integration/save_v3_test.gd` | `SAVE_V3_OK` |
+| 21 | `tests/integration/resonance_test.gd` | `RESONANCE_OK` |
 
 ## Level format (.brl)
 

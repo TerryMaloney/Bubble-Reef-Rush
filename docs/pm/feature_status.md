@@ -25,8 +25,8 @@ Last updated: 2026-06-11
 | Phase | Feature | Status | Notes |
 |-------|---------|--------|-------|
 | 14 | Save v3 + MutatorSystem stub | ✅ DONE | 22-stage suite green |
-| 15 | Resonance: Bubble Burst + Echo Shield | ⏳ NEXT | |
-| 16 | Ghost Recording + Playback | ⏳ | |
+| 15 | Resonance: Bubble Burst + Echo Shield | ✅ DONE | |
+| 16 | Ghost Recording + Playback | ⏳ NEXT | |
 | 17 | Challenge Capsules (.brrc) | ⏳ | |
 | 18 | Pass & Play + Family Tournament | ⏳ | |
 | 19 | Mutators (20 effects) | ⏳ | |

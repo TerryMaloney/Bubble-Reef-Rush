@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/LevelRoot.gd" id="1"]
 [ext_resource type="Script" path="res://src/core/LevelLoader.gd" id="2"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://src/gameplay/FeverController.gd" id="11"]
 [ext_resource type="Script" path="res://src/gameplay/BackgroundController.gd" id="12"]
 [ext_resource type="Script" path="res://src/gameplay/PracticeController.gd" id="13"]
+[ext_resource type="Script" path="res://src/gameplay/ResonanceController.gd" id="14"]
 
 [node name="LevelRoot" type="Node2D"]
 script = ExtResource("1")
@@ -51,6 +52,9 @@ script = ExtResource("12")
 
 [node name="PracticeController" type="Node" parent="."]
 script = ExtResource("13")
+
+[node name="ResonanceController" type="Node" parent="."]
+script = ExtResource("14")
 
 [node name="Player" parent="." instance=ExtResource("7")]
 position = Vector2(200, 960)
@@ -104,6 +108,14 @@ offset_bottom = 1860.0
 text = "Attempt 1"
 modulate = Color(1, 1, 1, 0.7)
 
+[node name="ResonanceChargeBar" type="Label" parent="HUD"]
+offset_left = 20.0
+offset_top = 1756.0
+offset_right = 540.0
+offset_bottom = 1808.0
+text = "○○○○○"
+modulate = Color(0.35, 0.45, 0.6, 0.7)
+
 [node name="RetryButton" type="Button" parent="HUD"]
 anchor_left = 0.5
 anchor_top = 0.5
@@ -127,5 +139,16 @@ offset_right = 96.0
 offset_bottom = 1836.0
 text = "DROP CP"
 visible = false
+
+[node name="PowerButton" type="Button" parent="HUD"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -200.0
+offset_right = -16.0
+offset_bottom = -104.0
+text = "◆"
 
 [node name="PauseMenu" parent="." instance=ExtResource("9")]

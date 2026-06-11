@@ -1,0 +1,53 @@
+{
+  "bubble_burst": {
+    "id": "bubble_burst",
+    "name": "Bubble Burst",
+    "description": "Fire a high-speed bubble that shatters obstacles in its path. Time it perfectly for a faster, bigger burst!",
+    "icon_key": "sprite/power/bubble_burst",
+    "sfx_fire": "sfx/power_fire",
+    "sfx_charge": "sfx/power_charge",
+    "unlock_condition": "default",
+    "destructible_tags": ["jellyfish", "mine"]
+  },
+  "echo_shield": {
+    "id": "echo_shield",
+    "name": "Echo Shield",
+    "description": "Summon a shimmering shield that absorbs one hit. Activate before danger strikes!",
+    "icon_key": "sprite/power/echo_shield",
+    "sfx_fire": "sfx/power_fire",
+    "sfx_charge": "sfx/power_charge",
+    "sfx_break": "sfx/shield_break",
+    "unlock_condition": "clear_z2_l4",
+    "absorbs_hits": 1
+  },
+  "magnet_pulse": {
+    "id": "magnet_pulse",
+    "name": "Magnet Pulse",
+    "description": "Emit a pulse that pulls nearby pearls directly to you for 3 beats.",
+    "icon_key": "sprite/power/magnet_pulse",
+    "sfx_fire": "sfx/power_fire",
+    "sfx_charge": "sfx/power_charge",
+    "unlock_condition": "stub_phase_19",
+    "duration_beats": 3
+  },
+  "beat_dash": {
+    "id": "beat_dash",
+    "name": "Beat Dash",
+    "description": "Blink forward through obstacles for one beat — untouchable for a split second!",
+    "icon_key": "sprite/power/beat_dash",
+    "sfx_fire": "sfx/power_fire",
+    "sfx_charge": "sfx/power_charge",
+    "unlock_condition": "stub_phase_19",
+    "duration_beats": 1
+  },
+  "phase_bubble": {
+    "id": "phase_bubble",
+    "name": "Phase Bubble",
+    "description": "Encase yourself in a ghost bubble — pass through one obstacle type for 2 beats.",
+    "icon_key": "sprite/power/phase_bubble",
+    "sfx_fire": "sfx/power_fire",
+    "sfx_charge": "sfx/power_charge",
+    "unlock_condition": "stub_phase_19",
+    "duration_beats": 2
+  }
+}

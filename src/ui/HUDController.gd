@@ -10,12 +10,15 @@ class_name HUDController
 @export var progress_bar: ProgressBar
 @export var attempt_label: Label
 @export var drop_cp_button: Button
+@export var resonance_bar: Label
+@export var power_button: Button
 
 var score: int = 0
 
 var _combo: int = 0
 var _judgment_tween: Tween = null
 var _beat_tween: Tween = null
+var _power_pct: float = 0.0
 
 ## Timing judge reference — must be set by LevelRoot after instantiating the judge.
 var timing_judge: TimingJudge = null
@@ -30,6 +33,7 @@ func _ready() -> void:
 	EventBus.fever_started.connect(_on_fever_started)
 	EventBus.fever_ended.connect(_on_fever_ended)
 	EventBus.practice_checkpoint_saved.connect(_on_checkpoint_saved)
+	EventBus.power_charged.connect(_on_power_charged)
 	BeatConductor.beat_fired.connect(_on_beat_fired)
 
 	if retry_button != null:
@@ -54,8 +58,10 @@ func connect_timing_judge(judge: TimingJudge) -> void:
 func _on_run_started(level_id: String) -> void:
 	score = 0
 	_combo = 0
+	_power_pct = 0.0
 	_update_score_label()
 	_update_combo_label()
+	_update_resonance_bar()
 	if judgment_label != null:
 		judgment_label.text = ""
 	if retry_button != null:
@@ -197,6 +203,35 @@ func _combo_multiplier(combo: int) -> int:
 		return 2
 	else:
 		return 1
+
+
+## Show or hide the power button based on the level's power_mode.
+func update_power_button_mode(mode: String) -> void:
+	if power_button != null:
+		power_button.visible = (mode != "disabled")
+	if resonance_bar != null:
+		resonance_bar.visible = (mode != "disabled")
+
+
+func _on_power_charged(pct: float) -> void:
+	_power_pct = pct
+	_update_resonance_bar()
+
+
+func _update_resonance_bar() -> void:
+	if resonance_bar == null:
+		return
+	if _power_pct >= 1.0:
+		resonance_bar.text = "◆ READY!"
+		resonance_bar.modulate = Color(0.3, 0.95, 1.0)
+	elif _power_pct > 0.0:
+		var filled: int = int(_power_pct * 5.0)
+		filled = clampi(filled, 0, 4)
+		resonance_bar.text = "●" .repeat(filled) + "○".repeat(5 - filled)
+		resonance_bar.modulate = Color(0.5, 0.75, 0.95)
+	else:
+		resonance_bar.text = "○○○○○"
+		resonance_bar.modulate = Color(0.35, 0.45, 0.6, 0.7)
 
 
 func _on_retry_pressed() -> void:

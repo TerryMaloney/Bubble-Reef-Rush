@@ -2,8 +2,11 @@ extends Node2D
 
 class_name LevelRoot
 
+const BUBBLE_BURST_SCENE: PackedScene = preload("res://scenes/gameplay/powers/BubbleBurst.tscn")
+
 var _hud_controller: HUDController
 var _level_loader: LevelLoader
+var _resonance: ResonanceController
 
 
 func _ready() -> void:
@@ -22,6 +25,8 @@ func _ready() -> void:
 	_hud_controller.judgment_label = $HUD/JudgmentLabel
 	_hud_controller.progress_bar = $HUD/ProgressBar
 	_hud_controller.attempt_label = $HUD/AttemptLabel
+	_hud_controller.resonance_bar = $HUD/ResonanceChargeBar
+	_hud_controller.power_button = $HUD/PowerButton
 
 	var retry_btn: Button = $HUD/RetryButton
 	_hud_controller.retry_button = retry_btn
@@ -30,6 +35,9 @@ func _ready() -> void:
 
 	var drop_cp_btn: Button = $HUD/DropCPButton
 	_hud_controller.drop_cp_button = drop_cp_btn
+
+	var power_btn: Button = $HUD/PowerButton
+	power_btn.pressed.connect(_on_power_button_pressed)
 
 	var player: PlayerController = $Player
 	_hud_controller.connect_timing_judge(player.timing_judge)
@@ -49,8 +57,46 @@ func _ready() -> void:
 	else:
 		drop_cp_btn.hide()
 
+	# ResonanceController — setup deferred to run_started so level metadata is available.
+	_resonance = $ResonanceController
+	_resonance.add_to_group("resonance_controller")
+	EventBus.run_started.connect(_on_run_started_resonance)
+	EventBus.practice_respawned.connect(_on_practice_respawned_resonance)
+	EventBus.power_activated.connect(_on_power_activated)
+
 	_level_loader.level_ended.connect(_on_level_ended)
 	_level_loader.load_level(GameManager.current_level_id)
+
+
+func _on_run_started_resonance(level_id: String) -> void:
+	var raw: Dictionary = _level_loader.rhythm_map.get_raw_data()
+	var meta: Dictionary = raw.get("metadata", {}) as Dictionary
+	var mode: String = str(meta.get("power_mode", "allowed"))
+	var max_charges: int = int(meta.get("max_charges", 1))
+	var profile: String = SaveSystem.get_active_profile_id()
+	var equipped: String = SaveSystem.get_equipped_power(profile)
+	_resonance.setup(mode, max_charges, equipped)
+	_hud_controller.update_power_button_mode(mode)
+
+
+func _on_practice_respawned_resonance() -> void:
+	_resonance.reset()
+
+
+func _on_power_button_pressed() -> void:
+	_resonance.fire()
+
+
+func _on_power_activated(power_type: String, is_perfect: bool) -> void:
+	if power_type == "bubble_burst":
+		_spawn_bubble_burst(is_perfect)
+
+
+func _spawn_bubble_burst(is_perfect: bool) -> void:
+	var player: PlayerController = $Player
+	var burst: BubbleBurst = BUBBLE_BURST_SCENE.instantiate() as BubbleBurst
+	add_child(burst)
+	burst.setup(player.global_position, is_perfect)
 
 
 func _on_level_ended(level_id: String) -> void:
