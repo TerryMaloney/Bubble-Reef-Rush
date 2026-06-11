@@ -4,8 +4,25 @@
 
 - **Repository**: `TerryMaloney/Bubble-Reef-Rush`
 - **Branch**: `claude/geometry-dash-game-brainstorm-m5Thu`
-- **Last pushed commit**: Phase C (production readiness pass)
+- **Last pushed commit**: P0/P1 runtime blocker fixes (SHA: 65960aa)
 - **Remote**: `https://github.com/TerryMaloney/Bubble-Reef-Rush.git`
+
+## ✅ ALL PHASES COMPLETE (1–25 + Production Readiness A/B/C + P0/P1 Runtime Fix Pass)
+
+### P0/P1 Runtime Blocker Fixes (done — SHA 65960aa, 36/36 tests green):
+
+| # | File | What was broken | Fix |
+|---|------|----------------|-----|
+| 1 | `src/core/PassPlaySession.gd` | No `Mode` enum; no public `level_id/profiles/mode`; no `get_results()`; wrong result dict keys | Added enum, public props, `get_results()`, fixed keys to `total_score`/`funny_title` |
+| 2 | `src/core/GameManager.gd` | No `start_pass_play()`, no `start_playlist()`, no P&P turn routing | Added all three; P&P routes to NextPlayerScreen or Scoreboard; playlists advance level by level |
+| 3 | `src/core/SaveSystem.gd` | No `add_tournament_entry()` | Added method; saves to `family_tournament.history` array |
+| 4+5 | `src/buildmode/PlaybackBar.gd` | `run_failed` emitted with 3 args, handler took 3 args — EventBus signal has 2 | Changed both to 2 args |
+| 6 | `src/ui/DailyDiveScreen.gd` | Read dive history dict (date→score) as if it were level results (lid→{best_score}) | Fixed to use `get_all_level_results()`; now calls `start_playlist()` |
+| 7 | `src/ui/RadioShuffleScreen.gd` | Only launched first level of playlist | Now calls `start_playlist()` for full sequence |
+| 8 | `src/ui/PassPlayNextPlayerScreen.gd` | Required `setup()` call; couldn't be loaded via TransitionLayer | Added `_ready()` that self-configures from `GameManager`; kept `setup()` for overlay use |
+| 9 | `src/ui/PassPlayScoreboardScreen.gd` | Required `setup()` call; emitted `pass_play_session_ended` a second time | `_ready()` auto-setups from `GameManager.pending_pass_play_session`; removed duplicate emit |
+| 10 | `export_presets.cfg` | Package ID `bubblereefrrush` (extra r) | Fixed to `bubblereefrush` |
+| 11 | `tools/run_tests.sh` | `--import` used `\|\| true`, silently hiding import errors | Replaced with visible WARN message |
 
 ## ✅ ALL PHASES COMPLETE (1–25 + Production Readiness A/B/C)
 
