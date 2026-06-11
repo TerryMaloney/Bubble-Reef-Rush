@@ -1,0 +1,22 @@
+{
+  "stations": [
+    {
+      "id": "ocean",
+      "name": "Ocean Album",
+      "description": "The full underwater journey through six zones of coral reefs and volcanic trenches.",
+      "zones": [1, 2, 3, 4, 5, 6],
+      "build_pack_id": "ocean_pack",
+      "signature_mechanic": "rhythm_dive",
+      "unlock_condition": {"type": "default"}
+    },
+    {
+      "id": "space_bubble",
+      "name": "Space Bubble",
+      "description": "Break free from the ocean and drift through zero-gravity bubble nebulae. Unlock via Radio Key.",
+      "zones": [7],
+      "build_pack_id": "space_pack",
+      "signature_mechanic": "gravity_well",
+      "unlock_condition": {"type": "radio_key", "key_id": "space_key"}
+    }
+  ]
+}

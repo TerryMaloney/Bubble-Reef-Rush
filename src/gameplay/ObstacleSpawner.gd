@@ -17,6 +17,7 @@ const OBSTACLE_SCENE_MAP: Dictionary = {
 	"mirror_fish": "res://scenes/obstacles/MirrorFish.tscn",
 	"crystal_shard": "res://scenes/obstacles/CrystalShard.tscn",
 	"secret_exit": "res://scenes/obstacles/SecretExit.tscn",
+	"gravity_well": "res://scenes/obstacles/GravityWell.tscn",
 }
 const PRESSURE_WAVE_SCENE: String = "res://scenes/obstacles/PressureWave.tscn"
 const CORAL_SPIKE_SCENE: String = "res://scenes/obstacles/CoralSpike.tscn"

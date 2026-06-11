@@ -75,5 +75,6 @@ run_stage "Seeded test"          "tests/integration/seeded_test.gd"           "S
 run_stage "Daily dive test"      "tests/integration/daily_dive_test.gd"       "DAILY_DIVE_OK"
 run_stage "Co-pilot test"        "tests/integration/copilot_test.gd"          "COPILOT_OK"
 run_stage "Level Tennis test"    "tests/integration/level_tennis_test.gd"     "LEVEL_TENNIS_OK"
+run_stage "Reef Radio test"      "tests/integration/reef_radio_test.gd"       "REEF_RADIO_OK"
 
 echo "==> All tests passed."

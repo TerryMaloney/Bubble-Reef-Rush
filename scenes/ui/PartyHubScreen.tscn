@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://party_hub"]
+
+[ext_resource type="Script" path="res://src/ui/PartyHubScreen.gd" id="1"]
+
+[node name="PartyHubScreen" type="Node"]
+script = ExtResource("1")

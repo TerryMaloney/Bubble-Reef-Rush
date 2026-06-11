@@ -1,0 +1,129 @@
+{
+  "schema_version": "1.1",
+  "metadata": {
+    "id": "sb_l1",
+    "name": "Bubble Nebula",
+    "description": "Space Bubble station level 1 \u2014 stub placeholder.",
+    "zone": 7,
+    "level_index": 1,
+    "bpm": 120,
+    "bpm_variable": false,
+    "difficulty": 2,
+    "difficulty_tag": "Beginner",
+    "author": "Bubble Reef Rush Team",
+    "created_at": "2026-06-11T10:00:00Z",
+    "is_official": true,
+    "total_beats": 32,
+    "tags": [
+      "space",
+      "stub"
+    ],
+    "level_type": "standard",
+    "character_id": "",
+    "boss_id": "",
+    "trial_unlock_id": ""
+  },
+  "music": {
+    "filename": "zone_1_sunlit_shallows.wav",
+    "loop": true,
+    "loop_start_beat": 0,
+    "preview_start_beat": 4,
+    "preview_duration_beats": 8,
+    "beat_offset_ms": 0,
+    "volume_db": 0
+  },
+  "beat_map": [
+    {
+      "beat_index": 4,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "coral_spike",
+      "lane_position": 0.5,
+      "parameters": {
+        "intensity": 0.5,
+        "section": "intro"
+      }
+    },
+    {
+      "beat_index": 8,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.5
+    },
+    {
+      "beat_index": 12,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "gravity_well",
+      "lane_position": 0.5,
+      "parameters": {
+        "pull_strength": 200,
+        "radius": 150
+      }
+    },
+    {
+      "beat_index": 16,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "coral_spike",
+      "lane_position": 0.4,
+      "parameters": {
+        "intensity": 0.6,
+        "section": "build"
+      }
+    },
+    {
+      "beat_index": 20,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "gravity_well",
+      "lane_position": 0.6,
+      "parameters": {
+        "pull_strength": 200,
+        "radius": 150
+      }
+    },
+    {
+      "beat_index": 24,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "jellyfish_drift",
+      "lane_position": 0.3
+    },
+    {
+      "beat_index": 28,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "coral_spike",
+      "lane_position": 0.5,
+      "parameters": {
+        "intensity": 0.7,
+        "section": "finale"
+      }
+    }
+  ],
+  "speed_zones": [
+    {
+      "start_beat": 0,
+      "end_beat": 32,
+      "speed_multiplier": 1.0,
+      "transition_beats": 0,
+      "label": "Normal"
+    }
+  ],
+  "background": {
+    "asset_key": "bg_space_nebula",
+    "parallax_enabled": true,
+    "color_override": null,
+    "shader_key": "space_shimmer",
+    "ambient_particle_key": "stars_drift"
+  },
+  "unlock_requirements": {
+    "min_stars_zone_previous": null,
+    "required_level_id": "z6-l8",
+    "required_level_stars": 1,
+    "requires_full_reef_iap": false,
+    "requires_creator_pass": false,
+    "min_total_stars": null
+  },
+  "par_score": {
+    "one_star": 200,
+    "two_star": 400,
+    "three_star": 600,
+    "max_possible": 800
+  }
+}

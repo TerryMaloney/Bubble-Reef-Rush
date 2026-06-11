@@ -41,7 +41,7 @@
         "id": {
           "type": "string",
           "description": "Unique level identifier. Official levels use format 'z{zone}-l{level}' (e.g. 'z1-l1'). Player-created levels use a UUID v4.",
-          "pattern": "^(z[1-6]-l[1-8])|(ct_[a-z]+)|(crtr_[a-z_]+)|(boss_z[3-6])|([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+          "pattern": "^(z[1-6]-l[1-8])|(ct_[a-z]+)|(crtr_[a-z_]+)|(boss_z[3-6])|(sb_l[1-8])|([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
           "examples": [
             "z1-l1",
             "a3b4c5d6-e7f8-4a9b-b0c1-d2e3f4a5b6c7"
@@ -61,9 +61,9 @@
         },
         "zone": {
           "type": "integer",
-          "description": "Zone number (1\u20136). Determines background defaults, obstacle availability, and unlock chain.",
+          "description": "Zone number (1\u20136 official; 7 = Space Bubble station stub). Determines background defaults, obstacle availability, and unlock chain.",
           "minimum": 1,
-          "maximum": 6
+          "maximum": 7
         },
         "level_index": {
           "type": "integer",
@@ -287,7 +287,8 @@
               "dark_void",
               "crystal_shard",
               "mirror_fish",
-              "secret_exit"
+              "secret_exit",
+              "gravity_well"
             ]
           },
           "lane_position": {
@@ -625,6 +626,7 @@
             "bg_volcanic",
             "bg_twilight_trench",
             "bg_crystal_caves",
+            "bg_space_nebula",
             "bg_custom"
           ]
         },
