@@ -63,12 +63,12 @@ func _cleanup() -> void:
 			DirAccess.remove_absolute(bak_path)
 
 
-## ── Fresh profile is v2 ──────────────────────────────────────────────────────
+## ── Fresh profile is v2+ ─────────────────────────────────────────────────────
 func _test_fresh_profile_is_v2() -> void:
 	_ss.ensure_profile(TEST_PROFILE)
 	var data: Dictionary = _ss.load_progress(TEST_PROFILE) as Dictionary
-	if int(data.get("version", 0)) != 2:
-		_fail("Fresh profile version=%d, expected 2" % int(data.get("version", 0)))
+	if int(data.get("version", 0)) < 2:
+		_fail("Fresh profile version=%d, expected >= 2" % int(data.get("version", 0)))
 	if not data.has("achievements"):
 		_fail("Fresh profile missing 'achievements' key")
 	if not data.has("cosmetics"):
@@ -105,8 +105,8 @@ func _test_v1_migration() -> void:
 	file.close()
 
 	var data: Dictionary = _ss.load_progress(TEST_PROFILE) as Dictionary
-	if int(data.get("version", 0)) != 2:
-		_fail("After migration version=%d, expected 2" % int(data.get("version", 0)))
+	if int(data.get("version", 0)) < 2:
+		_fail("After migration version=%d, expected >= 2" % int(data.get("version", 0)))
 	if int(data.get("total_stars", 0)) != 5:
 		_fail("Migration lost total_stars (got %d)" % int(data.get("total_stars", 0)))
 	var levels: Dictionary = data.get("levels", {}) as Dictionary
@@ -124,9 +124,10 @@ func _test_v1_migration() -> void:
 	var settings: Dictionary = data.get("settings", {}) as Dictionary
 	if absf(float(settings.get("timing_offset_ms", 0.0)) - 25.0) > 0.001:
 		_fail("Migration: timing_offset_ms not preserved (got %s)" % str(settings.get("timing_offset_ms")))
-	# .bak file should have been written.
+	# At least one .bak file should have been written (either v1 or v2 bak).
 	var bak_path: String = progress_path + ".bak"
-	if not FileAccess.file_exists(bak_path):
+	var bak_path_v2: String = "user://profiles/%s/progress_v2.json.bak" % TEST_PROFILE
+	if not FileAccess.file_exists(bak_path) and not FileAccess.file_exists(bak_path_v2):
 		_fail("Migration: .bak backup file not created")
 	print("v1→v2 migration check — OK")
 

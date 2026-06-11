@@ -27,6 +27,7 @@ EconomyService="*res://src/core/EconomyService.gd"
 AchievementSystem="*res://src/core/AchievementSystem.gd"
 AchievementToast="*res://src/ui/AchievementToast.gd"
 PlayerSkin="*res://src/gameplay/PlayerSkin.gd"
+MutatorSystem="*res://src/core/MutatorSystem.gd"
 
 [display]
 

@@ -1,7 +1,7 @@
 # Autoload node that manages local family profiles and per-profile level progress persistence.
 extends Node
 
-const SAVE_VERSION: int = 2
+const SAVE_VERSION: int = 3
 
 const PROFILE_INDEX_PATH: String = "user://profiles/index.cfg"
 const LEVELS_DIR_TEMPLATE: String = "user://profiles/%s/levels/"
@@ -9,6 +9,41 @@ const LEVELS_DIR_TEMPLATE: String = "user://profiles/%s/levels/"
 
 func _ready() -> void:
 	ensure_profile(get_active_profile_id())
+
+
+func _fresh_v3_extras() -> Dictionary:
+	return {
+		"powers_unlocked": {"bubble_burst": true},
+		"equipped_power": "bubble_burst",
+		"build_unlocks": {
+			"obstacles": ["coral_spike", "jellyfish_drift", "kelp_curtain", "bubble_mine"],
+			"backgrounds": [],
+			"palettes": [],
+			"particles": [],
+			"blueprints": []
+		},
+		"blueprints": [],
+		"lost_notes": [],
+		"radio_keys": [],
+		"world_stations_unlocked": ["ocean"],
+		"workshop_rank": 0,
+		"workshop_xp": 0,
+		"family_tournament": {"history": []},
+		"daily_dive": {"history": {}},
+		"mutators_unlocked": ["tiny_pebble", "gentle_gaps"],
+		"rule_cards_unlocked": ["beat_my_score", "no_miss", "collect_all_pearls"],
+		"secret_exits_found": {},
+		"collection": {"boss_trophies": [], "family_records": {}}
+	}
+
+
+func _fresh_profile(profile_id: String) -> Dictionary:
+	var base: Dictionary = _fresh_v2_profile(profile_id)
+	var extras: Dictionary = _fresh_v3_extras()
+	for k: String in extras.keys():
+		base[k] = extras[k]
+	base["version"] = SAVE_VERSION
+	return base
 
 
 func ensure_profile(profile_id: String) -> void:
@@ -23,7 +58,7 @@ func ensure_profile(profile_id: String) -> void:
 		DirAccess.make_dir_recursive_absolute(levels_dir)
 
 	if not FileAccess.file_exists(progress_path):
-		_write_json(progress_path, _fresh_v2_profile(profile_id))
+		_write_json(progress_path, _fresh_profile(profile_id))
 
 	# Ensure this profile is registered in the index.
 	var cfg: ConfigFile = ConfigFile.new()
@@ -99,39 +134,42 @@ func _migrate(data: Dictionary) -> Dictionary:
 	var bak_path: String = "user://profiles/%s/progress.json.bak" % profile_id
 	_write_json(bak_path, data)
 
-	# v1 → v2: add economy, achievement, cosmetics, per-level new fields, new settings.
-	var fresh: Dictionary = _fresh_v2_profile(profile_id)
+	# ── v1 → v2 ──────────────────────────────────────────────────────────────
+	if ver < 2:
+		var fresh: Dictionary = _fresh_v2_profile(profile_id)
+		fresh["total_stars"] = int(data.get("total_stars", 0))
+		fresh["coins"] = int(data.get("coins", 0))
+		fresh["characters"] = data.get("characters", {"default_fish": true}) as Dictionary
+		var old_settings: Dictionary = data.get("settings", {}) as Dictionary
+		var new_settings: Dictionary = fresh["settings"] as Dictionary
+		for k: String in old_settings.keys():
+			new_settings[k] = old_settings[k]
+		fresh["settings"] = new_settings
+		var old_levels: Dictionary = data.get("levels", {}) as Dictionary
+		var new_levels: Dictionary = {}
+		for lid: String in old_levels.keys():
+			var old_entry: Dictionary = old_levels[lid] as Dictionary
+			new_levels[lid] = {
+				"best_score": int(old_entry.get("best_score", 0)),
+				"best_stars": int(old_entry.get("best_stars", 0)),
+				"attempts": int(old_entry.get("attempts", 1)),
+				"best_progress_pct": float(old_entry.get("best_progress_pct", 100.0)),
+				"treasure_coins": old_entry.get("treasure_coins", [false, false, false]) as Array,
+				"practice_best_pct": float(old_entry.get("practice_best_pct", 0.0)),
+			}
+		fresh["levels"] = new_levels
+		fresh["version"] = 2
+		data = fresh
 
-	# Carry over existing fields.
-	fresh["total_stars"] = int(data.get("total_stars", 0))
-	fresh["coins"] = int(data.get("coins", 0))
-	fresh["characters"] = data.get("characters", {"default_fish": true}) as Dictionary
+	# ── v2 → v3 ──────────────────────────────────────────────────────────────
+	if int(data.get("version", 2)) < 3:
+		var extras: Dictionary = _fresh_v3_extras()
+		for k: String in extras.keys():
+			if not data.has(k):
+				data[k] = extras[k]
+		data["version"] = 3
 
-	# Carry over settings, merging new keys over old.
-	var old_settings: Dictionary = data.get("settings", {}) as Dictionary
-	var new_settings: Dictionary = fresh["settings"] as Dictionary
-	for k: String in old_settings.keys():
-		new_settings[k] = old_settings[k]
-	fresh["settings"] = new_settings
-
-	# Carry over per-level data, adding new per-level fields where absent.
-	var old_levels: Dictionary = data.get("levels", {}) as Dictionary
-	var new_levels: Dictionary = {}
-	for lid: String in old_levels.keys():
-		var old_entry: Dictionary = old_levels[lid] as Dictionary
-		var new_entry: Dictionary = {
-			"best_score": int(old_entry.get("best_score", 0)),
-			"best_stars": int(old_entry.get("best_stars", 0)),
-			"attempts": int(old_entry.get("attempts", 1)),
-			"best_progress_pct": float(old_entry.get("best_progress_pct", 100.0)),
-			"treasure_coins": old_entry.get("treasure_coins", [false, false, false]) as Array,
-			"practice_best_pct": float(old_entry.get("practice_best_pct", 0.0)),
-		}
-		new_levels[lid] = new_entry
-	fresh["levels"] = new_levels
-	fresh["version"] = SAVE_VERSION
-
-	return fresh
+	return data
 
 
 func load_progress(profile_id: String) -> Dictionary:
@@ -419,6 +457,202 @@ func _ensure_level_entry(levels: Dictionary, level_id: String) -> Dictionary:
 		"treasure_coins": [false, false, false],
 		"practice_best_pct": 0.0,
 	}
+
+
+# ── Resonance Powers ─────────────────────────────────────────────────────────
+
+func get_power_unlocked(profile_id: String, power_id: String) -> bool:
+	var data: Dictionary = load_progress(profile_id)
+	return bool((data.get("powers_unlocked", {}) as Dictionary).get(power_id, false))
+
+
+func set_power_unlocked(profile_id: String, power_id: String) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if not data.has("powers_unlocked"):
+		data["powers_unlocked"] = {"bubble_burst": true}
+	(data["powers_unlocked"] as Dictionary)[power_id] = true
+	save_progress(profile_id, data)
+
+
+func get_equipped_power(profile_id: String) -> String:
+	var data: Dictionary = load_progress(profile_id)
+	return str(data.get("equipped_power", "bubble_burst"))
+
+
+func set_equipped_power(profile_id: String, power_id: String) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	data["equipped_power"] = power_id
+	save_progress(profile_id, data)
+
+
+# ── Build Mode Unlocks ────────────────────────────────────────────────────────
+
+func has_build_unlock(profile_id: String, category: String, item_id: String) -> bool:
+	var data: Dictionary = load_progress(profile_id)
+	var unlocks: Dictionary = data.get("build_unlocks", {}) as Dictionary
+	var list: Array = unlocks.get(category, []) as Array
+	return item_id in list
+
+
+func add_build_unlock(profile_id: String, category: String, item_id: String) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if not data.has("build_unlocks"):
+		data["build_unlocks"] = _fresh_v3_extras().get("build_unlocks", {})
+	var unlocks: Dictionary = data["build_unlocks"] as Dictionary
+	if not unlocks.has(category):
+		unlocks[category] = []
+	var list: Array = unlocks[category] as Array
+	if not (item_id in list):
+		list.append(item_id)
+		unlocks[category] = list
+		data["build_unlocks"] = unlocks
+		save_progress(profile_id, data)
+		EventBus.build_unlock_earned.emit(category, item_id)
+
+
+func get_build_unlocks(profile_id: String, category: String) -> Array:
+	var data: Dictionary = load_progress(profile_id)
+	var unlocks: Dictionary = data.get("build_unlocks", {}) as Dictionary
+	return unlocks.get(category, []) as Array
+
+
+# ── Blueprints ────────────────────────────────────────────────────────────────
+
+func get_blueprints(profile_id: String) -> Array:
+	var data: Dictionary = load_progress(profile_id)
+	return data.get("blueprints", []) as Array
+
+
+func add_blueprint(profile_id: String, blueprint_id: String) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if not data.has("blueprints"):
+		data["blueprints"] = []
+	var blueprints: Array = data["blueprints"] as Array
+	if not (blueprint_id in blueprints):
+		blueprints.append(blueprint_id)
+		data["blueprints"] = blueprints
+		save_progress(profile_id, data)
+
+
+# ── Workshop Rank ─────────────────────────────────────────────────────────────
+
+func get_workshop_rank(profile_id: String) -> int:
+	var data: Dictionary = load_progress(profile_id)
+	return int(data.get("workshop_rank", 0))
+
+
+func add_workshop_xp(profile_id: String, xp: int) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	var current_xp: int = int(data.get("workshop_xp", 0)) + xp
+	data["workshop_xp"] = current_xp
+	var rank: int = _xp_to_rank(current_xp)
+	data["workshop_rank"] = rank
+	save_progress(profile_id, data)
+
+
+func _xp_to_rank(xp: int) -> int:
+	# 0-99: rank 0 (Drifter), 100-299: rank 1 (Builder), 300-599: rank 2 (Architect),
+	# 600+: rank 3 (Master Maker).
+	if xp >= 600: return 3
+	if xp >= 300: return 2
+	if xp >= 100: return 1
+	return 0
+
+
+# ── Secret Exits ──────────────────────────────────────────────────────────────
+
+func get_secret_exit_found(profile_id: String, level_id: String, exit_id: String) -> bool:
+	var data: Dictionary = load_progress(profile_id)
+	var exits: Dictionary = data.get("secret_exits_found", {}) as Dictionary
+	return bool((exits.get(level_id, {}) as Dictionary).get(exit_id, false))
+
+
+func set_secret_exit_found(profile_id: String, level_id: String, exit_id: String) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if not data.has("secret_exits_found"):
+		data["secret_exits_found"] = {}
+	var exits: Dictionary = data["secret_exits_found"] as Dictionary
+	if not exits.has(level_id):
+		exits[level_id] = {}
+	(exits[level_id] as Dictionary)[exit_id] = true
+	data["secret_exits_found"] = exits
+	save_progress(profile_id, data)
+	EventBus.secret_exit_found.emit(level_id, exit_id)
+
+
+# ── Mutators ──────────────────────────────────────────────────────────────────
+
+func get_mutator_unlocked(profile_id: String, mutator_id: String) -> bool:
+	var data: Dictionary = load_progress(profile_id)
+	var list: Array = data.get("mutators_unlocked", []) as Array
+	return mutator_id in list
+
+
+func add_mutator_unlock(profile_id: String, mutator_id: String) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if not data.has("mutators_unlocked"):
+		data["mutators_unlocked"] = []
+	var list: Array = data["mutators_unlocked"] as Array
+	if not (mutator_id in list):
+		list.append(mutator_id)
+		data["mutators_unlocked"] = list
+		save_progress(profile_id, data)
+
+
+# ── Rule Cards ────────────────────────────────────────────────────────────────
+
+func get_rule_card_unlocked(profile_id: String, card_id: String) -> bool:
+	var data: Dictionary = load_progress(profile_id)
+	var list: Array = data.get("rule_cards_unlocked", []) as Array
+	return card_id in list
+
+
+func add_rule_card_unlock(profile_id: String, card_id: String) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if not data.has("rule_cards_unlocked"):
+		data["rule_cards_unlocked"] = []
+	var list: Array = data["rule_cards_unlocked"] as Array
+	if not (card_id in list):
+		list.append(card_id)
+		data["rule_cards_unlocked"] = list
+		save_progress(profile_id, data)
+
+
+# ── Radio Keys ────────────────────────────────────────────────────────────────
+
+func has_radio_key(profile_id: String, key_id: String) -> bool:
+	var data: Dictionary = load_progress(profile_id)
+	var list: Array = data.get("radio_keys", []) as Array
+	return key_id in list
+
+
+func add_radio_key(profile_id: String, key_id: String) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if not data.has("radio_keys"):
+		data["radio_keys"] = []
+	var list: Array = data["radio_keys"] as Array
+	if not (key_id in list):
+		list.append(key_id)
+		data["radio_keys"] = list
+		save_progress(profile_id, data)
+
+
+# ── World Stations ────────────────────────────────────────────────────────────
+
+func get_world_stations_unlocked(profile_id: String) -> Array:
+	var data: Dictionary = load_progress(profile_id)
+	return data.get("world_stations_unlocked", ["ocean"]) as Array
+
+
+func unlock_world_station(profile_id: String, station_id: String) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if not data.has("world_stations_unlocked"):
+		data["world_stations_unlocked"] = ["ocean"]
+	var list: Array = data["world_stations_unlocked"] as Array
+	if not (station_id in list):
+		list.append(station_id)
+		data["world_stations_unlocked"] = list
+		save_progress(profile_id, data)
 
 
 func _write_json(path: String, payload: Dictionary) -> void:

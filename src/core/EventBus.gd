@@ -34,3 +34,37 @@ signal coins_changed(profile_id: String, new_total: int)
 signal achievement_unlocked(achievement_id: String, name: String)
 signal character_unlocked(char_id: String)
 signal treasure_coin_collected(level_id: String, coin_idx: int)
+
+## Resonance Powers (Phase 15)
+signal power_charged(pct: float)
+signal power_activated(power_type: String, is_perfect: bool)
+signal power_cooldown_started()
+
+## Ghost system (Phase 16)
+signal ghost_saved(level_id: String, ghost_type: String)
+signal ghost_beat_delta(seconds: float)
+
+## Challenge Capsules (Phase 17)
+signal capsule_exported(path: String)
+signal capsule_imported(level_id: String)
+
+## Pass & Play (Phase 18)
+signal pass_play_next_player(profile_id: String)
+signal pass_play_session_ended(results: Array)
+
+## Mutators (Phase 19)
+signal mutators_changed(active: Array)
+
+## Rule Cards + Build Mode unlocks (Phase 20)
+signal rule_card_result(card_id: String, passed: bool)
+signal build_unlock_earned(category: String, item_id: String)
+
+## Special Levels — boss + trials (Phase 21)
+signal boss_phase_changed(boss_id: String, phase: int)
+signal trial_completed(trial_id: String, unlock_id: String)
+
+## Secrets (Phase 22)
+signal secret_exit_found(level_id: String, exit_id: String)
+
+## Deterministic replay (Phase 23)
+signal daily_dive_completed(date: String, score: int)

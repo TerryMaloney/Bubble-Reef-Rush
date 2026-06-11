@@ -6,7 +6,7 @@ Godot 4.6 (GDScript, typed). Portrait 1080×1920. Android-first, iOS secondary.
 ## Quick commands
 
 ```bash
-# Run full test suite (21 stages, ~2 min)
+# Run full test suite (22 stages, ~2 min)
 GODOT=/tmp/Godot_v4.6.3-stable_linux.x86_64 ./tools/run_tests.sh
 
 # Validate all 48 .brl level files (schema + movement budgets)
@@ -67,7 +67,7 @@ tools/
 |------|--------|---------|
 | `GameManager` | `src/core/GameManager.gd` | Scene state machine, level lifecycle |
 | `EventBus` | `src/core/EventBus.gd` | Cross-scene signals |
-| `SaveSystem` | `src/core/SaveSystem.gd` | Profile progress, v2 schema |
+| `SaveSystem` | `src/core/SaveSystem.gd` | Profile progress, v3 schema + migration |
 | `BeatConductor` | `src/rhythm/BeatConductor.gd` | Fixed + variable BPM clock, beat/half-beat signals |
 | `Accessibility` | `src/core/Accessibility.gd` | Reduced motion, wide timing, text scale |
 | `GameConstants` | `src/core/GameConstants.gd` | Canvas 1080×1920, speeds, timing windows |
@@ -81,8 +81,9 @@ tools/
 | `AchievementSystem` | `src/core/AchievementSystem.gd` | Rule-engine over achievements.json |
 | `AchievementToast` | `src/ui/AchievementToast.gd` | Queued toast notifications |
 | `PlayerSkin` | `src/gameplay/PlayerSkin.gd` | Character + cosmetic equip state |
+| `MutatorSystem` | `src/core/MutatorSystem.gd` | Active mutators for current run; apply() at level load |
 
-## Test suite (21 stages)
+## Test suite (22 stages)
 
 | Stage | Script | Marker |
 |-------|--------|--------|
@@ -106,6 +107,7 @@ tools/
 | 17 | `tests/integration/obstacle_z6_test.gd` | `OBSTACLE_Z6_OK` |
 | 18 | `tests/integration/buildmode_test.gd` | `BUILDMODE_OK` |
 | 19 | `tests/integration/playtest.gd` | `PLAYTEST_OK` |
+| 20 | `tests/integration/save_v3_test.gd` | `SAVE_V3_OK` |
 
 ## Level format (.brl)
 
