@@ -6,6 +6,7 @@
     {"id": "z3_complete",    "name": "Wreck Survivor",      "desc": "Clear all 8 Shipwreck Alley levels.",   "rule": "zone_cleared",        "zone": "z3"},
     {"id": "z4_complete",    "name": "Vent Runner",         "desc": "Clear all 8 Volcanic Vent levels.",     "rule": "zone_cleared",        "zone": "z4"},
     {"id": "z5_complete",    "name": "Twilight Swimmer",    "desc": "Clear all 8 Twilight Trench levels.",   "rule": "zone_cleared",        "zone": "z5"},
+    {"id": "z6_complete",    "name": "Crystal Master",      "desc": "Clear all 8 Crystal Caves levels.",     "rule": "zone_cleared",        "zone": "z6"},
     {"id": "stars_10",       "name": "Rising Star",         "desc": "Earn 10 stars total.",                  "rule": "stars_total",         "threshold": 10},
     {"id": "stars_25",       "name": "Star Collector",      "desc": "Earn 25 stars total.",                  "rule": "stars_total",         "threshold": 25},
     {"id": "stars_50",       "name": "Star Power",          "desc": "Earn 50 stars total.",                  "rule": "stars_total",         "threshold": 50},
