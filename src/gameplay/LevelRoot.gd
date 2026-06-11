@@ -5,10 +5,13 @@ class_name LevelRoot
 const BUBBLE_BURST_SCENE: PackedScene = preload("res://scenes/gameplay/powers/BubbleBurst.tscn")
 const GHOST_PLAYER_SCENE: PackedScene = preload("res://scenes/gameplay/GhostPlayer.tscn")
 
+const SPECIAL_CONTROLLER_GD: String = "res://src/gameplay/SpecialLevelController.gd"
+
 var _hud_controller: HUDController
 var _level_loader: LevelLoader
 var _resonance: ResonanceController
 var _recorder: GhostRecorder
+var _special: Node = null
 
 
 func _ready() -> void:
@@ -27,8 +30,8 @@ func _ready() -> void:
 	_hud_controller.judgment_label = $HUD/JudgmentLabel
 	_hud_controller.progress_bar = $HUD/ProgressBar
 	_hud_controller.attempt_label = $HUD/AttemptLabel
-	_hud_controller.resonance_bar = $HUD/ResonanceChargeBar
-	_hud_controller.power_button = $HUD/PowerButton
+	_hud_controller.resonance_bar = $HUD/ResonanceChargeBar if $HUD.has_node("ResonanceChargeBar") else null
+	_hud_controller.power_button = $HUD/PowerButton if $HUD.has_node("PowerButton") else null
 
 	var retry_btn: Button = $HUD/RetryButton
 	_hud_controller.retry_button = retry_btn
@@ -38,8 +41,8 @@ func _ready() -> void:
 	var drop_cp_btn: Button = $HUD/DropCPButton
 	_hud_controller.drop_cp_button = drop_cp_btn
 
-	var power_btn: Button = $HUD/PowerButton
-	power_btn.pressed.connect(_on_power_button_pressed)
+	if $HUD.has_node("PowerButton"):
+		($HUD/PowerButton as Button).pressed.connect(_on_power_button_pressed)
 
 	var player: PlayerController = $Player
 	_hud_controller.connect_timing_judge(player.timing_judge)
@@ -60,21 +63,26 @@ func _ready() -> void:
 		drop_cp_btn.hide()
 
 	# ResonanceController — setup deferred to run_started so level metadata is available.
-	_resonance = $ResonanceController
-	_resonance.add_to_group("resonance_controller")
-	EventBus.run_started.connect(_on_run_started_resonance)
-	EventBus.practice_respawned.connect(_on_practice_respawned_resonance)
-	EventBus.power_activated.connect(_on_power_activated)
+	if has_node("ResonanceController"):
+		_resonance = $ResonanceController
+		_resonance.add_to_group("resonance_controller")
+		EventBus.run_started.connect(_on_run_started_resonance)
+		EventBus.practice_respawned.connect(_on_practice_respawned_resonance)
+		EventBus.power_activated.connect(_on_power_activated)
 
 	# GhostRecorder — wired to PlayerController; saves on run_completed.
-	_recorder = $GhostRecorder
-	player.set_ghost_recorder(_recorder)
-	EventBus.run_started.connect(_on_run_started_ghost)
-	EventBus.practice_respawned.connect(_on_practice_respawned_ghost)
-	EventBus.run_completed.connect(_on_run_completed_ghost)
+	if has_node("GhostRecorder"):
+		_recorder = $GhostRecorder
+		player.set_ghost_recorder(_recorder)
+		EventBus.run_started.connect(_on_run_started_ghost)
+		EventBus.practice_respawned.connect(_on_practice_respawned_ghost)
+		EventBus.run_completed.connect(_on_run_completed_ghost)
 
 	# GhostPlayer — instantiate if GameManager.show_ghost is set.
 	_maybe_spawn_ghost_player(player)
+
+	# SpecialLevelController — created on run_started when level_type != standard.
+	EventBus.run_started.connect(_on_run_started_special)
 
 	_level_loader.level_ended.connect(_on_level_ended)
 	_level_loader.load_level(GameManager.current_level_id)
@@ -153,6 +161,20 @@ func _maybe_spawn_ghost_player(_player: PlayerController) -> void:
 	add_child(gp)
 	gp.setup(ghost_data)
 	EventBus.run_started.connect(func(_id: String) -> void: gp.play())
+
+
+# ── Special levels ────────────────────────────────────────────────────────────
+
+func _on_run_started_special(_level_id: String) -> void:
+	if _special != null:
+		return
+	var raw: Dictionary = _level_loader.rhythm_map.get_raw_data()
+	var meta: Dictionary = raw.get("metadata", {}) as Dictionary
+	if str(meta.get("level_type", "standard")) == "standard":
+		return
+	_special = load(SPECIAL_CONTROLLER_GD).new()
+	add_child(_special)
+	_special.setup(meta)
 
 
 # ── Level end ────────────────────────────────────────────────────────────────

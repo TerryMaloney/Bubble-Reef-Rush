@@ -1,114 +1,128 @@
 [
   {
     "id": "no_miss",
-    "name": "No Miss",
-    "description": "Complete the level without getting hit once.",
+    "name": "Perfect Run",
+    "description": "Complete the level without any misses.",
     "check_type": "max_misses",
     "check_params": {"limit": 0},
-    "unlock_condition": "default"
+    "unlock_condition": "default",
+    "unlocked_by_default": true
   },
   {
     "id": "one_miss",
-    "name": "Close Call",
-    "description": "Complete the level with at most one hit.",
+    "name": "Nearly Perfect",
+    "description": "Complete with at most one miss.",
     "check_type": "max_misses",
     "check_params": {"limit": 1},
-    "unlock_condition": "default"
+    "unlock_condition": "default",
+    "unlocked_by_default": true
   },
   {
     "id": "collect_all_pearls",
-    "name": "Pearl Sweep",
+    "name": "Pearl Collector",
     "description": "Collect every pearl in the level.",
     "check_type": "collect_all_pearls",
     "check_params": {},
-    "unlock_condition": "default"
+    "unlock_condition": "default",
+    "unlocked_by_default": true
   },
   {
     "id": "beat_my_score",
-    "name": "Beat My Score",
-    "description": "Outscore the best ghost on file.",
+    "name": "Beat Your Best",
+    "description": "Score higher than your personal best.",
     "check_type": "race_ghost",
     "check_params": {},
-    "unlock_condition": "default"
+    "unlock_condition": "default",
+    "unlocked_by_default": true
   },
   {
     "id": "treasure_hunt",
-    "name": "Treasure Hunt",
-    "description": "Collect all treasure coins in the level.",
+    "name": "Treasure Hunter",
+    "description": "Collect all treasure coins.",
     "check_type": "treasure_hunt",
     "check_params": {},
-    "unlock_condition": "complete_zone_2"
+    "unlock_condition": "clear_z2_l2",
+    "unlocked_by_default": false
   },
   {
     "id": "no_powers",
-    "name": "Power Free",
-    "description": "Clear the level without firing any power.",
+    "name": "Au Naturel",
+    "description": "Complete without using any powers.",
     "check_type": "no_powers",
     "check_params": {},
-    "unlock_condition": "complete_zone_2"
+    "unlock_condition": "clear_z2_l4",
+    "unlocked_by_default": false
   },
   {
     "id": "one_burst",
     "name": "One Shot",
-    "description": "Use Bubble Burst at most once during the run.",
-    "check_type": "one_bubble_burst",
+    "description": "Use exactly one Bubble Burst.",
+    "check_type": "one_burst",
     "check_params": {},
-    "unlock_condition": "unlock_bubble_burst"
+    "unlock_condition": "clear_z3_l2",
+    "unlocked_by_default": false
   },
   {
     "id": "shield_only",
-    "name": "Shield Run",
-    "description": "Only activate Echo Shield — no other powers.",
+    "name": "Shield Bearer",
+    "description": "Use only Echo Shield powers.",
     "check_type": "shield_only",
     "check_params": {},
-    "unlock_condition": "unlock_echo_shield"
+    "unlock_condition": "clear_z3_l4",
+    "unlocked_by_default": false
   },
   {
     "id": "speed_run",
     "name": "Speed Run",
-    "description": "Clear the level on the very first attempt.",
-    "check_type": "max_attempts",
-    "check_params": {"limit": 1},
-    "unlock_condition": "complete_zone_3"
+    "description": "Complete within the first 80% of the level's beats.",
+    "check_type": "speed_run",
+    "check_params": {"time_limit_beats": 26},
+    "unlock_condition": "clear_z4_l2",
+    "unlocked_by_default": false
   },
   {
     "id": "tiny_challenge",
     "name": "Tiny Challenge",
-    "description": "Clear the level with the Tiny Pebble mutator active.",
-    "check_type": "tiny_character",
+    "description": "Complete with the Tiny Pebble mutator.",
+    "check_type": "tiny_challenge",
     "check_params": {},
-    "unlock_condition": "unlock_mutator_tiny_pebble"
+    "unlock_condition": "clear_z4_l4",
+    "unlocked_by_default": false
   },
   {
     "id": "upside_down",
     "name": "Upside Down",
-    "description": "Clear the level with Reverse Buoyancy active.",
-    "check_type": "reverse_buoyancy",
+    "description": "Complete with Reverse Buoyancy mutator.",
+    "check_type": "reverse_buoyancy_challenge",
     "check_params": {},
-    "unlock_condition": "unlock_mutator_reverse_buoyancy"
+    "unlock_condition": "clear_z4_l6",
+    "unlocked_by_default": false
   },
   {
     "id": "find_secret",
     "name": "Secret Seeker",
-    "description": "Find the hidden secret exit.",
+    "description": "Find the secret exit in this level.",
     "check_type": "find_secret",
     "check_params": {},
-    "unlock_condition": "complete_zone_4"
+    "unlock_condition": "clear_z5_l2",
+    "unlocked_by_default": false
   },
   {
     "id": "family_run",
     "name": "Family Run",
-    "description": "Complete a Pass & Play relay on this level.",
-    "check_type": "family_relay",
+    "description": "Complete as part of a Pass & Play session.",
+    "check_type": "family_run",
     "check_params": {},
-    "unlock_condition": "play_pass_and_play"
+    "unlock_condition": "clear_z5_l4",
+    "unlocked_by_default": false
   },
   {
     "id": "high_tide",
     "name": "High Tide",
-    "description": "Score 1000 points or more in a single run.",
+    "description": "Score at least 800 points.",
     "check_type": "beat_score",
-    "check_params": {"threshold": 1000},
-    "unlock_condition": "complete_zone_3"
+    "check_params": {"target": 800},
+    "unlock_condition": "clear_z6_l2",
+    "unlocked_by_default": false
   }
 ]

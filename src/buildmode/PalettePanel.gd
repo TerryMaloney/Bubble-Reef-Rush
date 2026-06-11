@@ -1,5 +1,5 @@
 ## PalettePanel.gd
-## Scrollable list of obstacle buttons filtered by player's cleared zone.
+## Scrollable list of obstacle buttons filtered by player's cleared zone AND build unlocks.
 ## Emits obstacle_selected when the user taps an obstacle type.
 extends Panel
 
@@ -22,7 +22,6 @@ func _ready() -> void:
 
 
 ## Rebuild palette buttons for the given cleared-zone level.
-## Only shows obstacle types that the active profile has unlocked in Build Mode.
 func refresh_palette(max_zone: int) -> void:
 	highest_cleared_zone = max_zone
 	for b: Button in _buttons:
@@ -30,8 +29,9 @@ func refresh_palette(max_zone: int) -> void:
 	_buttons.clear()
 	_available_types.clear()
 
-	var all_types: Array[String] = ObstacleParamSchema.types_for_zone(max_zone)
 	var profile_id: String = SaveSystem.get_active_profile_id()
+	var all_types: Array[String] = ObstacleParamSchema.types_for_zone(max_zone)
+
 	for otype: String in all_types:
 		if SaveSystem.has_build_unlock(profile_id, "obstacles", otype):
 			_available_types.append(otype)

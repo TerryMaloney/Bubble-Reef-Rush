@@ -20,7 +20,6 @@ var _player: Node2D = null
 
 func _ready() -> void:
 	add_to_group("scrolling")
-	add_to_group("bubble_destructible")
 	body_entered.connect(_on_body_entered)
 	_player = get_tree().get_first_node_in_group("player") as Node2D
 

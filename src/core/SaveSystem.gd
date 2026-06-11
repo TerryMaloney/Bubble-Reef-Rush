@@ -655,28 +655,6 @@ func unlock_world_station(profile_id: String, station_id: String) -> void:
 		save_progress(profile_id, data)
 
 
-# ── Family Tournament ─────────────────────────────────────────────────────────
-
-## Append a session result to the profile's family tournament history.
-## entry: {date, level_id, results: Array[{profile_id, total_score, best_score, funny_title}]}
-func add_tournament_entry(profile_id: String, entry: Dictionary) -> void:
-	var data: Dictionary = load_progress(profile_id)
-	if not data.has("family_tournament"):
-		data["family_tournament"] = {"history": []}
-	var tournament: Dictionary = data["family_tournament"] as Dictionary
-	var history: Array = tournament.get("history", []) as Array
-	history.append(entry)
-	tournament["history"] = history
-	data["family_tournament"] = tournament
-	save_progress(profile_id, data)
-
-
-## Return the full tournament history for a profile.
-func get_tournament_history(profile_id: String) -> Array:
-	var data: Dictionary = load_progress(profile_id)
-	return ((data.get("family_tournament", {}) as Dictionary).get("history", [])) as Array
-
-
 func _write_json(path: String, payload: Dictionary) -> void:
 	var tmp_path: String = path + ".tmp"
 	var file: FileAccess = FileAccess.open(tmp_path, FileAccess.WRITE)

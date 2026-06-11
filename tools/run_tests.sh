@@ -68,5 +68,6 @@ run_stage "Pass Play test"  "tests/integration/pass_play_test.gd"       "PASS_PL
 run_stage "Mutator test"       "tests/integration/mutator_test.gd"         "MUTATOR_OK"
 run_stage "Rule card test"    "tests/integration/rule_card_test.gd"      "RULE_CARD_OK"
 run_stage "Build unlock test" "tests/integration/build_unlock_test.gd"   "BUILD_UNLOCK_OK"
+run_stage "Special level test" "tests/integration/special_level_test.gd" "SPECIAL_LEVEL_OK"
 
 echo "==> All tests passed."

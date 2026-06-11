@@ -22,19 +22,19 @@ const CANVAS_H: float = 1920.0
 var diving: bool = false
 var alive: bool = true
 
-var _ghost_recorder: Node = null
-
-
-func set_ghost_recorder(recorder: Node) -> void:
-	_ghost_recorder = recorder
-
 @onready var beat_visualizer: BeatVisualizer = $BeatVisualizer
 @onready var timing_judge: TimingJudge = $TimingJudge
+
+var _ghost_recorder: GhostRecorder = null
 
 
 func _ready() -> void:
 	add_to_group("player")
 	timing_judge.input_judged.connect(_on_input_judged)
+
+
+func set_ghost_recorder(recorder: GhostRecorder) -> void:
+	_ghost_recorder = recorder
 
 
 func _input(event: InputEvent) -> void:
@@ -48,11 +48,11 @@ func _input(event: InputEvent) -> void:
 		velocity.y = dive_impulse
 		timing_judge.judge_input(BeatConductor.get_current_beat_time_ms())
 		if _ghost_recorder != null:
-			_ghost_recorder.record_event("dive_start")
+			_ghost_recorder.record_event(BeatConductor.get_current_beat_position(), "dive_start")
 	elif event.is_action_released("swim_dive"):
 		diving = false
 		if _ghost_recorder != null:
-			_ghost_recorder.record_event("dive_end")
+			_ghost_recorder.record_event(BeatConductor.get_current_beat_position(), "dive_end")
 
 
 func _physics_process(delta: float) -> void:
@@ -81,10 +81,11 @@ func _physics_process(delta: float) -> void:
 func on_hit() -> void:
 	if not alive:
 		return
-	# Give ResonanceController a chance to absorb the hit with EchoShield.
-	var rc := get_tree().get_first_node_in_group("resonance_controller") as Node
-	if rc != null and rc.has_method("consume_shield") and rc.consume_shield():
-		return
+	# Check EchoShield before dying.
+	var rc: Node = get_tree().get_first_node_in_group("resonance_controller")
+	if rc != null and rc.has_method("consume_shield"):
+		if rc.consume_shield():
+			return
 	alive = false
 	modulate = Color(1.0, 0.3, 0.3)
 	EventBus.player_hit.emit()

@@ -6,10 +6,10 @@ Godot 4.6 (GDScript, typed). Portrait 1080×1920. Android-first, iOS secondary.
 ## Quick commands
 
 ```bash
-# Run full test suite (26 stages, ~2 min)
+# Run full test suite (29 stages, ~3 min)
 GODOT=/tmp/Godot_v4.6.3-stable_linux.x86_64 ./tools/run_tests.sh
 
-# Validate all 48 .brl level files (schema + movement budgets)
+# Validate all .brl level files (48 official + 17 special)
 python3 tools/validate_brl.py assets/levels/
 python3 tools/check_movements.py assets/levels/
 
@@ -23,26 +23,30 @@ python3 tools/gen_audio.py
 src/
   core/           GameManager, SaveSystem, EventBus, GameConstants,
                   AssetRegistry, VisualFactory, TransitionLayer,
-                  EconomyService, AchievementSystem, LevelLoader
+                  EconomyService, AchievementSystem, LevelLoader,
+                  MutatorSystem, GhostLibrary, RuleCardSystem,
+                  CapsuleSerializer, PassPlaySession
   rhythm/         BeatConductor, TimingJudge, RhythmMap, BeatVisualizer
   gameplay/       LevelRoot, ObstacleSpawner, CollectibleSpawner,
                   ScrollService, DifficultyDirector, PlayerController,
                   JuiceDirector, FXFactory, FeverController,
                   NearMissDetector, PracticeController, BackgroundController,
-                  ResonanceController
+                  ResonanceController, GhostRecorder, GhostPlayer,
+                  SpecialLevelController
   gameplay/obstacles/   All 12 obstacle scripts
   gameplay/collectibles/ Pearl, TreasureCoin
   gameplay/powers/      BubbleBurst, EchoShield
+  gameplay/bosses/      boss_z3, boss_z4, boss_z5, boss_z6
   buildmode/      BuildSession, BrlSerializer, PlayabilityValidator,
                   DifficultyTagger, ObstacleParamSchema,
                   BuildModeRoot, TimelineView, PalettePanel,
-                  PropertiesPanel, PlaybackBar
+                  PropertiesPanel, PlaybackBar, BuildUnlockRegistry
   ui/             PauseMenu, SettingsScreen, HUDController, AchievementToast
   audio/          SFXManager
 
 scenes/
   gameplay/       LevelRoot, MainMenu, ZoneSelect, LevelSelect,
-                  ResultsScreen, SettingsScreen
+                  ResultsScreen, SettingsScreen, GhostPlayer
   gameplay/powers/ BubbleBurst.tscn
   buildmode/      BuildModeRoot.tscn
   obstacles/      All 12 obstacle scenes
@@ -51,14 +55,17 @@ scenes/
 
 assets/
   levels/         48 .brl files (z1-l1 … z6-l8)
-  data/           achievements.json
+  levels/trials/  8 character trials (ct_*.brl) + 5 creator trials (crtr_*.brl)
+  levels/bosses/  4 boss chase levels (boss_z3–z6.brl)
+  data/           achievements.json, powers.json, mutators.json,
+                  rule_cards.json
   asset_manifest.json
 
 tests/
   smoke/          run_smoke_tests.gd
-  integration/    22 headless test scripts
+  integration/    28 headless test scripts
 tools/
-  run_tests.sh    22-stage headless suite runner
+  run_tests.sh    29-stage headless suite runner
   validate_brl.py JSON-schema validation for .brl files
   check_movements.py  Movement budget + speed-zone readability checks
   gen_audio.py    Procedural WAV click-track generator
@@ -88,6 +95,16 @@ tools/
 | `GhostLibrary` | `src/core/GhostLibrary.gd` | Persists and retrieves ghost run data (personal_best, family_champion, imported) |
 | `RuleCardSystem` | `src/core/RuleCardSystem.gd` | Active rule cards for a run; evaluate_run() post-completion |
 | `BuildUnlockRegistry` | `src/buildmode/BuildUnlockRegistry.gd` | Maps level clears to Build Mode palette unlocks |
+
+## Special level types (Phase 21)
+
+| level_type | ID format | Files | Purpose |
+|-----------|-----------|-------|---------|
+| `character_trial` | `ct_<name>` | `assets/levels/trials/ct_*.brl` | Unlocks character on completion |
+| `creator_trial` | `crtr_<name>` | `assets/levels/trials/crtr_*.brl` | Unlocks Build Mode content |
+| `boss_chase` | `boss_z<n>` | `assets/levels/bosses/boss_z*.brl` | Multi-phase boss encounter |
+
+Boss scripts: `src/gameplay/bosses/boss_z{3-6}.gd` — each defines `get_phases() -> Array`
 
 ## Test suite (29 stages)
 
@@ -121,13 +138,15 @@ tools/
 | 25 | `tests/integration/mutator_test.gd` | `MUTATOR_OK` |
 | 26 | `tests/integration/rule_card_test.gd` | `RULE_CARD_OK` |
 | 27 | `tests/integration/build_unlock_test.gd` | `BUILD_UNLOCK_OK` |
+| 28 | `tests/integration/special_level_test.gd` | `SPECIAL_LEVEL_OK` |
 
 ## Level format (.brl)
 
 Schema: `docs/design/level_schema.json` (v1.1)
 
 Key fields:
-- `metadata.id`: official = `z1-l1` … `z6-l8`; player-created = UUID v4
+- `metadata.id`: official = `z1-l1` … `z6-l8`; trials = `ct_<name>` / `crtr_<name>`; bosses = `boss_z<n>`; player-created = UUID v4
+- `metadata.level_type`: "standard" | "character_trial" | "creator_trial" | "boss_chase" | "treasure_hunt"
 - `metadata.bpm_variable`: true only for Zone 5 levels; requires `bpm_changes` array
 - `beat_map[]`: each entry has `beat_index`, `lane_position`, `obstacle_type`, `parameters`
 - `speed_zones[]`: `{start_beat, end_beat, speed_multiplier}` — changes scroll speed, not beat clock
@@ -173,6 +192,7 @@ Key classes (all in `src/buildmode/`):
 - `PlayabilityValidator` — Movement budget + density cap + ±80 px overlap rule
 - `DifficultyTagger` — GDD §6.4 formula; override-down-only
 - `ObstacleParamSchema` — Per-type param definitions for the properties panel
+- `BuildUnlockRegistry` — Maps level clears to palette unlocks (z2→current_jet, etc.)
 
 ## Drop-in assets
 

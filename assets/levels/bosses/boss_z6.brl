@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.1",
+  "metadata": {
+    "id": "boss_z6",
+    "name": "Crystal Colossus",
+    "description": "The Crystal Colossus shatters the deep with prismatic fury.",
+    "zone": 6,
+    "level_index": 8,
+    "bpm": 175,
+    "bpm_variable": false,
+    "difficulty": 8,
+    "difficulty_tag": "Expert",
+    "author": "Bubble Reef Rush Team",
+    "created_at": "2026-06-11T10:00:00Z",
+    "is_official": true,
+    "total_beats": 40,
+    "tags": [],
+    "level_type": "boss_chase",
+    "character_id": "",
+    "boss_id": "boss_z6",
+    "trial_unlock_id": ""
+  },
+  "music": {
+    "filename": "zone_1_sunlit_shallows.wav",
+    "loop": false,
+    "loop_start_beat": 0,
+    "preview_start_beat": 4,
+    "preview_duration_beats": 8,
+    "beat_offset_ms": 0,
+    "volume_db": 0
+  },
+  "beat_map": [
+    {"beat_index": 2, "beat_subdivision": "quarter", "obstacle_type": "crystal_shard", "lane_position": 0.3, "parameters": {"velocity_x": -2.0, "velocity_y": 1.0}},
+    {"beat_index": 4, "beat_subdivision": "quarter", "obstacle_type": "crystal_shard", "lane_position": 0.7, "parameters": {"velocity_x": -2.0, "velocity_y": 1.0}},
+    {"beat_index": 6, "beat_subdivision": "quarter", "obstacle_type": "crystal_shard", "lane_position": 0.2, "parameters": {"velocity_x": -2.0, "velocity_y": 1.0}},
+    {"beat_index": 8, "beat_subdivision": "quarter", "obstacle_type": "crystal_shard", "lane_position": 0.8, "parameters": {"velocity_x": -2.0, "velocity_y": 1.0}},
+    {"beat_index": 12, "beat_subdivision": "quarter", "obstacle_type": "crystal_shard", "lane_position": 0.5, "parameters": {"velocity_x": -2.0, "velocity_y": 1.0}},
+    {"beat_index": 16, "beat_subdivision": "quarter", "obstacle_type": "crystal_shard", "lane_position": 0.3, "parameters": {"velocity_x": -2.0, "velocity_y": 1.0}},
+    {"beat_index": 20, "beat_subdivision": "quarter", "obstacle_type": "crystal_shard", "lane_position": 0.6, "parameters": {"velocity_x": -2.0, "velocity_y": 1.0}},
+    {"beat_index": 24, "beat_subdivision": "quarter", "obstacle_type": "crystal_shard", "lane_position": 0.4, "parameters": {"velocity_x": -2.0, "velocity_y": 1.0}}
+  ],
+  "speed_zones": [
+    {"start_beat": 0, "end_beat": 40, "speed_multiplier": 1.0, "transition_beats": 0, "label": "Normal"}
+  ],
+  "background": {
+    "asset_key": "bg_crystal_caves",
+    "parallax_enabled": true,
+    "color_override": null,
+    "shader_key": "prismatic_cycle",
+    "ambient_particle_key": "crystal_dust"
+  },
+  "unlock_requirements": {
+    "min_stars_zone_previous": null,
+    "required_level_id": null,
+    "required_level_stars": 1,
+    "requires_full_reef_iap": true,
+    "requires_creator_pass": false,
+    "min_total_stars": null
+  },
+  "par_score": {
+    "one_star": 200,
+    "two_star": 400,
+    "three_star": 600,
+    "max_possible": 800
+  }
+}

@@ -1,15 +1,19 @@
+## rule_card_test.gd — Phase 20 contracts for RuleCardSystem.
+##
+## Tests:
+##   1. max_misses_passes           — no_miss rule passes when misses=0.
+##   2. max_misses_fails            — no_miss rule fails when misses=2.
+##   3. collect_all_passes          — collect_all_pearls passes when flag is true.
+##   4. no_powers_fails             — no_powers rule fails when powers_used=1.
+##   5. race_ghost_passes           — beat_my_score passes when score > ghost_score.
+##   6. signal_emitted              — rule_card_result signal fires on evaluate_run.
+##   7. signal_card_id              — received signal card_id matches "no_miss".
+##   8. evaluate_run_result_all_passed — mixed rules yield passed=false when one fails.
+##   9. evaluate_run_result_array   — two rules produce two entries in results.
+##
+## Run with:
+##   godot --headless --path . --script tests/integration/rule_card_test.gd
 extends SceneTree
-
-# RuleCardSystem integration test — 7 contracts.
-# Contract 1: max_misses_passes       — "no_miss" with misses=0 → passed
-# Contract 2: max_misses_fails        — "no_miss" with misses=2 → failed
-# Contract 3: collect_all_passes      — "collect_all_pearls" with full collection → passed
-# Contract 4: no_powers_fails         — "no_powers" with powers_fired=1 → failed
-# Contract 5: race_ghost_passes       — "beat_my_score" score > ghost_score → passed
-# Contract 6: signal_emitted          — rule_card_result signal fires with correct args
-# Contract 7: evaluate_run_result     — all_passed=false when any card fails
-
-const RULE_CARD_GD := "res://src/core/RuleCardSystem.gd"
 
 var _pass_count := 0
 var _fail_count := 0
@@ -17,17 +21,18 @@ var _fail_count := 0
 
 func _initialize() -> void:
 	var root := get_root()
-	var rcs: Node = root.get_node("RuleCardSystem")
 
-	_test_max_misses_passes(rcs)
-	_test_max_misses_fails(rcs)
-	_test_collect_all_passes(rcs)
-	_test_no_powers_fails(rcs)
-	_test_race_ghost_passes(rcs)
-	_test_signal_emitted(rcs, root)
-	_test_evaluate_run_result(rcs)
+	_test_max_misses_passes(root)
+	_test_max_misses_fails(root)
+	_test_collect_all_passes(root)
+	_test_no_powers_fails(root)
+	_test_race_ghost_passes(root)
+	_test_signal_emitted(root)
+	_test_signal_card_id(root)
+	_test_evaluate_run_result_all_passed(root)
+	_test_evaluate_run_result_array(root)
 
-	print("RuleCard tests: %d passed, %d failed" % [_pass_count, _fail_count])
+	print("Rule card tests: %d passed, %d failed" % [_pass_count, _fail_count])
 	if _fail_count == 0:
 		print("RULE_CARD_OK")
 	quit()
@@ -43,118 +48,139 @@ func _fail(label: String, detail: String = "") -> void:
 	_fail_count += 1
 
 
-# ── Contract 1 ────────────────────────────────────────────────────────────────
+## 1. max_misses_passes
+func _test_max_misses_passes(root: Node) -> void:
+	var rcs: Node = root.get_node("RuleCardSystem")
+	rcs.set("_cards_by_id", {})
+	rcs.set_active_rules(["no_miss"])
+	var result: Dictionary = rcs.evaluate_run("z1-l1", {"misses": 0, "score": 300})
 
-func _test_max_misses_passes(rcs: Node) -> void:
-	rcs.active_rules.clear()
-	rcs.active_rules.append("no_miss")
-	var result: Dictionary = rcs.evaluate_run("z1-l1", {"misses": 0})
-	if result.get("passed", false):
-		_ok("max_misses_passes: no_miss passes with 0 misses")
+	if result.get("passed", false) == true:
+		_ok("max_misses_passes")
 	else:
-		_fail("max_misses_passes", "expected passed=true")
-	rcs.active_rules.clear()
+		_fail("max_misses_passes", "expected passed=true with misses=0")
 
 
-# ── Contract 2 ────────────────────────────────────────────────────────────────
+## 2. max_misses_fails
+func _test_max_misses_fails(root: Node) -> void:
+	var rcs: Node = root.get_node("RuleCardSystem")
+	rcs.set("_cards_by_id", {})
+	rcs.set_active_rules(["no_miss"])
+	var result: Dictionary = rcs.evaluate_run("z1-l1", {"misses": 2, "score": 100})
 
-func _test_max_misses_fails(rcs: Node) -> void:
-	rcs.active_rules.clear()
-	rcs.active_rules.append("no_miss")
-	var result: Dictionary = rcs.evaluate_run("z1-l1", {"misses": 2})
-	if not result.get("passed", true):
-		_ok("max_misses_fails: no_miss fails with 2 misses")
+	if result.get("passed", true) == false:
+		_ok("max_misses_fails")
 	else:
-		_fail("max_misses_fails", "expected passed=false")
-	rcs.active_rules.clear()
+		_fail("max_misses_fails", "expected passed=false with misses=2")
 
 
-# ── Contract 3 ────────────────────────────────────────────────────────────────
+## 3. collect_all_passes
+func _test_collect_all_passes(root: Node) -> void:
+	var rcs: Node = root.get_node("RuleCardSystem")
+	rcs.set("_cards_by_id", {})
+	rcs.set_active_rules(["collect_all_pearls"])
+	var result: Dictionary = rcs.evaluate_run("z1-l1", {"all_pearls_collected": true})
 
-func _test_collect_all_passes(rcs: Node) -> void:
-	rcs.active_rules.clear()
-	rcs.active_rules.append("collect_all_pearls")
-	var result: Dictionary = rcs.evaluate_run("z1-l1",
-		{"total_pearls": 10, "pearls_collected": 10})
-	if result.get("passed", false):
-		_ok("collect_all_passes: all 10 pearls collected")
+	if result.get("passed", false) == true:
+		_ok("collect_all_passes")
 	else:
-		_fail("collect_all_passes", "expected passed=true")
-	rcs.active_rules.clear()
+		_fail("collect_all_passes", "expected passed=true with all_pearls_collected=true")
 
 
-# ── Contract 4 ────────────────────────────────────────────────────────────────
+## 4. no_powers_fails
+func _test_no_powers_fails(root: Node) -> void:
+	var rcs: Node = root.get_node("RuleCardSystem")
+	rcs.set("_cards_by_id", {})
+	rcs.set_active_rules(["no_powers"])
+	var result: Dictionary = rcs.evaluate_run("z1-l1", {"powers_used": 1})
 
-func _test_no_powers_fails(rcs: Node) -> void:
-	rcs.active_rules.clear()
-	rcs.active_rules.append("no_powers")
-	var result: Dictionary = rcs.evaluate_run("z1-l1", {"powers_fired": 1})
-	if not result.get("passed", true):
-		_ok("no_powers_fails: no_powers fails when power was used")
+	if result.get("passed", true) == false:
+		_ok("no_powers_fails")
 	else:
-		_fail("no_powers_fails", "expected passed=false")
-	rcs.active_rules.clear()
+		_fail("no_powers_fails", "expected passed=false with powers_used=1")
 
 
-# ── Contract 5 ────────────────────────────────────────────────────────────────
+## 5. race_ghost_passes
+func _test_race_ghost_passes(root: Node) -> void:
+	var rcs: Node = root.get_node("RuleCardSystem")
+	rcs.set("_cards_by_id", {})
+	rcs.set_active_rules(["beat_my_score"])
+	var result: Dictionary = rcs.evaluate_run("z1-l1", {"score": 500, "ghost_score": 400})
 
-func _test_race_ghost_passes(rcs: Node) -> void:
-	rcs.active_rules.clear()
-	rcs.active_rules.append("beat_my_score")
-	var result: Dictionary = rcs.evaluate_run("z1-l1",
-		{"score": 500, "ghost_score": 400})
-	if result.get("passed", false):
-		_ok("race_ghost_passes: score 500 beats ghost 400")
+	if result.get("passed", false) == true:
+		_ok("race_ghost_passes")
 	else:
-		_fail("race_ghost_passes", "expected passed=true")
-	rcs.active_rules.clear()
+		_fail("race_ghost_passes", "expected passed=true with score=500 > ghost_score=400")
 
 
-# ── Contract 6 ────────────────────────────────────────────────────────────────
-
-func _test_signal_emitted(rcs: Node, root: Node) -> void:
-	rcs.active_rules.clear()
-	rcs.active_rules.append("no_miss")
+## 6. signal_emitted
+func _test_signal_emitted(root: Node) -> void:
+	var rcs: Node = root.get_node("RuleCardSystem")
+	var eb: Node = root.get_node("EventBus")
+	rcs.set("_cards_by_id", {})
+	rcs.set_active_rules(["no_miss"])
 
 	var received: Array = []
-	root.get_node("EventBus").rule_card_result.connect(
-		func(card_id: String, passed: bool) -> void:
-			received.append({"card_id": card_id, "passed": passed})
-	)
+	var cb_6: Callable = func(card_id: String, passed: bool) -> void:
+		received.append({"card_id": card_id, "passed": passed})
+	eb.rule_card_result.connect(cb_6)
 
 	rcs.evaluate_run("z1-l1", {"misses": 0})
 
+	eb.rule_card_result.disconnect(cb_6)
+
 	if received.size() >= 1:
-		_ok("signal_emitted: rule_card_result received")
+		_ok("signal_emitted")
 	else:
-		_fail("signal_emitted", "no signal received")
+		_fail("signal_emitted", "expected at least 1 signal emission, got %d" % received.size())
 
-	if received.size() >= 1 and received[0].get("card_id", "") == "no_miss":
-		_ok("signal_emitted: card_id is 'no_miss'")
+
+## 7. signal_card_id
+func _test_signal_card_id(root: Node) -> void:
+	var rcs: Node = root.get_node("RuleCardSystem")
+	var eb: Node = root.get_node("EventBus")
+	rcs.set("_cards_by_id", {})
+	rcs.set_active_rules(["no_miss"])
+
+	var received_ids: Array = []
+	var cb_7: Callable = func(card_id: String, _passed: bool) -> void:
+		received_ids.append(card_id)
+	eb.rule_card_result.connect(cb_7)
+
+	rcs.evaluate_run("z1-l1", {"misses": 0})
+
+	eb.rule_card_result.disconnect(cb_7)
+
+	if received_ids.size() >= 1 and received_ids[0] == "no_miss":
+		_ok("signal_card_id")
 	else:
-		_fail("signal_emitted: wrong card_id", str(received))
+		var got: String = str(received_ids)
+		_fail("signal_card_id", "expected [no_miss], got " + got)
 
-	rcs.active_rules.clear()
 
+## 8. evaluate_run_result_all_passed
+func _test_evaluate_run_result_all_passed(root: Node) -> void:
+	var rcs: Node = root.get_node("RuleCardSystem")
+	rcs.set("_cards_by_id", {})
+	# no_miss passes with misses=0; no_powers fails with powers_used=1
+	rcs.set_active_rules(["no_miss", "no_powers"])
+	var result: Dictionary = rcs.evaluate_run("z1-l1", {"misses": 0, "powers_used": 1})
 
-# ── Contract 7 ────────────────────────────────────────────────────────────────
-
-func _test_evaluate_run_result(rcs: Node) -> void:
-	rcs.active_rules.clear()
-	rcs.active_rules.append("no_miss")
-	rcs.active_rules.append("no_powers")
-
-	# misses=1 fails no_miss; powers_fired=0 passes no_powers
-	var result: Dictionary = rcs.evaluate_run("z1-l1", {"misses": 1, "powers_fired": 0})
-	if not result.get("passed", true):
-		_ok("evaluate_run_result: all_passed=false when one card fails")
+	if result.get("passed", true) == false:
+		_ok("evaluate_run_result_all_passed")
 	else:
-		_fail("evaluate_run_result", "expected passed=false")
+		_fail("evaluate_run_result_all_passed", "expected passed=false when one rule fails")
 
-	var results: Array = result.get("results", []) as Array
-	if results.size() == 2:
-		_ok("evaluate_run_result: results array has 2 entries")
+
+## 9. evaluate_run_result_array
+func _test_evaluate_run_result_array(root: Node) -> void:
+	var rcs: Node = root.get_node("RuleCardSystem")
+	rcs.set("_cards_by_id", {})
+	rcs.set_active_rules(["no_miss", "collect_all_pearls"])
+	var result: Dictionary = rcs.evaluate_run("z1-l1", {"misses": 0, "all_pearls_collected": true})
+
+	var results_arr: Array = result.get("results", [])
+	if results_arr.size() == 2:
+		_ok("evaluate_run_result_array")
 	else:
-		_fail("evaluate_run_result: wrong results count", str(results.size()))
-
-	rcs.active_rules.clear()
+		_fail("evaluate_run_result_array", "expected 2 entries, got %d" % results_arr.size())

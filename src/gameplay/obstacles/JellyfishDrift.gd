@@ -11,7 +11,6 @@ var _time: float = 0.0
 
 func _ready() -> void:
 	add_to_group("scrolling")
-	add_to_group("bubble_destructible")
 	body_entered.connect(_on_body_entered)
 	_start_y = position.y
 

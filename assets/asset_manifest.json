@@ -45,17 +45,5 @@
   "sprite/obstacle/kelp_blade":      { "path": "res://assets/art/obstacles/kelp_blade.png",      "fallback": "", "spec": "32×120 px PNG, single kelp blade, slightly tapered toward top" },
   "sprite/obstacle/bubble_mine":     { "path": "res://assets/art/obstacles/bubble_mine.png",     "fallback": "", "spec": "112×112 px PNG, round mine with spikes, 2 states (idle/warning)" },
   "sprite/collectible/pearl":        { "path": "res://assets/art/obstacles/pearl.png",           "fallback": "", "spec": "40×40 px PNG, lustrous white/iridescent pearl" },
-  "sprite/collectible/treasure_coin":{ "path": "res://assets/art/obstacles/treasure_coin.png",   "fallback": "", "spec": "40×40 px PNG, gold coin with coral motif" },
-
-  "sfx/power_charge":    { "path": "res://assets/audio/sfx/power_charge.wav",    "fallback": "res://assets/audio/sfx/power_charge.wav",    "spec": "Rising 3-note arpeggio 440→659→880 Hz, <0.4 s, charge-filling ping" },
-  "sfx/power_fire":      { "path": "res://assets/audio/sfx/power_fire.wav",      "fallback": "res://assets/audio/sfx/power_fire.wav",      "spec": "Bright whoosh + pop 600 Hz base, <0.3 s, forward-motion launch feel" },
-  "sfx/shield_break":    { "path": "res://assets/audio/sfx/shield_break.wav",    "fallback": "res://assets/audio/sfx/shield_break.wav",    "spec": "Glass-shatter reverb 800 Hz burst, <0.4 s, protective bubble pop" },
-
-  "sprite/power/bubble_burst": { "path": "res://assets/art/powers/bubble_burst.png", "fallback": "", "spec": "48×48 px PNG, glowing teal bubble with rightward motion lines, transparent bg" },
-  "sprite/power/echo_shield":  { "path": "res://assets/art/powers/echo_shield.png",  "fallback": "", "spec": "48×48 px PNG, cyan ring/shield glyph with inner glow, transparent bg" },
-  "sprite/power/magnet_pulse": { "path": "res://assets/art/powers/magnet_pulse.png", "fallback": "", "spec": "48×48 px PNG, horseshoe magnet with attraction arc lines, transparent bg" },
-  "sprite/power/beat_dash":    { "path": "res://assets/art/powers/beat_dash.png",    "fallback": "", "spec": "48×48 px PNG, lightning bolt overlapping a music note, transparent bg" },
-  "sprite/power/phase_bubble": { "path": "res://assets/art/powers/phase_bubble.png", "fallback": "", "spec": "48×48 px PNG, ghost bubble with dashed outline and alpha fade, transparent bg" },
-
-  "sprite/ghost/trail": { "path": "res://assets/art/ghost/ghost_trail.png", "fallback": "", "spec": "48×48 px PNG, translucent teal silhouette of the player fish, alpha ≤0.4, no outline" }
+  "sprite/collectible/treasure_coin":{ "path": "res://assets/art/obstacles/treasure_coin.png",   "fallback": "", "spec": "40×40 px PNG, gold coin with coral motif" }
 }

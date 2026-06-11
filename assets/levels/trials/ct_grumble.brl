@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.1",
+  "metadata": {
+    "id": "ct_grumble",
+    "name": "Grumble's Gauntlet",
+    "description": "Survive the pressure walls and jellyfish to win Grumble over.",
+    "zone": 1,
+    "level_index": 1,
+    "bpm": 100,
+    "bpm_variable": false,
+    "difficulty": 1,
+    "difficulty_tag": "Beginner",
+    "author": "Bubble Reef Rush Team",
+    "created_at": "2026-06-11T10:00:00Z",
+    "is_official": true,
+    "total_beats": 32,
+    "tags": [],
+    "level_type": "character_trial",
+    "character_id": "grumble",
+    "boss_id": "",
+    "trial_unlock_id": "unlock_grumble"
+  },
+  "music": {
+    "filename": "zone_1_sunlit_shallows.wav",
+    "loop": false,
+    "loop_start_beat": 0,
+    "preview_start_beat": 4,
+    "preview_duration_beats": 8,
+    "beat_offset_ms": 0,
+    "volume_db": 0
+  },
+  "beat_map": [
+    {"beat_index": 2, "beat_subdivision": "quarter", "obstacle_type": "jellyfish_drift", "lane_position": 0.3},
+    {"beat_index": 6, "beat_subdivision": "quarter", "obstacle_type": "pressure_wall", "lane_position": 0.5, "parameters": {"gap_y_normalized": 0.5, "intensity": 0.3}},
+    {"beat_index": 10, "beat_subdivision": "quarter", "obstacle_type": "jellyfish_drift", "lane_position": 0.7},
+    {"beat_index": 14, "beat_subdivision": "quarter", "obstacle_type": "pressure_wall", "lane_position": 0.5, "parameters": {"gap_y_normalized": 0.5, "intensity": 0.3}}
+  ],
+  "speed_zones": [
+    {"start_beat": 0, "end_beat": 32, "speed_multiplier": 1.0, "transition_beats": 0, "label": "Normal"}
+  ],
+  "background": {
+    "asset_key": "bg_sunlit_shallows",
+    "parallax_enabled": true,
+    "color_override": null,
+    "shader_key": null,
+    "ambient_particle_key": "bubbles_light"
+  },
+  "unlock_requirements": {
+    "min_stars_zone_previous": null,
+    "required_level_id": null,
+    "required_level_stars": 1,
+    "requires_full_reef_iap": false,
+    "requires_creator_pass": false,
+    "min_total_stars": null
+  },
+  "par_score": {
+    "one_star": 200,
+    "two_star": 400,
+    "three_star": 600,
+    "max_possible": 800
+  }
+}

@@ -41,7 +41,7 @@
         "id": {
           "type": "string",
           "description": "Unique level identifier. Official levels use format 'z{zone}-l{level}' (e.g. 'z1-l1'). Player-created levels use a UUID v4.",
-          "pattern": "^(z[1-6]-l[1-8])|([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+          "pattern": "^(z[1-6]-l[1-8])|(ct_[a-z]+)|(crtr_[a-z_]+)|(boss_z[3-6])|([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
           "examples": [
             "z1-l1",
             "a3b4c5d6-e7f8-4a9b-b0c1-d2e3f4a5b6c7"
@@ -164,6 +164,27 @@
           },
           "maxItems": 5,
           "default": []
+        },
+        "level_type": {
+          "type": "string",
+          "description": "Special level type. 'standard' is the default gameplay mode.",
+          "enum": ["standard", "character_trial", "creator_trial", "boss_chase", "treasure_hunt"],
+          "default": "standard"
+        },
+        "character_id": {
+          "type": "string",
+          "description": "For character_trial levels: the character ID unlocked on completion.",
+          "default": ""
+        },
+        "boss_id": {
+          "type": "string",
+          "description": "For boss_chase levels: the boss script ID.",
+          "default": ""
+        },
+        "trial_unlock_id": {
+          "type": "string",
+          "description": "For trial levels: the unlock ID granted on completion.",
+          "default": ""
         }
       }
     },

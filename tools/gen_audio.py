@@ -201,10 +201,6 @@ def main() -> None:
         "achievement.wav":        chord_burst([523, 659, 784, 1047], 0.55, 0.18, 0.55),
         "ui_select.wav":          sine_burst(1047, 0.05, 0.03, 0.45),
         "ui_back.wav":            sine_burst(784, 0.05, 0.03, 0.35),
-        # Phase 15 — Resonance powers
-        "power_charge.wav":       chord_burst([440, 659, 880], 0.38, 0.12, 0.60),
-        "power_fire.wav":         chord_burst([600, 900, 1200], 0.28, 0.06, 0.65),
-        "shield_break.wav":       chord_burst([800, 1000, 1400], 0.38, 0.08, 0.55),
     }
     for name, samples in {**sfx_original, **sfx_new}.items():
         write_wav(os.path.join(sfx_dir, name), samples)

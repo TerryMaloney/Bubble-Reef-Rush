@@ -1,6 +1,6 @@
 # Feature Status
 
-Last updated: 2026-06-11 (Phase 16 complete)
+Last updated: 2026-06-11 (Phase 21 complete)
 
 ## Phases 1–13 (Foundation) — ALL COMPLETE
 
@@ -24,14 +24,14 @@ Last updated: 2026-06-11 (Phase 16 complete)
 
 | Phase | Feature | Status | Notes |
 |-------|---------|--------|-------|
-| 14 | Save v3 + MutatorSystem stub | ✅ DONE | 22-stage suite green |
+| 14 | Save v3 + MutatorSystem stub | ✅ DONE | 20-stage suite green |
 | 15 | Resonance: Bubble Burst + Echo Shield | ✅ DONE | |
-| 16 | Ghost Recording + Playback | ✅ DONE | 24-stage suite green |
-| 17 | Challenge Capsules (.brrc) | ✅ DONE | 25-stage suite green |
-| 18 | Pass & Play + Family Tournament | ✅ DONE | 26-stage suite green |
-| 19 | Mutators (20 effects) | ✅ DONE | 27-stage suite green |
-| 20 | Rule Cards + Build Mode Unlock Progression | ✅ DONE | 29-stage suite green |
-| 21 | Special Levels: Character/Creator Trials + Boss Chase | ⏳ | |
+| 16 | Ghost Recording + Playback | ✅ DONE | |
+| 17 | Challenge Capsules (.brrc) | ✅ DONE | |
+| 18 | Pass & Play + Family Tournament | ✅ DONE | |
+| 19 | Mutators (20 effects) | ✅ DONE | |
+| 20 | Rule Cards + Build Mode Unlock Progression | ✅ DONE | |
+| 21 | Special Levels: Character/Creator Trials + Boss Chase | ✅ DONE | 29-stage suite green |
 | 22 | Secret Exits + Collection Room | ⏳ | |
 | 23 | Daily Dive + Seeded Reef + Radio Shuffle | ⏳ | |
 | 24 | Co-Pilot Mode + Level Tennis | ⏳ | |
@@ -42,8 +42,9 @@ Last updated: 2026-06-11 (Phase 16 complete)
 | Name | File | Status |
 |------|------|--------|
 | MutatorSystem | src/core/MutatorSystem.gd | ✅ all 20 effects |
-| GhostLibrary | src/core/GhostLibrary.gd | ⏳ Phase 16 |
-| RuleCardSystem | src/core/RuleCardSystem.gd | ⏳ Phase 20 |
+| GhostLibrary | src/core/GhostLibrary.gd | ✅ Phase 16 |
+| RuleCardSystem | src/core/RuleCardSystem.gd | ✅ Phase 20 |
+| BuildUnlockRegistry | src/buildmode/BuildUnlockRegistry.gd | ✅ Phase 20 |
 | DeterministicSeed | src/core/DeterministicSeed.gd | ⏳ Phase 23 |
 
 ## New EventBus Signals (declared in Phase 14)
