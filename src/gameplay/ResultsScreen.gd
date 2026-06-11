@@ -9,23 +9,22 @@ func _ready() -> void:
 	var score: int = GameManager.last_score
 	var stars: int = GameManager.last_stars
 
-	$StarsLabel.text = _stars_text(stars)
-	$ScoreLabel.text = "Score: %d" % score
-	$BestScoreLabel.text = _best_score_text(score)
+	$Center/VBox/StarsLabel.text = _stars_text(stars)
+	$Center/VBox/ScoreLabel.text = "Score: %d" % score
+	$Center/VBox/BestScoreLabel.text = _best_score_text(score)
 
-	# Show coins earned this run if any.
-	if has_node("CoinsLabel"):
-		var coins: int = GameManager.last_coins_earned
-		$CoinsLabel.text = "+" + str(coins) + " coins" if coins > 0 else ""
-		$CoinsLabel.visible = coins > 0
+	var coins: int = GameManager.last_coins_earned
+	$Center/VBox/CoinsLabel.text = "+%d coins" % coins
+	$Center/VBox/CoinsLabel.visible = coins > 0
 
 	_show_ghost_delta(score)
 	_show_rule_card_results()
+	_show_copilot_contribution()
 	_setup_next_level_button()
 
-	$RetryButton.pressed.connect(_on_retry_pressed)
-	$LevelsButton.pressed.connect(_on_levels_pressed)
-	$MenuButton.pressed.connect(_on_menu_pressed)
+	$Center/VBox/RetryButton.pressed.connect(_on_retry_pressed)
+	$Center/VBox/LevelsButton.pressed.connect(_on_levels_pressed)
+	$Center/VBox/MenuButton.pressed.connect(_on_menu_pressed)
 
 
 func _stars_text(stars: int) -> String:
@@ -43,7 +42,7 @@ func _best_score_text(current_score: int) -> String:
 
 
 func _setup_next_level_button() -> void:
-	var btn: Button = $NextLevelButton
+	var btn: Button = $Center/VBox/NextLevelButton
 	var next_id: String = _next_level_id(GameManager.current_level_id)
 	if next_id.is_empty():
 		btn.disabled = true
@@ -54,12 +53,11 @@ func _setup_next_level_button() -> void:
 
 
 func _next_level_id(level_id: String) -> String:
-	# level_id format: "z<zone>-l<index>" e.g. "z1-l1"
 	var parts: PackedStringArray = level_id.split("-")
 	if parts.size() != 2:
 		return ""
-	var zone_part: String = parts[0]  # "z1"
-	var level_part: String = parts[1]  # "l1"
+	var zone_part: String = parts[0]
+	var level_part: String = parts[1]
 	if not level_part.begins_with("l"):
 		return ""
 	var level_num_str: String = level_part.substr(1)
@@ -81,30 +79,29 @@ func _on_levels_pressed() -> void:
 
 
 func _show_ghost_delta(score: int) -> void:
-	if not has_node("GhostDeltaLabel"):
-		return
+	var label: Label = $Center/VBox/GhostDeltaLabel
 	var ghost_score: int = GhostLibrary.last_ghost_score
 	if ghost_score < 0:
-		$GhostDeltaLabel.visible = false
+		label.visible = false
 		return
 	var delta: int = score - ghost_score
+	label.visible = true
 	if delta > 0:
-		$GhostDeltaLabel.text = "Beat the ghost by %d!" % delta
-		$GhostDeltaLabel.modulate = Color(0.3, 1.0, 0.4, 1)
+		label.text = "Beat the ghost by %d!" % delta
+		label.modulate = Color(0.3, 1.0, 0.4, 1)
 	elif delta < 0:
-		$GhostDeltaLabel.text = "Ghost beat you by %d" % (-delta)
-		$GhostDeltaLabel.modulate = Color(0.4, 0.8, 1.0, 1)
+		label.text = "Ghost beat you by %d" % (-delta)
+		label.modulate = Color(0.4, 0.8, 1.0, 1)
 	else:
-		$GhostDeltaLabel.text = "Tied the ghost!"
-		$GhostDeltaLabel.modulate = Color(1, 1, 0.5, 1)
+		label.text = "Tied the ghost!"
+		label.modulate = Color(1, 1, 0.5, 1)
 
 
 func _show_rule_card_results() -> void:
-	if not has_node("RuleCardResults"):
-		return
+	var container: VBoxContainer = $Center/VBox/RuleCardResults
 	var results: Array = RuleCardSystem.last_results
 	if results.is_empty():
-		$RuleCardResults.visible = false
+		container.visible = false
 		return
 	for entry: Variant in results:
 		var d: Dictionary = entry as Dictionary
@@ -114,7 +111,21 @@ func _show_rule_card_results() -> void:
 		lbl.text = ("%s  ✓" if passed else "%s  ✗") % card_id.replace("_", " ").capitalize()
 		lbl.modulate = Color(0.3, 1.0, 0.4) if passed else Color(1.0, 0.4, 0.4)
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		$RuleCardResults.add_child(lbl)
+		container.add_child(lbl)
+
+
+func _show_copilot_contribution() -> void:
+	var contrib: Dictionary = GameManager.last_copilot_contribution
+	if contrib.is_empty():
+		return
+	var activations: int = int(contrib.get("power_activations", 0))
+	if activations == 0:
+		return
+	var lbl: Label = Label.new()
+	lbl.text = "Player B: %d power%s activated" % [activations, "s" if activations != 1 else ""]
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.modulate = Color(0.6, 0.9, 1.0)
+	$Center/VBox/RuleCardResults.add_child(lbl)
 
 
 func _on_menu_pressed() -> void:

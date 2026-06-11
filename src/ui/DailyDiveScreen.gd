@@ -42,7 +42,7 @@ func _populate_ui() -> void:
 func _on_start_pressed() -> void:
 	if _today_levels.is_empty():
 		return
-	GameManager.start_playlist(_today_levels)
+	GameManager.start_playlist(_today_levels, "daily_dive")
 	queue_free()
 
 

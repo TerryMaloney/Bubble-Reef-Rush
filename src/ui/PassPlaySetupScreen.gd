@@ -53,7 +53,10 @@ func _on_start_pressed() -> void:
 		if (_profile_checks[pid] as CheckBox).button_pressed:
 			selected.append(pid)
 	if selected.size() < 2:
-		return  # Need at least 2 players.
+		$Panel/VBox/ErrorLabel.text = "Select at least 2 players to start."
+		$Panel/VBox/ErrorLabel.visible = true
+		return
+	$Panel/VBox/ErrorLabel.visible = false
 	var session: PassPlaySession = PassPlaySession.new()
 	session.setup(selected, _selected_level, _mode)
 	GameManager.start_pass_play(session)

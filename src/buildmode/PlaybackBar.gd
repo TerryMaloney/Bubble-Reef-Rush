@@ -42,12 +42,14 @@ func _ready() -> void:
 func _on_play_pressed() -> void:
 	if level_id.is_empty():
 		return
-	# Mark the level as test-play-initiated and launch via GameManager.
-	# The level was already saved to user:// by BrlSerializer; load from there.
-	GameManager.is_practice_mode = true  # suppresses SaveSystem writes
+	# Stash session + set flag so BuildModeRoot can restore state after test-play.
+	var bmr: Node = get_tree().get_first_node_in_group("build_mode_root")
+	if bmr != null and bmr.has_method("get_session"):
+		GameManager.pending_build_session = bmr.call("get_session")
+		bmr.call("set_awaiting_playtest", true)
+	# Mark as practice so SaveSystem writes are suppressed.
+	GameManager.is_practice_mode = true
 	EventBus.level_load_requested.emit(level_id)
-	# playhead seek is handled by GameManager/LevelLoader start_level(id, from_beat)
-	# For now, a full-level test-play from beat 0 is the simplest implementation.
 
 
 func _on_stop_pressed() -> void:

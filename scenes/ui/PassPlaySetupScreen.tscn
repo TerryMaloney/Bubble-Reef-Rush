@@ -50,6 +50,13 @@ button_pressed = true
 text = "3 Attempts"
 toggle_mode = true
 
+[node name="ErrorLabel" type="Label" parent="Panel/VBox"]
+text = ""
+modulate = Color(1, 0.4, 0.4, 1)
+visible = false
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+
 [node name="StartButton" type="Button" parent="Panel/VBox"]
 text = "Let's Go!"
 

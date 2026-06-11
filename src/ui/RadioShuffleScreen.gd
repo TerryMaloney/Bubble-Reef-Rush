@@ -28,7 +28,7 @@ func _start_mode(mode: String) -> void:
 	var levels: Array[String] = get_playlist(mode, 5)
 	if levels.is_empty():
 		return
-	GameManager.start_playlist(levels)
+	GameManager.start_playlist(levels, "radio_shuffle")
 	queue_free()
 
 

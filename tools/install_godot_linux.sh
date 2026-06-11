@@ -2,7 +2,7 @@
 # Install Godot 4.3 headless binary to ./bin/godot (Linux x86_64).
 set -euo pipefail
 
-GODOT_VERSION="4.3"
+GODOT_VERSION="4.6.3"
 GODOT_RELEASE="stable"
 GODOT_TAG="${GODOT_VERSION}-${GODOT_RELEASE}"
 GODOT_FILENAME="Godot_v${GODOT_TAG}_linux.x86_64"
@@ -52,4 +52,4 @@ echo "Verifying Godot installation..."
 VERSION_OUTPUT="$(${GODOT_BINARY} --version 2>&1)"
 echo "Godot version: ${VERSION_OUTPUT}"
 
-echo "Godot 4.3 headless installed successfully to ${GODOT_BINARY}"
+echo "Godot 4.6.3 headless installed successfully to ${GODOT_BINARY}"

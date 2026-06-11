@@ -41,7 +41,7 @@ func _fail(label: String, detail: String = "") -> void:
 ## 1. is_active_works
 func _test_is_active_works(root: Node) -> void:
 	var ms: Node = root.get_node("MutatorSystem")
-	ms.active_mutators = ["tiny_pebble", "faster_scroll"]
+	ms._test_set_active(["tiny_pebble", "faster_scroll"])
 
 	var tiny_active: bool = ms.is_active("tiny_pebble")
 	var ghost_inactive: bool = not ms.is_active("ghost_mode")
@@ -56,7 +56,7 @@ func _test_is_active_works(root: Node) -> void:
 ## 2. clear_empties_list
 func _test_clear_empties_list(root: Node) -> void:
 	var ms: Node = root.get_node("MutatorSystem")
-	ms.active_mutators = ["tiny_pebble", "faster_scroll"]
+	ms._test_set_active(["tiny_pebble", "faster_scroll"])
 	ms.clear()
 
 	if ms.active_mutators.is_empty():
@@ -69,7 +69,7 @@ func _test_clear_empties_list(root: Node) -> void:
 ## 3. no_powers_blocks_fire
 func _test_no_powers_blocks_fire(root: Node) -> void:
 	var ms: Node = root.get_node("MutatorSystem")
-	ms.active_mutators = ["no_powers"]
+	ms._test_set_active(["no_powers"])
 
 	var ctrl: Node = load("res://src/gameplay/ResonanceController.gd").new()
 	root.add_child(ctrl)
@@ -87,7 +87,7 @@ func _test_no_powers_blocks_fire(root: Node) -> void:
 ## 4. faster_scroll_active
 func _test_faster_scroll_active(root: Node) -> void:
 	var ms: Node = root.get_node("MutatorSystem")
-	ms.active_mutators = ["faster_scroll"]
+	ms._test_set_active(["faster_scroll"])
 
 	if ms.is_active("faster_scroll"):
 		_ok("faster_scroll_active")

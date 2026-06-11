@@ -42,6 +42,8 @@ var is_practice_mode: bool = false
 var show_ghost: String = ""
 ## Co-Pilot mode: profile ID of Player B; "" = disabled.
 var copilot_profile_b: String = ""
+## Co-Pilot contribution from last run — read by ResultsScreen.
+var last_copilot_contribution: Dictionary = {}
 
 ## Pass & Play — active session; null when not in P&P mode.
 var active_pass_play_session: PassPlaySession = null
@@ -50,10 +52,17 @@ var pending_pass_play_session: PassPlaySession = null
 ## Previous player info shown on PassPlayNextPlayerScreen.
 var pp_prev_profile: String = ""
 var pp_prev_score: int = 0
+## Active profile before P&P started — restored when session ends.
+var _pp_original_profile: String = ""
 
 ## Playlist (Daily Dive / Radio Shuffle) — levels queued after start_playlist().
 var playlist: Array[String] = []
 var playlist_index: int = 0
+## "daily_dive" | "radio_shuffle" | "" — determines end-of-playlist save behaviour.
+var playlist_context: String = ""
+
+## BuildMode: session stashed before test-play, restored in BuildModeRoot._ready().
+var pending_build_session = null  # BuildSession ref — untyped to avoid forward dep
 
 
 func _ready() -> void:
@@ -63,6 +72,8 @@ func _ready() -> void:
 	EventBus.retry_requested.connect(retry_level)
 	EventBus.level_load_requested.connect(start_level)
 	_active_profile = SaveSystem.get_active_profile_id()
+	# Apply stored text scale immediately on startup.
+	Accessibility._apply_text_scale(Accessibility.text_scale())
 
 
 func start_level(level_id: String) -> void:
@@ -79,6 +90,7 @@ func retry_level() -> void:
 
 func go_to_menu() -> void:
 	current_state = State.MENU
+	_clear_session_state()
 	TransitionLayer.go_to(MAIN_MENU_SCENE)
 
 
@@ -102,6 +114,7 @@ func finish_level(score: int, stars: int) -> void:
 
 func go_to_zone_select() -> void:
 	current_state = State.MENU
+	_clear_session_state()
 	TransitionLayer.go_to(ZONE_SELECT_SCENE)
 
 
@@ -113,7 +126,17 @@ func go_to_level_select(zone_id: String) -> void:
 
 func open_build_mode() -> void:
 	current_state = State.BUILD_MODE
+	_clear_session_state()
 	TransitionLayer.go_to(BUILD_MODE_SCENE)
+
+
+## Clear per-session transient state when navigating away from a run.
+func _clear_session_state() -> void:
+	playlist.clear()
+	playlist_index = 0
+	playlist_context = ""
+	copilot_profile_b = ""
+	last_copilot_contribution = {}
 
 
 func go_to_settings(return_scene: String = MAIN_MENU_SCENE) -> void:
@@ -126,15 +149,19 @@ func return_from_settings() -> void:
 
 
 func start_pass_play(session: PassPlaySession) -> void:
+	_pp_original_profile = SaveSystem.get_active_profile_id()
 	active_pass_play_session = session
 	pp_prev_profile = ""
 	pp_prev_score = 0
+	# Switch to first player's profile so saves are credited correctly.
+	SaveSystem.set_active_profile(session.get_current_profile())
 	start_level(session.level_id)
 
 
-func start_playlist(levels: Array[String]) -> void:
+func start_playlist(levels: Array[String], context: String = "") -> void:
 	playlist = levels.duplicate()
 	playlist_index = 0
+	playlist_context = context
 	if not playlist.is_empty():
 		start_level(playlist[0])
 
@@ -146,7 +173,26 @@ func _on_run_progress(_level_id: String, pct: float) -> void:
 func _on_run_failed(level_id: String, _score: int) -> void:
 	if is_practice_mode:
 		return  # PracticeController handles respawn; no death/progress tracking
-	# RetryController handles the prompt; GameManager just records state.
+
+	# Pass & Play: death counts as the attempt — advance the turn immediately.
+	if active_pass_play_session != null and active_pass_play_session.is_active():
+		_active_profile = SaveSystem.get_active_profile_id()
+		pp_prev_profile = _active_profile
+		pp_prev_score = 0
+		active_pass_play_session.submit_score(_active_profile, 0)
+		var still_going: bool = active_pass_play_session.advance_turn()
+		if still_going:
+			current_state = State.MENU
+			TransitionLayer.go_to(PASS_PLAY_NEXT_PLAYER_SCENE)
+		else:
+			pending_pass_play_session = active_pass_play_session
+			active_pass_play_session = null
+			SaveSystem.set_active_profile(_pp_original_profile)
+			current_state = State.RESULTS
+			TransitionLayer.go_to(PASS_PLAY_SCOREBOARD_SCENE)
+		return
+
+	# Normal campaign death.
 	current_state = State.PLAYING
 	consecutive_deaths += 1
 	_active_profile = SaveSystem.get_active_profile_id()
@@ -171,6 +217,7 @@ func _on_run_completed(level_id: String, score: int, stars: int) -> void:
 		else:
 			pending_pass_play_session = active_pass_play_session
 			active_pass_play_session = null
+			SaveSystem.set_active_profile(_pp_original_profile)
 			current_state = State.RESULTS
 			TransitionLayer.go_to(PASS_PLAY_SCOREBOARD_SCENE)
 		return
@@ -179,9 +226,23 @@ func _on_run_completed(level_id: String, score: int, stars: int) -> void:
 	if not playlist.is_empty():
 		playlist_index += 1
 		if playlist_index < playlist.size():
+			# Save stats for intermediate levels without showing the results screen.
+			_active_profile = SaveSystem.get_active_profile_id()
+			var prev: Dictionary = SaveSystem.get_all_level_results(_active_profile)
+			last_prev_best_score = int((prev.get(level_id, {}) as Dictionary).get("best_score", 0))
+			last_coins_earned = EconomyService.process_run_completed(level_id, score, stars)
+			SaveSystem.update_level_result(_active_profile, level_id, score, stars)
+			AchievementSystem.evaluate_run(_active_profile, level_id, score, stars)
 			start_level(playlist[playlist_index])
 			return
+		# Final level in playlist — save Daily Dive date result, then show results.
+		if playlist_context == "daily_dive":
+			_active_profile = SaveSystem.get_active_profile_id()
+			var date: String = Time.get_date_string_from_system()
+			SaveSystem.set_daily_dive_result(_active_profile, date, score)
+			EventBus.daily_dive_completed.emit(date, score)
 		playlist.clear()
 		playlist_index = 0
+		playlist_context = ""
 
 	finish_level(score, stars)

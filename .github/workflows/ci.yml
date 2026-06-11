@@ -63,9 +63,9 @@ jobs:
           path: |
             ~/.cache/godot
             ~/.local/share/godot/export_templates
-          key: godot-4_3-linux-${{ hashFiles('project.godot') }}
+          key: godot-4_6_3-linux-${{ hashFiles('project.godot') }}
 
-      - name: Install Godot 4.3 headless
+      - name: Install Godot 4.6.3 headless
         run: ./tools/install_godot_linux.sh
 
       - name: Run smoke tests
@@ -76,12 +76,17 @@ jobs:
       - name: Assert SMOKE_OK in output
         run: grep -q "SMOKE_OK" smoke_output.txt
 
-      - name: Upload smoke test output
+      - name: Run full integration suite
+        run: GODOT=./bin/godot ./tools/run_tests.sh 2>&1 | tee full_test_output.txt
+
+      - name: Upload test output
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: smoke-test-output
-          path: smoke_output.txt
+          name: test-output
+          path: |
+            smoke_output.txt
+            full_test_output.txt
           retention-days: 7
 
   export-android:
@@ -105,9 +110,9 @@ jobs:
           path: |
             ~/.cache/godot
             ~/.local/share/godot/export_templates
-          key: godot-4_3-linux-${{ hashFiles('project.godot') }}
+          key: godot-4_6_3-linux-${{ hashFiles('project.godot') }}
 
-      - name: Install Godot 4.3 headless
+      - name: Install Godot 4.6.3 headless
         run: ./tools/install_godot_linux.sh
 
       - name: Install Android SDK

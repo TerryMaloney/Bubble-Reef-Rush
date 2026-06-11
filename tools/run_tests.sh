@@ -33,14 +33,19 @@ run_stage() {
 	local name="$1"; local script="$2"; local needle="$3"
 	echo "==> $name"
 	local out
-	out="$("$GODOT" --headless --path . --script "$script" 2>&1)" || true
+	local exit_code=0
+	out="$("$GODOT" --headless --path . --script "$script" 2>&1)" || exit_code=$?
 	echo "$out" | grep -vE '^\s*$' | tail -20
-	if echo "$out" | grep -q "$needle"; then
-		echo "    PASS: $name"
-	else
-		echo "    FAIL: $name (expected '$needle')"
+	# Fail on Godot script/parse errors in output regardless of exit code.
+	if echo "$out" | grep -qE 'SCRIPT ERROR|Parse Error|Invalid call|Invalid get index|Method not found|nonexistent function'; then
+		echo "    FAIL: $name (script error detected in output)"
 		exit 1
 	fi
+	if ! echo "$out" | grep -q "$needle"; then
+		echo "    FAIL: $name (expected '$needle', exit_code=$exit_code)"
+		exit 1
+	fi
+	echo "    PASS: $name"
 }
 
 run_stage "Smoke test"      "tests/smoke/run_smoke_tests.gd"              "SMOKE_OK"
@@ -78,5 +83,6 @@ run_stage "Daily dive test"      "tests/integration/daily_dive_test.gd"       "D
 run_stage "Co-pilot test"        "tests/integration/copilot_test.gd"          "COPILOT_OK"
 run_stage "Level Tennis test"    "tests/integration/level_tennis_test.gd"     "LEVEL_TENNIS_OK"
 run_stage "Reef Radio test"      "tests/integration/reef_radio_test.gd"       "REEF_RADIO_OK"
+run_stage "Settings scene test" "tests/integration/settings_scene_test.gd"  "SETTINGS_SCENE_OK"
 
 echo "==> All tests passed."

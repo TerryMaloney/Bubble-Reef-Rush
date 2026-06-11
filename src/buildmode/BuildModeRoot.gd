@@ -28,6 +28,7 @@ var _awaiting_playtest: bool = false
 
 
 func _ready() -> void:
+	add_to_group("build_mode_root")
 	_profile_id = SaveSystem.get_active_profile_id()
 	var progress: Dictionary = SaveSystem.load_progress(_profile_id)
 	var total_stars: int = int(progress.get("total_stars", 0))
@@ -53,8 +54,13 @@ func _ready() -> void:
 
 	EventBus.run_completed.connect(_on_run_completed)
 
-	# Start with a new empty session.
-	_new_session()
+	# Restore session stashed before test-play, or start fresh.
+	if GameManager.pending_build_session != null:
+		_session = GameManager.pending_build_session as BuildSession
+		GameManager.pending_build_session = null
+		_apply_session_to_ui()
+	else:
+		_new_session()
 
 
 ## Called from GameManager or "New Level" button.
@@ -62,6 +68,14 @@ func _new_session() -> void:
 	_session = BuildSession.new()
 	_session.create_new(_profile_id, 1)
 	_apply_session_to_ui()
+
+
+func get_session() -> BuildSession:
+	return _session
+
+
+func set_awaiting_playtest(val: bool) -> void:
+	_awaiting_playtest = val
 
 
 ## Load an existing player level by ID.

@@ -34,10 +34,15 @@ func _ready() -> void:
 	EventBus.practice_checkpoint_saved.connect(_on_checkpoint_saved)
 	BeatConductor.beat_fired.connect(_on_beat_fired)
 	EventBus.power_charged.connect(_on_power_charged)
+	EventBus.power_cooldown_started.connect(_on_power_cooldown_started)
 
 	if retry_button != null:
 		retry_button.pressed.connect(_on_retry_pressed)
 		retry_button.hide()
+
+	# Power button starts disabled — enabled only when fully charged.
+	if power_button != null:
+		power_button.disabled = true
 
 	if drop_cp_button != null:
 		drop_cp_button.visible = GameManager.is_practice_mode
@@ -215,4 +220,11 @@ func update_power_button_mode(mode: String) -> void:
 func _on_power_charged(pct: float) -> void:
 	if resonance_bar != null:
 		resonance_bar.value = pct * 100.0
+	if power_button != null:
+		power_button.disabled = (pct < 1.0)
+
+
+func _on_power_cooldown_started() -> void:
+	if power_button != null:
+		power_button.disabled = true
 

@@ -79,6 +79,13 @@ func get_collectible_multiplier() -> float:
 	return 2.0 if is_active("double_pearls") else 1.0
 
 
+## Test-only helper: set active mutators (accepts untyped array to work from external scripts).
+func _test_set_active(mutators: Array) -> void:
+	active_mutators.clear()
+	for m in mutators:
+		active_mutators.append(m as String)
+
+
 ## Clear active mutators (called by GameManager when returning to menu).
 func clear() -> void:
 	if not active_mutators.is_empty():

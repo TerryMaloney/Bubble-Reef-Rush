@@ -66,6 +66,13 @@ func set_reduced_motion(value: bool) -> void:
 
 func set_text_scale(value: float) -> void:
 	SaveSystem.set_setting(SaveSystem.get_active_profile_id(), "text_scale", value)
+	_apply_text_scale(value)
+
+
+func _apply_text_scale(value: float) -> void:
+	var loop: SceneTree = Engine.get_main_loop() as SceneTree
+	if loop != null:
+		loop.root.content_scale_factor = clampf(value, 0.5, 2.0)
 
 
 func set_colorblind_judgements(value: bool) -> void:

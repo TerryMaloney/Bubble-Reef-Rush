@@ -12,6 +12,7 @@ var _level_loader: LevelLoader
 var _resonance: ResonanceController
 var _recorder: GhostRecorder
 var _special: Node = null
+var _copilot: CoPilotController = null
 
 
 func _ready() -> void:
@@ -83,6 +84,12 @@ func _ready() -> void:
 
 	# SpecialLevelController — created on run_started when level_type != standard.
 	EventBus.run_started.connect(_on_run_started_special)
+
+	# Co-Pilot — instantiate when Player B is configured.
+	if not GameManager.copilot_profile_b.is_empty() and _resonance != null:
+		_copilot = CoPilotController.new()
+		add_child(_copilot)
+		_copilot.setup(GameManager.copilot_profile_b, _resonance)
 
 	_level_loader.level_ended.connect(_on_level_ended)
 	_level_loader.load_level(GameManager.current_level_id)
@@ -165,6 +172,18 @@ func _maybe_spawn_ghost_player(_player: PlayerController) -> void:
 	EventBus.run_started.connect(func(_id: String) -> void: gp.play())
 
 
+# ── Co-Pilot ─────────────────────────────────────────────────────────────────
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _copilot == null:
+		return
+	if event is InputEventScreenTouch and (event as InputEventScreenTouch).pressed:
+		# Right half of screen → Player B power trigger; left half remains Player A swim/dive.
+		if (event as InputEventScreenTouch).position.x > get_viewport_rect().size.x * 0.5:
+			_copilot.trigger_power()
+			get_viewport().set_input_as_handled()
+
+
 # ── Special levels ────────────────────────────────────────────────────────────
 
 func _on_run_started_special(_level_id: String) -> void:
@@ -182,6 +201,8 @@ func _on_run_started_special(_level_id: String) -> void:
 # ── Level end ────────────────────────────────────────────────────────────────
 
 func _on_level_ended(level_id: String) -> void:
+	if _copilot != null:
+		GameManager.last_copilot_contribution = _copilot.get_contribution()
 	var raw: Dictionary = _level_loader.rhythm_map.get_raw_data()
 	var par: Dictionary = raw.get("par_score", {}) as Dictionary
 	var one_star: int = int(par.get("one_star", 280))

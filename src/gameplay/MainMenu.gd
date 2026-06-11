@@ -11,6 +11,10 @@ func _ready() -> void:
 	$Layout/RadioShuffleButton.pressed.connect(_on_radio_shuffle_pressed)
 	$Layout/CollectionRoomButton.pressed.connect(_on_collection_room_pressed)
 	$SettingsButton.pressed.connect(_on_settings_pressed)
+	$PlayersButton.pressed.connect(_on_players_pressed)
+	# Profile badge — update immediately and on profile switch.
+	$ProfileBadge.text = SaveSystem.get_active_profile_id()
+	EventBus.active_profile_changed.connect(func(id: String) -> void: $ProfileBadge.text = id)
 	_animate_in()
 
 
@@ -54,6 +58,11 @@ func _on_radio_shuffle_pressed() -> void:
 
 func _on_collection_room_pressed() -> void:
 	var screen: Control = load("res://scenes/ui/CollectionRoomScreen.tscn").instantiate() as Control
+	add_child(screen)
+
+
+func _on_players_pressed() -> void:
+	var screen: Control = load("res://scenes/ui/ProfileManagerScreen.tscn").instantiate() as Control
 	add_child(screen)
 
 

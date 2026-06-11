@@ -38,6 +38,8 @@ func _on_start_pressed() -> void:
 	if _on_start.is_valid():
 		_on_start.call()
 	elif GameManager.active_pass_play_session != null:
+		# Switch active profile to the next player before starting the level.
+		SaveSystem.set_active_profile(GameManager.active_pass_play_session.get_current_profile())
 		GameManager.start_level(GameManager.active_pass_play_session.level_id)
 	else:
 		GameManager.go_to_menu()
