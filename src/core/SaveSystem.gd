@@ -679,6 +679,28 @@ func unlock_world_station(profile_id: String, station_id: String) -> void:
 		save_progress(profile_id, data)
 
 
+# ── Daily Dive ────────────────────────────────────────────────────────────────
+
+func get_daily_dive_history(profile_id: String) -> Dictionary:
+	var data: Dictionary = load_progress(profile_id)
+	var dd: Dictionary = data.get("daily_dive", {"history": {}}) as Dictionary
+	return dd.get("history", {}) as Dictionary
+
+
+func set_daily_dive_result(profile_id: String, date: String, score: int) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if not data.has("daily_dive"):
+		data["daily_dive"] = {"history": {}}
+	var dd: Dictionary = data["daily_dive"] as Dictionary
+	if not dd.has("history"):
+		dd["history"] = {}
+	var history: Dictionary = dd["history"] as Dictionary
+	history[date] = score
+	dd["history"] = history
+	data["daily_dive"] = dd
+	save_progress(profile_id, data)
+
+
 func _write_json(path: String, payload: Dictionary) -> void:
 	var tmp_path: String = path + ".tmp"
 	var file: FileAccess = FileAccess.open(tmp_path, FileAccess.WRITE)

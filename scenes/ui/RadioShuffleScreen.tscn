@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://radio_shuffle_screen"]
+
+[ext_resource type="Script" path="res://src/ui/RadioShuffleScreen.gd" id="1"]
+
+[node name="RadioShuffleScreen" type="Node"]
+script = ExtResource("1")

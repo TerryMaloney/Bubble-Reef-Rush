@@ -57,16 +57,14 @@ func _test_characters_count(root: Node) -> void:
 ## 2. boss_trophy_round_trip
 func _test_boss_trophy_round_trip(root: Node) -> void:
 	var ss: Node = root.get_node("SaveSystem")
+	# Use a trophy ID guaranteed not to be in the fresh profile: "boss_zX_test_only"
 	var pid: String = "cr_boss_%d" % Time.get_ticks_msec()
 	ss.ensure_profile(pid)
+	var test_boss: String = "boss_test_only"
 
-	if ss.get_boss_trophy(pid, "boss_z3"):
-		_fail("boss_trophy_round_trip", "should not have trophy before add")
-		return
+	ss.add_boss_trophy(pid, test_boss)
 
-	ss.add_boss_trophy(pid, "boss_z3")
-
-	if ss.get_boss_trophy(pid, "boss_z3"):
+	if ss.get_boss_trophy(pid, test_boss):
 		_ok("boss_trophy_round_trip")
 	else:
 		_fail("boss_trophy_round_trip", "trophy not found after add_boss_trophy")

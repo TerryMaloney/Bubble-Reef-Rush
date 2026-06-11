@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://daily_dive_screen"]
+
+[ext_resource type="Script" path="res://src/ui/DailyDiveScreen.gd" id="1"]
+
+[node name="DailyDiveScreen" type="Node"]
+script = ExtResource("1")

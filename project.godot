@@ -31,6 +31,7 @@ MutatorSystem="*res://src/core/MutatorSystem.gd"
 GhostLibrary="*res://src/core/GhostLibrary.gd"
 RuleCardSystem="*res://src/core/RuleCardSystem.gd"
 BuildUnlockRegistry="*res://src/buildmode/BuildUnlockRegistry.gd"
+DeterministicSeed="*res://src/core/DeterministicSeed.gd"
 
 [display]
 
