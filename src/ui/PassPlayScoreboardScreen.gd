@@ -11,14 +11,24 @@ class_name PassPlayScoreboardScreen
 var _session: PassPlaySession = null
 
 
+func _ready() -> void:
+	# When loaded via TransitionLayer, GameManager deposits the session here.
+	if GameManager.pending_pass_play_session != null:
+		var s: PassPlaySession = GameManager.pending_pass_play_session
+		GameManager.pending_pass_play_session = null
+		setup(s)
+
+
 func setup(session: PassPlaySession) -> void:
 	_session = session
 	_title_label.text = "Reef Results!"
-	_play_again_btn.pressed.connect(_on_play_again)
-	_menu_btn.pressed.connect(_on_menu)
+	if not _play_again_btn.pressed.is_connected(_on_play_again):
+		_play_again_btn.pressed.connect(_on_play_again)
+	if not _menu_btn.pressed.is_connected(_on_menu):
+		_menu_btn.pressed.connect(_on_menu)
 	_populate_results()
 
-	# Save tournament history if applicable.
+	# Save tournament history.
 	var profile: String = SaveSystem.get_active_profile_id()
 	var tournament_entry: Dictionary = {
 		"date": Time.get_date_string_from_system(),
@@ -26,7 +36,6 @@ func setup(session: PassPlaySession) -> void:
 		"results": session.get_results()
 	}
 	SaveSystem.add_tournament_entry(profile, tournament_entry)
-	EventBus.pass_play_session_ended.emit(session.get_results())
 
 
 func _populate_results() -> void:
@@ -50,7 +59,7 @@ func _populate_results() -> void:
 func _on_play_again() -> void:
 	if _session != null:
 		var new_session: PassPlaySession = PassPlaySession.new()
-		new_session.setup(_session.profiles, _session.level_id, _session.mode)
+		new_session.setup(_session.profiles, _session.level_id, int(_session.mode))
 		GameManager.start_pass_play(new_session)
 	queue_free()
 

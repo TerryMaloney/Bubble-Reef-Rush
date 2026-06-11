@@ -51,7 +51,7 @@ func _on_play_pressed() -> void:
 
 
 func _on_stop_pressed() -> void:
-	EventBus.run_failed.emit("build_mode_stop", 0, 0.0)
+	EventBus.run_failed.emit("build_mode_stop", 0)
 
 
 func _on_zoom_pressed() -> void:
@@ -76,6 +76,6 @@ func _on_run_completed(_level_id: String, _score: int, _stars: int) -> void:
 	GameManager.open_build_mode()
 
 
-func _on_run_failed(_reason: String, _score: int, _pct: float) -> void:
+func _on_run_failed(_reason: String, _score: int) -> void:
 	# Return to Build Mode on death during test-play.
 	GameManager.open_build_mode()

@@ -25,7 +25,9 @@ echo "    PASS: Movement budget check"
 
 # ── Godot headless stages ────────────────────────────────────────────────────
 echo "==> Importing project (building class cache)…"
-"$GODOT" --headless --import >/dev/null 2>&1 || true
+if ! "$GODOT" --headless --import >/dev/null 2>&1; then
+	echo "    WARN: --import reported errors (may be harmless asset warnings)"
+fi
 
 run_stage() {
 	local name="$1"; local script="$2"; local needle="$3"

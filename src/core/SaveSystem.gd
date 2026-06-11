@@ -701,6 +701,18 @@ func set_daily_dive_result(profile_id: String, date: String, score: int) -> void
 	save_progress(profile_id, data)
 
 
+func add_tournament_entry(profile_id: String, entry: Dictionary) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if not data.has("family_tournament"):
+		data["family_tournament"] = {"history": []}
+	var ft: Dictionary = data["family_tournament"] as Dictionary
+	if not ft.has("history"):
+		ft["history"] = []
+	(ft["history"] as Array).append(entry)
+	data["family_tournament"] = ft
+	save_progress(profile_id, data)
+
+
 func _write_json(path: String, payload: Dictionary) -> void:
 	var tmp_path: String = path + ".tmp"
 	var file: FileAccess = FileAccess.open(tmp_path, FileAccess.WRITE)

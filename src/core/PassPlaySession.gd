@@ -4,8 +4,15 @@ extends RefCounted
 
 class_name PassPlaySession
 
+enum Mode { ONE_ATTEMPT = 1, THREE_ATTEMPTS = 3 }
+
 signal turn_started(profile_id: String)
 signal session_ended(results: Array)
+
+## Public read-only view — set by setup(), consumed by scoreboard / play-again.
+var level_id: String = ""
+var profiles: Array[String] = []
+var mode: int = Mode.ONE_ATTEMPT
 
 var _profiles: Array[String] = []
 var _scores: Dictionary = {}   # profile_id -> int
@@ -16,9 +23,9 @@ var _level_id: String = ""
 var _active: bool = false
 
 
-func setup(profiles: Array[String], level_id: String, attempts_per_player: int = 1) -> void:
-	_profiles = profiles.duplicate()
-	_level_id = level_id
+func setup(profiles_in: Array[String], level_id_in: String, attempts_per_player: int = 1) -> void:
+	_profiles = profiles_in.duplicate()
+	_level_id = level_id_in
 	_max_attempts = maxi(1, attempts_per_player)
 	_current_idx = 0
 	_scores.clear()
@@ -27,6 +34,10 @@ func setup(profiles: Array[String], level_id: String, attempts_per_player: int =
 	for pid: String in _profiles:
 		_scores[pid] = 0
 		_attempts[pid] = 0
+	# Expose public view.
+	level_id = _level_id
+	profiles = _profiles.duplicate()
+	mode = _max_attempts
 
 
 func get_current_profile() -> String:
@@ -62,16 +73,20 @@ func _all_done() -> bool:
 	return true
 
 
-func _build_results() -> Array:
-	var results: Array = []
+func get_results() -> Array[Dictionary]:
+	return _build_results()
+
+
+func _build_results() -> Array[Dictionary]:
+	var results: Array[Dictionary] = []
 	for pid: String in _profiles:
 		results.append({
 			"profile_id": pid,
-			"score": int(_scores.get(pid, 0)),
-			"title": funny_title(pid),
+			"total_score": int(_scores.get(pid, 0)),
+			"funny_title": funny_title(pid),
 		})
 	results.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
-		return int(a.get("score", 0)) > int(b.get("score", 0))
+		return int(a.get("total_score", 0)) > int(b.get("total_score", 0))
 	)
 	return results
 

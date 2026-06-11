@@ -11,6 +11,8 @@ const BUILD_MODE_SCENE: String = "res://scenes/buildmode/BuildModeRoot.tscn"
 const ZONE_SELECT_SCENE: String = "res://scenes/gameplay/ZoneSelect.tscn"
 const LEVEL_SELECT_SCENE: String = "res://scenes/gameplay/LevelSelect.tscn"
 const SETTINGS_SCENE: String = "res://scenes/gameplay/SettingsScreen.tscn"
+const PASS_PLAY_SCOREBOARD_SCENE: String = "res://scenes/ui/PassPlayScoreboardScreen.tscn"
+const PASS_PLAY_NEXT_PLAYER_SCENE: String = "res://scenes/ui/PassPlayNextPlayerScreen.tscn"
 
 var current_state: State = State.MENU
 var current_level_id: String = ""
@@ -40,6 +42,18 @@ var is_practice_mode: bool = false
 var show_ghost: String = ""
 ## Co-Pilot mode: profile ID of Player B; "" = disabled.
 var copilot_profile_b: String = ""
+
+## Pass & Play — active session; null when not in P&P mode.
+var active_pass_play_session: PassPlaySession = null
+## Passed to PassPlayScoreboardScreen via its _ready() so TransitionLayer can load it.
+var pending_pass_play_session: PassPlaySession = null
+## Previous player info shown on PassPlayNextPlayerScreen.
+var pp_prev_profile: String = ""
+var pp_prev_score: int = 0
+
+## Playlist (Daily Dive / Radio Shuffle) — levels queued after start_playlist().
+var playlist: Array[String] = []
+var playlist_index: int = 0
 
 
 func _ready() -> void:
@@ -111,6 +125,20 @@ func return_from_settings() -> void:
 	TransitionLayer.go_to(_settings_return_scene)
 
 
+func start_pass_play(session: PassPlaySession) -> void:
+	active_pass_play_session = session
+	pp_prev_profile = ""
+	pp_prev_score = 0
+	start_level(session.level_id)
+
+
+func start_playlist(levels: Array[String]) -> void:
+	playlist = levels.duplicate()
+	playlist_index = 0
+	if not playlist.is_empty():
+		start_level(playlist[0])
+
+
 func _on_run_progress(_level_id: String, pct: float) -> void:
 	_last_progress_pct = pct
 
@@ -130,4 +158,30 @@ func _on_run_completed(level_id: String, score: int, stars: int) -> void:
 	consecutive_deaths = 0
 	_active_profile = SaveSystem.get_active_profile_id()
 	SaveSystem.record_attempt(_active_profile, level_id)
+
+	# Pass & Play: route the score to the session, then advance turn.
+	if active_pass_play_session != null and active_pass_play_session.is_active():
+		pp_prev_profile = _active_profile
+		pp_prev_score = score
+		active_pass_play_session.submit_score(_active_profile, score)
+		var still_going: bool = active_pass_play_session.advance_turn()
+		if still_going:
+			current_state = State.MENU
+			TransitionLayer.go_to(PASS_PLAY_NEXT_PLAYER_SCENE)
+		else:
+			pending_pass_play_session = active_pass_play_session
+			active_pass_play_session = null
+			current_state = State.RESULTS
+			TransitionLayer.go_to(PASS_PLAY_SCOREBOARD_SCENE)
+		return
+
+	# Playlist (Daily Dive / Radio Shuffle): advance to next level.
+	if not playlist.is_empty():
+		playlist_index += 1
+		if playlist_index < playlist.size():
+			start_level(playlist[playlist_index])
+			return
+		playlist.clear()
+		playlist_index = 0
+
 	finish_level(score, stars)

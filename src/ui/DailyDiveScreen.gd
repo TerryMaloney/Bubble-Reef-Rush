@@ -19,7 +19,8 @@ func _populate_ui() -> void:
 
 	_today_levels = get_today_levels()
 	var profile: String = SaveSystem.get_active_profile_id()
-	var history: Dictionary = SaveSystem.get_daily_dive_history(profile)
+	# Level best scores come from the level results dict, not the dive history.
+	var level_results: Dictionary = SaveSystem.get_all_level_results(profile)
 
 	var labels: Array[Label] = [
 		$Panel/VBox/LevelsContainer/Level1Row/Level1Id as Label,
@@ -34,14 +35,14 @@ func _populate_ui() -> void:
 
 	for i: int in range(_today_levels.size()):
 		labels[i].text = _today_levels[i]
-		var best: int = int((history.get(_today_levels[i], {}) as Dictionary).get("best_score", 0))
+		var best: int = int((level_results.get(_today_levels[i], {}) as Dictionary).get("best_score", 0))
 		score_labels[i].text = "Best: %d" % best if best > 0 else ""
 
 
 func _on_start_pressed() -> void:
 	if _today_levels.is_empty():
 		return
-	GameManager.start_level(_today_levels[0])
+	GameManager.start_playlist(_today_levels)
 	queue_free()
 
 
