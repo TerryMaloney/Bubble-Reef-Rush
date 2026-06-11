@@ -125,6 +125,20 @@ Drop directory: `assets/art/powers/`
 
 ---
 
+## Ghost Sprites (Phase 16)
+
+Drop directory: `assets/art/ghost/`
+
+| Key | Path | Spec |
+|-----|------|------|
+| `sprite/ghost/trail` | `assets/art/ghost/ghost_trail.png` | 48×48 px PNG, translucent teal silhouette of the player fish, alpha ≤0.4, no outline — replaces the polygon placeholder in GhostPlayer.tscn |
+
+The ghost visual is currently rendered as a Polygon2D (cyan octagon, `Color(0.1, 0.85, 0.95, 0.4)`). Replace by:
+1. Dropping `ghost_trail.png` into `assets/art/ghost/`
+2. Swapping the Polygon2D in `scenes/gameplay/GhostPlayer.tscn` for a Sprite2D referencing the new texture
+
+---
+
 ## Zone Backgrounds
 
 Each zone needs a background texture and optional shader + particle effect.

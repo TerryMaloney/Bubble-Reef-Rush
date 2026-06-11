@@ -3,10 +3,12 @@ extends Node2D
 class_name LevelRoot
 
 const BUBBLE_BURST_SCENE: PackedScene = preload("res://scenes/gameplay/powers/BubbleBurst.tscn")
+const GHOST_PLAYER_SCENE: PackedScene = preload("res://scenes/gameplay/GhostPlayer.tscn")
 
 var _hud_controller: HUDController
 var _level_loader: LevelLoader
 var _resonance: ResonanceController
+var _recorder: GhostRecorder
 
 
 func _ready() -> void:
@@ -64,9 +66,21 @@ func _ready() -> void:
 	EventBus.practice_respawned.connect(_on_practice_respawned_resonance)
 	EventBus.power_activated.connect(_on_power_activated)
 
+	# GhostRecorder — wired to PlayerController; saves on run_completed.
+	_recorder = $GhostRecorder
+	player.set_ghost_recorder(_recorder)
+	EventBus.run_started.connect(_on_run_started_ghost)
+	EventBus.practice_respawned.connect(_on_practice_respawned_ghost)
+	EventBus.run_completed.connect(_on_run_completed_ghost)
+
+	# GhostPlayer — instantiate if GameManager.show_ghost is set.
+	_maybe_spawn_ghost_player(player)
+
 	_level_loader.level_ended.connect(_on_level_ended)
 	_level_loader.load_level(GameManager.current_level_id)
 
+
+# ── Resonance ─────────────────────────────────────────────────────────────────
 
 func _on_run_started_resonance(level_id: String) -> void:
 	var raw: Dictionary = _level_loader.rhythm_map.get_raw_data()
@@ -98,6 +112,50 @@ func _spawn_bubble_burst(is_perfect: bool) -> void:
 	add_child(burst)
 	burst.setup(player.global_position, is_perfect)
 
+
+# ── Ghost ─────────────────────────────────────────────────────────────────────
+
+func _on_run_started_ghost(_level_id: String) -> void:
+	_recorder.start()
+
+
+func _on_practice_respawned_ghost() -> void:
+	_recorder.start()
+
+
+func _on_run_completed_ghost(level_id: String, score: int, _stars: int) -> void:
+	if GameManager.is_practice_mode:
+		return
+	_recorder.stop(score)
+	if _recorder.is_empty():
+		return
+	var profile: String = SaveSystem.get_active_profile_id()
+	var ghost_data: Dictionary = _recorder.get_ghost_data(level_id, "1.0")
+	var existing: Dictionary = GhostLibrary.load_ghost(profile, level_id, "personal_best")
+	var existing_score: int = int(existing.get("final_score", -1))
+	if score > existing_score:
+		GhostLibrary.save_ghost(profile, level_id, "personal_best", ghost_data)
+
+
+func _maybe_spawn_ghost_player(_player: PlayerController) -> void:
+	var ghost_type: String = GameManager.show_ghost
+	if ghost_type.is_empty():
+		return
+	var ghost_data: Dictionary = {}
+	if ghost_type == "family_champion":
+		ghost_data = GhostLibrary.get_family_champion(GameManager.current_level_id)
+	else:
+		var profile: String = SaveSystem.get_active_profile_id()
+		ghost_data = GhostLibrary.load_ghost(profile, GameManager.current_level_id, ghost_type)
+	if ghost_data.is_empty():
+		return
+	var gp: GhostPlayer = GHOST_PLAYER_SCENE.instantiate() as GhostPlayer
+	add_child(gp)
+	gp.setup(ghost_data)
+	EventBus.run_started.connect(func(_id: String) -> void: gp.play())
+
+
+# ── Level end ────────────────────────────────────────────────────────────────
 
 func _on_level_ended(level_id: String) -> void:
 	var raw: Dictionary = _level_loader.rhythm_map.get_raw_data()

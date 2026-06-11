@@ -22,6 +22,12 @@ const CANVAS_H: float = 1920.0
 var diving: bool = false
 var alive: bool = true
 
+var _ghost_recorder: Node = null
+
+
+func set_ghost_recorder(recorder: Node) -> void:
+	_ghost_recorder = recorder
+
 @onready var beat_visualizer: BeatVisualizer = $BeatVisualizer
 @onready var timing_judge: TimingJudge = $TimingJudge
 
@@ -41,8 +47,12 @@ func _input(event: InputEvent) -> void:
 		diving = true
 		velocity.y = dive_impulse
 		timing_judge.judge_input(BeatConductor.get_current_beat_time_ms())
+		if _ghost_recorder != null:
+			_ghost_recorder.record_event("dive_start")
 	elif event.is_action_released("swim_dive"):
 		diving = false
+		if _ghost_recorder != null:
+			_ghost_recorder.record_event("dive_end")
 
 
 func _physics_process(delta: float) -> void:

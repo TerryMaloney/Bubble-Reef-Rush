@@ -55,5 +55,7 @@
   "sprite/power/echo_shield":  { "path": "res://assets/art/powers/echo_shield.png",  "fallback": "", "spec": "48×48 px PNG, cyan ring/shield glyph with inner glow, transparent bg" },
   "sprite/power/magnet_pulse": { "path": "res://assets/art/powers/magnet_pulse.png", "fallback": "", "spec": "48×48 px PNG, horseshoe magnet with attraction arc lines, transparent bg" },
   "sprite/power/beat_dash":    { "path": "res://assets/art/powers/beat_dash.png",    "fallback": "", "spec": "48×48 px PNG, lightning bolt overlapping a music note, transparent bg" },
-  "sprite/power/phase_bubble": { "path": "res://assets/art/powers/phase_bubble.png", "fallback": "", "spec": "48×48 px PNG, ghost bubble with dashed outline and alpha fade, transparent bg" }
+  "sprite/power/phase_bubble": { "path": "res://assets/art/powers/phase_bubble.png", "fallback": "", "spec": "48×48 px PNG, ghost bubble with dashed outline and alpha fade, transparent bg" },
+
+  "sprite/ghost/trail": { "path": "res://assets/art/ghost/ghost_trail.png", "fallback": "", "spec": "48×48 px PNG, translucent teal silhouette of the player fish, alpha ≤0.4, no outline" }
 }

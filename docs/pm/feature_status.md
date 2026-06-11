@@ -1,6 +1,6 @@
 # Feature Status
 
-Last updated: 2026-06-11
+Last updated: 2026-06-11 (Phase 16 complete)
 
 ## Phases 1–13 (Foundation) — ALL COMPLETE
 
@@ -26,8 +26,8 @@ Last updated: 2026-06-11
 |-------|---------|--------|-------|
 | 14 | Save v3 + MutatorSystem stub | ✅ DONE | 22-stage suite green |
 | 15 | Resonance: Bubble Burst + Echo Shield | ✅ DONE | |
-| 16 | Ghost Recording + Playback | ⏳ NEXT | |
-| 17 | Challenge Capsules (.brrc) | ⏳ | |
+| 16 | Ghost Recording + Playback | ✅ DONE | 24-stage suite green |
+| 17 | Challenge Capsules (.brrc) | ⏳ NEXT | |
 | 18 | Pass & Play + Family Tournament | ⏳ | |
 | 19 | Mutators (20 effects) | ⏳ | |
 | 20 | Rule Cards + Build Mode Unlock Progression | ⏳ | |

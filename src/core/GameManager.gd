@@ -37,6 +37,10 @@ var _settings_return_scene: String = MAIN_MENU_SCENE
 ## Suppresses SaveSystem writes and auto-retry; PracticeController handles respawn.
 var is_practice_mode: bool = false
 
+## Ghost type to display on the next level run ("personal_best", "family_champion",
+## "imported", or "" for none). LevelRoot reads and consumes this on _ready().
+var show_ghost: String = ""
+
 
 func _ready() -> void:
 	EventBus.run_failed.connect(_on_run_failed)

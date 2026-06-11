@@ -4,54 +4,58 @@
 
 - **Repository**: `TerryMaloney/Bubble-Reef-Rush`
 - **Branch**: `claude/geometry-dash-game-brainstorm-m5Thu`
-- **Last pushed commit**: Phase 15 (see git log)
+- **Last pushed commit**: Phase 16 (see git log)
 - **Last-green tag**: `green-build-mode-v1` = commit `2407e15`
 - **Remote**: `https://github.com/TerryMaloney/Bubble-Reef-Rush.git`
 
-## Current Phase: 15 COMPLETE → Starting Phase 16
+## Current Phase: 16 COMPLETE → Starting Phase 17
 
-### Phase 15 deliverables (done):
+### Phase 16 deliverables (done):
 
-- `src/gameplay/ResonanceController.gd` — charge meter (5 pearls = 1 charge), fire(), consume_shield(), _is_perfect_timed()
-- `src/gameplay/powers/BubbleBurst.gd` — rightward projectile at 1200/1600 px/s, pops bubble_destructible group
-- `src/gameplay/powers/EchoShield.gd` — visual ring on Player node, pulse animation, break flash
-- `scenes/gameplay/powers/BubbleBurst.tscn` — minimal Node2D + Polygon2D visual
-- `assets/data/powers.json` — 5 powers defined (bubble_burst, echo_shield + 3 stubs)
-- `scenes/gameplay/LevelRoot.tscn` — ResonanceController node, ResonanceChargeBar label, PowerButton (bottom-right 184x96 px)
-- `scenes/player/Player.tscn` — EchoShield child node with octagonal Ring polygon
-- `src/gameplay/LevelRoot.gd` — wires RC; reads level power_mode/max_charges from metadata on run_started
-- `src/ui/HUDController.gd` — resonance_bar label, power_button export, update_power_button_mode(), _on_power_charged() with pip progress
-- `src/gameplay/PlayerController.gd` — on_hit() checks ResonanceController.consume_shield() before death
-- `src/gameplay/obstacles/JellyfishDrift.gd` — added to bubble_destructible group
-- `src/gameplay/obstacles/BubbleMine.gd` — added to bubble_destructible group
-- `assets/asset_manifest.json` — 8 new keys: sfx/power_charge, sfx/power_fire, sfx/shield_break + 5 sprite/power/* keys
-- `tools/gen_audio.py` — 3 new power SFX WAV stubs (generated on disk)
-- `STUB_ASSETS.md` — Power SFX section + Power Sprites section
-- `tests/integration/resonance_test.gd` — 8 contracts, all PASS
-- `tools/run_tests.sh` — stage 21 added (RESONANCE_OK)
-- 23-stage suite: all green
+- `src/gameplay/GhostRecorder.gd` — captures `{beat, event}` on swim_dive; start()/stop(score)/record_event()/get_ghost_data()
+- `src/gameplay/GhostPlayer.gd` — deterministic physics replay via recorded beat-indexed inputs; Node2D, non-colliding
+- `src/core/GhostLibrary.gd` — autoload; save_ghost/load_ghost/list_ghosts/get_family_champion; writes user://profiles/<id>/ghosts/
+- `scenes/gameplay/GhostPlayer.tscn` — Node2D at (200,960) + translucent cyan Polygon2D Visual child (alpha 0.4)
+- `scenes/gameplay/LevelRoot.tscn` — added GhostRecorder node (load_steps 16→17, ext_resource id=15)
+- `src/gameplay/LevelRoot.gd` — wires GhostRecorder to player; _on_run_completed_ghost saves PB; _maybe_spawn_ghost_player reads GameManager.show_ghost
+- `src/gameplay/PlayerController.gd` — set_ghost_recorder(); record_event("dive_start"/"dive_end") in _input()
+- `src/core/GameManager.gd` — added show_ghost: String = "" property
+- `project.godot` — GhostLibrary autoload added after MutatorSystem
+- `assets/asset_manifest.json` — sprite/ghost/trail key added
+- `STUB_ASSETS.md` — Ghost Sprites section added
+- `tests/integration/ghost_test.gd` — 7 contracts, all PASS
+- `tools/run_tests.sh` — stage 22 added (GHOST_OK)
+- 24-stage suite: all green
 
-### Level metadata fields (existing .brl levels default gracefully):
+### Ghost types available:
 
-- metadata.power_mode: String — "allowed" (default) | "disabled" | "required"
-- metadata.max_charges: int — default 1
+- `"personal_best"` — best score for the active profile
+- `"family_champion"` — highest score across all profiles (scanned by get_family_champion())
+- `"imported"` — from a Challenge Capsule (Phase 17)
 
-### Next Phase: 16 — Ghost Recording + Playback
+### How to show a ghost on a level run:
+
+```gdscript
+GameManager.show_ghost = "personal_best"  # or "family_champion" or "imported"
+GameManager.start_level("z1-l1")
+```
+
+LevelRoot._maybe_spawn_ghost_player() reads and acts on this flag at _ready() time.
+
+### Next Phase: 17 — Challenge Capsules + Level Swap
 
 Files to create:
-- src/gameplay/GhostRecorder.gd — captures {beat: float, event: String} on swim_dive action
-- src/gameplay/GhostPlayer.gd — replays inputs as translucent Node2D (non-colliding, alpha=0.4)
-- src/core/GhostLibrary.gd — autoload; save_ghost(), load_ghost(), list_ghosts() → user://profiles/<id>/ghosts/
+- `src/core/CapsuleSerializer.gd` (RefCounted) — pack()/unpack()/validate(); HMAC checksum via Crypto.hmac_digest()
+- `src/ui/ChallengeExportScreen.gd` + `.tscn` — clipboard code + "Share File" (Android intent)
+- `src/ui/ChallengeImportScreen.gd` + `.tscn` — paste or file picker; validate → save to user://capsules/
+- `assets/data/` update if capsule schema needs static data
 
 Files to modify:
-- src/gameplay/PlayerController.gd — attach GhostRecorder; emit inputs when alive
-- src/gameplay/LevelRoot.gd — wire GhostPlayer if GameManager.show_ghost != ""
-- project.godot — GhostLibrary autoload after MutatorSystem
-- src/core/GameManager.gd — add show_ghost: String property (ghost type to show on next run)
-- assets/asset_manifest.json — ghost sprite key
-- STUB_ASSETS.md — ghost sprite section
+- `src/core/EventBus.gd` — capsule_exported(path), capsule_imported(level_id)
+- `assets/asset_manifest.json` — capsule UI icons if needed
+- `STUB_ASSETS.md` — capsule section
 
-Test to add: tests/integration/ghost_test.gd (5 contracts: record/replay, determinism, non-collide, ghost_saved signal, family_champion selection)
+Tests: `tests/integration/capsule_test.gd` — round-trip deep-equal, tampered checksum → rejected, level hash mismatch → warning, old app_ver → compat flag
 
 ## Test Suite Status
 
@@ -60,8 +64,9 @@ Test to add: tests/integration/ghost_test.gd (5 contracts: record/replay, determ
 | 0 | BRL schema + movement validation | PASS |
 | 1-20 | All original + save_v3 stages | PASS |
 | 21 | resonance_test.gd | PASS |
+| 22 | ghost_test.gd | PASS |
 
-23 stages, all green.
+24 stages, all green.
 
 ## Expansion Plan Summary
 
@@ -69,8 +74,8 @@ Test to add: tests/integration/ghost_test.gd (5 contracts: record/replay, determ
 |-------|---------|--------|
 | 14 | Save v3 + MutatorSystem stub | DONE |
 | 15 | Resonance: Bubble Burst + Echo Shield | DONE |
-| 16 | Ghost Recording + Playback | NEXT |
-| 17 | Challenge Capsules (.brrc) | pending |
+| 16 | Ghost Recording + Playback | DONE |
+| 17 | Challenge Capsules (.brrc) | NEXT |
 | 18 | Pass & Play + Family Tournament | pending |
 | 19 | Mutators (20 effects) | pending |
 | 20 | Rule Cards + Build Mode Unlock Progression | pending |

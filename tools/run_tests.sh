@@ -62,5 +62,6 @@ run_stage "Build Mode test"  "tests/integration/buildmode_test.gd"       "BUILDM
 run_stage "Playtest"         "tests/integration/playtest.gd"             "PLAYTEST_OK"
 run_stage "Save v3 test"    "tests/integration/save_v3_test.gd"         "SAVE_V3_OK"
 run_stage "Resonance test"  "tests/integration/resonance_test.gd"       "RESONANCE_OK"
+run_stage "Ghost test"      "tests/integration/ghost_test.gd"           "GHOST_OK"
 
 echo "==> All tests passed."
