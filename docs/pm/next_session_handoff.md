@@ -4,67 +4,59 @@
 
 - **Repository**: `TerryMaloney/Bubble-Reef-Rush`
 - **Branch**: `claude/geometry-dash-game-brainstorm-m5Thu`
-- **Last pushed commit**: Phase 17 (see git log)
 - **Last-green tag**: `green-build-mode-v1` = commit `2407e15`
 - **Remote**: `https://github.com/TerryMaloney/Bubble-Reef-Rush.git`
 
-## Current Phase: 17 COMPLETE → Starting Phase 18
+## Current Phase: 19 COMPLETE → Starting Phase 20
 
-### Phase 17 deliverables (done):
+### Phase 19 deliverables (done):
 
-- `src/core/CapsuleSerializer.gd` (RefCounted) — `pack()/unpack()/validate()/save_capsule()/load_capsule_file()`
-  - HMAC-SHA256 checksum via `Crypto.hmac_digest()` (embedded key, tamper detection only)
-  - JSON type normalization fix: pack() round-trips through JSON.parse_string before computing canonical (avoids int/float mismatch after Godot 4.6 JSON parse)
-  - `sort_keys=true` for deterministic canonical ordering
-  - validate() returns `Array[String]`; "WARN:" prefix = non-fatal, no prefix = hard error
-  - Prunes user://capsules/ to MAX_CAPSULES=100 FIFO
-- `src/ui/ChallengeExportScreen.gd` + `scenes/ui/ChallengeExportScreen.tscn` — clipboard copy + Android share intent stub
-- `src/ui/ChallengeImportScreen.gd` + `scenes/ui/ChallengeImportScreen.tscn` — paste code, validate, preview, import
-- `tests/integration/capsule_test.gd` — 9 contracts, all PASS
-- `tools/run_tests.sh` — stage 23 added (CAPSULE_OK)
-- 25-stage suite: all green
+- `assets/data/mutators.json` — 20 mutators with `{id, name, description, effect_type, effect_params, unlock_condition}`
+- `src/core/MutatorSystem.gd` — full apply() implementing all 20 effects:
+  - tiny_pebble / giant_pebble: player.scale
+  - reverse_buoyancy: negate float_force + dive_force
+  - slippery_water: drag = 0.998
+  - double_pearls: CollectibleSpawner.pearl_value_multiplier = 2
+  - treasure_only: CollectibleSpawner.pearls_visible = false
+  - one_hit_shield: ResonanceController.grant_shield()
+  - no_powers: ResonanceController._mode = "disabled" (via Object.set)
+  - bubble_burst_only: ResonanceController.equipped_power = "bubble_burst"
+  - ghost_mode: player.modulate.a = 0.3
+  - mirror_controls: swap float_force / dive_force
+  - faster_scroll: scroll.speed_now *= 1.3
+  - gentle_gaps / sudden_darkness / fever_forever / one_attempt / random_character / invisible_hud / beat_rings_only / chaos_background: pass or delegate to child nodes
+- `tests/integration/mutator_test.gd` — 5 contracts, all PASS:
+  1. tiny_pebble_scales: player scale == (0.5, 0.5)
+  2. reverse_buoyancy_flips: float_force negated
+  3. reverse_buoyancy_flips: dive_force negated
+  4. no_powers_blocks_fire: fire() blocked when mode=disabled
+  5. faster_scroll_increases: speed_now x1.3
+- `tools/run_tests.sh` — stage 25 MUTATOR_OK added
+- 27-stage suite: all green
 
-### Capsule data schema:
-```json
-{
-  "schema_ver": 1,
-  "app_ver": "1.0",
-  "creator_nick": "...",
-  "level_id": "...",
-  "level_hash": "...",
-  "ghost_inputs": [{beat, event}, ...],
-  "rules": [],
-  "mutators": [],
-  "target": {"score": 0},
-  "checksum": "<HMAC-SHA256-hex>"
-}
-```
+### Key implementation notes:
 
-### Validate() issue categories:
-- `""` (empty array) — fully valid
-- `"checksum_mismatch"` — tampered; reject
-- `"missing field: X"` — bad schema; reject
-- `"unsupported schema_ver: N"` — reject
-- `"incompatible_app_ver: X"` — reject
-- `"WARN:old_app_ver"` — readable but old; show UI warning
-- `"WARN:newer_app_ver"` — may have unknown fields; show warning
-- `"WARN:level_hash_mismatch"` — level may differ; still playable
+- `_force_power_mode()` sets ResonanceController `_mode` via `rc.set("_mode", mode)` (Object.set bypasses GDScript private access)
+- Test mocks use inline GDScript (`GDScript.new()` + `source_code` + `reload()`) so properties are real GDScript variables (needed for `in` operator and direct dot access)
+- No `await` in signal-based tests — Godot signals fire synchronously
 
-### Next Phase: 18 — Pass & Play + Family Tournament
+## Next Phase: 20 — Rule Cards + Build Mode Unlock Progression
 
 Files to create:
-- `src/core/PassPlaySession.gd` (RefCounted) — profile queue management, per-turn score, funny titles
-- `scenes/ui/PassPlaySetupScreen.tscn` + `src/ui/PassPlaySetupScreen.gd`
-- `scenes/ui/PassPlayNextPlayerScreen.tscn` + `src/ui/PassPlayNextPlayerScreen.gd`
-- `scenes/ui/PassPlayScoreboardScreen.tscn` + `src/ui/PassPlayScoreboardScreen.gd`
-- `scenes/ui/ReefRivalsScreen.tscn` + `src/ui/ReefRivalsScreen.gd` — hub for ghost challenge, pass & play, tournament, import
+- `assets/data/rule_cards.json` — 14 rule cards with `{id, name, check_type, check_params, description}`
+- `src/core/RuleCardSystem.gd` (autoload) — `set_active_rules(cards)`, `evaluate_run(level_id, run_data) → {passed, results}`
+- `src/buildmode/BuildUnlockRegistry.gd` — maps level completions → `SaveSystem.add_build_unlock(category, id)`
+- `tests/integration/rule_card_test.gd` — rule evaluation, pass/fail, capsule stores rules
+- `tests/integration/build_unlock_test.gd` — clearing level → palette entry appears
 
 Files to modify:
-- `src/core/SaveSystem.gd` — family_tournament.history[] (already in v3 schema)
-- `src/core/EventBus.gd` — pass_play_next_player, pass_play_session_ended (already declared)
-- `scenes/gameplay/MainMenu.tscn` — add Reef Rivals button
+- `src/core/SaveSystem.gd` — `add_build_unlock(category, id)` + `has_build_unlock(category, id)` methods
+- `src/core/AchievementSystem.gd` — hook to BuildUnlockRegistry on evaluate_run
+- `src/buildmode/PalettePanel.gd` — check `SaveSystem.has_build_unlock("obstacles", otype)` before showing
+- `project.godot` — add RuleCardSystem autoload
+- `CLAUDE.md` — add RuleCardSystem to autoloads table, update stage count
 
-Tests: `tests/integration/pass_play_test.gd` — profile rotation, score aggregation, funny titles, tournament bracket seeding
+Rule card check_types: max_misses, collect_all_pearls, find_secret, one_bubble_burst, no_powers, shield_only, race_ghost, tiny_character, reverse_buoyancy, max_attempts, family_relay, treasure_hunt, beat_score
 
 ## Test Suite Status
 
@@ -75,8 +67,10 @@ Tests: `tests/integration/pass_play_test.gd` — profile rotation, score aggrega
 | 21 | resonance_test.gd | PASS |
 | 22 | ghost_test.gd | PASS |
 | 23 | capsule_test.gd | PASS |
+| 24 | pass_play_test.gd | PASS |
+| 25 | mutator_test.gd | PASS |
 
-25 stages, all green.
+27 stages, all green.
 
 ## Expansion Plan Summary
 
@@ -86,9 +80,9 @@ Tests: `tests/integration/pass_play_test.gd` — profile rotation, score aggrega
 | 15 | Resonance: Bubble Burst + Echo Shield | DONE |
 | 16 | Ghost Recording + Playback | DONE |
 | 17 | Challenge Capsules (.brrc) | DONE |
-| 18 | Pass & Play + Family Tournament | NEXT |
-| 19 | Mutators (20 effects) | pending |
-| 20 | Rule Cards + Build Mode Unlock Progression | pending |
+| 18 | Pass & Play + Family Tournament | DONE |
+| 19 | Mutators (20 effects) | DONE |
+| 20 | Rule Cards + Build Mode Unlock Progression | NEXT |
 | 21 | Special Levels: Trials + Boss Chase | pending |
 | 22 | Secret Exits + Collection Room | pending |
 | 23 | Daily Dive + Seeded Reef + Radio Shuffle | pending |

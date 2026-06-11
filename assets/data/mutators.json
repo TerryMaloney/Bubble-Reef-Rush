@@ -1,0 +1,162 @@
+[
+  {
+    "id": "tiny_pebble",
+    "name": "Tiny Pebble",
+    "description": "Player is 50% smaller — easier to dodge.",
+    "effect_type": "player_scale",
+    "effect_params": {"scale": 0.5},
+    "unlock_condition": "default"
+  },
+  {
+    "id": "giant_pebble",
+    "name": "Giant Pebble",
+    "description": "Player is 200% bigger — harder to dodge!",
+    "effect_type": "player_scale",
+    "effect_params": {"scale": 2.0},
+    "unlock_condition": "collect_10_pearls_in_one_level"
+  },
+  {
+    "id": "reverse_buoyancy",
+    "name": "Reverse Buoyancy",
+    "description": "Tap to float, hold to sink. Everything is upside down.",
+    "effect_type": "reverse_buoyancy",
+    "effect_params": {},
+    "unlock_condition": "complete_zone_2"
+  },
+  {
+    "id": "slippery_water",
+    "name": "Slippery Water",
+    "description": "Almost no drag — velocity carries further.",
+    "effect_type": "drag_override",
+    "effect_params": {"drag": 0.998},
+    "unlock_condition": "complete_zone_3"
+  },
+  {
+    "id": "double_pearls",
+    "name": "Double Pearls",
+    "description": "Every pearl counts double.",
+    "effect_type": "pearl_multiplier",
+    "effect_params": {"multiplier": 2},
+    "unlock_condition": "get_3_stars_on_any_z1"
+  },
+  {
+    "id": "treasure_only",
+    "name": "Treasure Only",
+    "description": "Regular pearls hidden — only treasure coins visible.",
+    "effect_type": "hide_pearls",
+    "effect_params": {},
+    "unlock_condition": "collect_5_treasure_coins"
+  },
+  {
+    "id": "one_hit_shield",
+    "name": "Shield Start",
+    "description": "Begin every run with an Echo Shield pre-activated.",
+    "effect_type": "start_with_shield",
+    "effect_params": {},
+    "unlock_condition": "unlock_echo_shield"
+  },
+  {
+    "id": "no_powers",
+    "name": "No Powers",
+    "description": "Power meter disabled — rely only on skill.",
+    "effect_type": "force_power_mode",
+    "effect_params": {"mode": "disabled"},
+    "unlock_condition": "complete_any_level_without_power"
+  },
+  {
+    "id": "bubble_burst_only",
+    "name": "Bubble Burst Only",
+    "description": "Power locked to Bubble Burst regardless of loadout.",
+    "effect_type": "force_power_type",
+    "effect_params": {"power": "bubble_burst"},
+    "unlock_condition": "fire_bubble_burst_10_times"
+  },
+  {
+    "id": "ghost_mode",
+    "name": "Ghost Mode",
+    "description": "Player rendered at 30% alpha — spooky.",
+    "effect_type": "player_alpha",
+    "effect_params": {"alpha": 0.3},
+    "unlock_condition": "view_a_ghost_replay"
+  },
+  {
+    "id": "mirror_controls",
+    "name": "Mirror Controls",
+    "description": "Hold to float, tap to dive — inverted from normal.",
+    "effect_type": "mirror_controls",
+    "effect_params": {},
+    "unlock_condition": "complete_zone_4"
+  },
+  {
+    "id": "faster_scroll",
+    "name": "Faster Scroll",
+    "description": "Level scrolls 30% faster than normal.",
+    "effect_type": "scroll_multiplier",
+    "effect_params": {"multiplier": 1.3},
+    "unlock_condition": "achieve_fever_3_times"
+  },
+  {
+    "id": "gentle_gaps",
+    "name": "Gentle Gaps",
+    "description": "30% more gap space between obstacles.",
+    "effect_type": "gap_multiplier",
+    "effect_params": {"multiplier": 1.3},
+    "unlock_condition": "default"
+  },
+  {
+    "id": "sudden_darkness",
+    "name": "Sudden Darkness",
+    "description": "DarkVoid obstacle active from the very first beat.",
+    "effect_type": "force_dark_void",
+    "effect_params": {},
+    "unlock_condition": "survive_dark_void_zone"
+  },
+  {
+    "id": "fever_forever",
+    "name": "Fever Forever",
+    "description": "Fever mode active from beat 0 — non-stop bonus!",
+    "effect_type": "start_in_fever",
+    "effect_params": {},
+    "unlock_condition": "reach_fever_5_times_in_one_run"
+  },
+  {
+    "id": "one_attempt",
+    "name": "One Attempt",
+    "description": "No retry — one life only.",
+    "effect_type": "one_attempt",
+    "effect_params": {},
+    "unlock_condition": "complete_zone_5"
+  },
+  {
+    "id": "random_character",
+    "name": "Random Character",
+    "description": "Character randomized each attempt.",
+    "effect_type": "random_character",
+    "effect_params": {},
+    "unlock_condition": "unlock_any_3_characters"
+  },
+  {
+    "id": "invisible_hud",
+    "name": "Invisible HUD",
+    "description": "Score and UI hidden — play by feel.",
+    "effect_type": "hide_hud",
+    "effect_params": {},
+    "unlock_condition": "score_over_500_without_hud_challenge"
+  },
+  {
+    "id": "beat_rings_only",
+    "name": "Beat Rings Only",
+    "description": "No score pop-ups — only the beat visualizer.",
+    "effect_type": "hide_score_labels",
+    "effect_params": {},
+    "unlock_condition": "get_perfect_combo_10"
+  },
+  {
+    "id": "chaos_background",
+    "name": "Chaos Background",
+    "description": "Background zone changes randomly every 4 beats.",
+    "effect_type": "chaos_background",
+    "effect_params": {"interval_beats": 4},
+    "unlock_condition": "complete_all_zones"
+  }
+]

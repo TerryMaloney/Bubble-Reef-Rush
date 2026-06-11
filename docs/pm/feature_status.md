@@ -29,7 +29,7 @@ Last updated: 2026-06-11 (Phase 16 complete)
 | 16 | Ghost Recording + Playback | ✅ DONE | 24-stage suite green |
 | 17 | Challenge Capsules (.brrc) | ✅ DONE | 25-stage suite green |
 | 18 | Pass & Play + Family Tournament | ✅ DONE | 26-stage suite green |
-| 19 | Mutators (20 effects) | ⏳ | |
+| 19 | Mutators (20 effects) | ✅ DONE | 27-stage suite green |
 | 20 | Rule Cards + Build Mode Unlock Progression | ⏳ | |
 | 21 | Special Levels: Character/Creator Trials + Boss Chase | ⏳ | |
 | 22 | Secret Exits + Collection Room | ⏳ | |
@@ -41,7 +41,7 @@ Last updated: 2026-06-11 (Phase 16 complete)
 
 | Name | File | Status |
 |------|------|--------|
-| MutatorSystem | src/core/MutatorSystem.gd | ✅ stub, effects in Phase 19 |
+| MutatorSystem | src/core/MutatorSystem.gd | ✅ all 20 effects |
 | GhostLibrary | src/core/GhostLibrary.gd | ⏳ Phase 16 |
 | RuleCardSystem | src/core/RuleCardSystem.gd | ⏳ Phase 20 |
 | DeterministicSeed | src/core/DeterministicSeed.gd | ⏳ Phase 23 |
