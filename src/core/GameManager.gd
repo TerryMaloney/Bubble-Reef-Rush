@@ -41,6 +41,9 @@ var is_practice_mode: bool = false
 ## "imported", or "" for none). LevelRoot reads and consumes this on _ready().
 var show_ghost: String = ""
 
+## Active Pass & Play session; null when not in a pass-play session.
+var active_pass_play_session: RefCounted = null
+
 
 func _ready() -> void:
 	EventBus.run_failed.connect(_on_run_failed)
@@ -100,6 +103,16 @@ func go_to_level_select(zone_id: String) -> void:
 func open_build_mode() -> void:
 	current_state = State.BUILD_MODE
 	TransitionLayer.go_to(BUILD_MODE_SCENE)
+
+
+## Start a Pass & Play session. Stores the session and launches the first player's level.
+func start_pass_play(session: RefCounted) -> void:
+	active_pass_play_session = session
+	var lid: Variant = session.get("level_id")
+	current_level_id = str(lid) if lid != null else ""
+	consecutive_deaths = 0
+	_last_progress_pct = 0.0
+	TransitionLayer.go_to(LEVEL_ROOT_SCENE)
 
 
 func go_to_settings(return_scene: String = MAIN_MENU_SCENE) -> void:

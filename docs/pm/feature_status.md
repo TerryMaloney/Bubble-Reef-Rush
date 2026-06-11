@@ -28,7 +28,7 @@ Last updated: 2026-06-11 (Phase 16 complete)
 | 15 | Resonance: Bubble Burst + Echo Shield | ✅ DONE | |
 | 16 | Ghost Recording + Playback | ✅ DONE | 24-stage suite green |
 | 17 | Challenge Capsules (.brrc) | ✅ DONE | 25-stage suite green |
-| 18 | Pass & Play + Family Tournament | ⏳ NEXT | |
+| 18 | Pass & Play + Family Tournament | ✅ DONE | 26-stage suite green |
 | 19 | Mutators (20 effects) | ⏳ | |
 | 20 | Rule Cards + Build Mode Unlock Progression | ⏳ | |
 | 21 | Special Levels: Character/Creator Trials + Boss Chase | ⏳ | |

@@ -64,5 +64,6 @@ run_stage "Save v3 test"    "tests/integration/save_v3_test.gd"         "SAVE_V3
 run_stage "Resonance test"  "tests/integration/resonance_test.gd"       "RESONANCE_OK"
 run_stage "Ghost test"      "tests/integration/ghost_test.gd"           "GHOST_OK"
 run_stage "Capsule test"    "tests/integration/capsule_test.gd"         "CAPSULE_OK"
+run_stage "Pass Play test"  "tests/integration/pass_play_test.gd"       "PASS_PLAY_OK"
 
 echo "==> All tests passed."
