@@ -1,3 +1,140 @@
-[gd_scene load_steps=1 format=3]
+[gd_scene load_steps=8 format=3]
 
-[node name="BuildModeRoot" type="Node"]
+[ext_resource type="Script" path="res://src/buildmode/BuildModeRoot.gd" id="1"]
+[ext_resource type="Script" path="res://src/buildmode/TimelineView.gd" id="2"]
+[ext_resource type="Script" path="res://src/buildmode/PalettePanel.gd" id="3"]
+[ext_resource type="Script" path="res://src/buildmode/PropertiesPanel.gd" id="4"]
+[ext_resource type="Script" path="res://src/buildmode/PlaybackBar.gd" id="5"]
+
+[node name="BuildModeRoot" type="Node2D"]
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1080.0
+offset_bottom = 1920.0
+color = Color(0.04, 0.04, 0.1, 1)
+
+[node name="TopBar" type="Panel" parent="."]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1080.0
+offset_bottom = 100.0
+
+[node name="HBox" type="HBoxContainer" parent="TopBar"]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 1072.0
+offset_bottom = 92.0
+theme_override_constants/separation = 8
+
+[node name="NameEdit" type="LineEdit" parent="TopBar/HBox"]
+custom_minimum_size = Vector2(280, 60)
+placeholder_text = "Level name…"
+text = "My Level"
+
+[node name="BpmSpin" type="SpinBox" parent="TopBar/HBox"]
+custom_minimum_size = Vector2(120, 60)
+min_value = 60.0
+max_value = 220.0
+step = 0.5
+value = 120.0
+prefix = "BPM "
+
+[node name="ZoneOpt" type="OptionButton" parent="TopBar/HBox"]
+custom_minimum_size = Vector2(130, 60)
+
+[node name="DiffLabel" type="Label" parent="TopBar/HBox"]
+custom_minimum_size = Vector2(130, 60)
+text = "Beginner"
+vertical_alignment = 1
+
+[node name="ValidateLabel" type="Label" parent="TopBar/HBox"]
+custom_minimum_size = Vector2(200, 60)
+text = "Valid"
+modulate = Color(0.4, 1, 0.4, 1)
+vertical_alignment = 1
+
+[node name="SaveBtn" type="Button" parent="TopBar/HBox"]
+custom_minimum_size = Vector2(110, 60)
+text = "Save"
+
+[node name="MainArea" type="HBoxContainer" parent="."]
+offset_left = 0.0
+offset_top = 100.0
+offset_right = 1080.0
+offset_bottom = 1560.0
+
+[node name="TimelineView" type="Control" parent="MainArea"]
+custom_minimum_size = Vector2(840, 1460)
+size_flags_horizontal = 3
+script = ExtResource("2")
+
+[node name="PalettePanel" type="Panel" parent="MainArea"]
+custom_minimum_size = Vector2(240, 1460)
+script = ExtResource("3")
+
+[node name="BottomPanel" type="VBoxContainer" parent="."]
+offset_left = 0.0
+offset_top = 1560.0
+offset_right = 1080.0
+offset_bottom = 1920.0
+
+[node name="PropertiesPanel" type="Panel" parent="BottomPanel"]
+custom_minimum_size = Vector2(1080, 260)
+script = ExtResource("4")
+
+[node name="TitleLabel" type="Label" parent="BottomPanel/PropertiesPanel"]
+offset_left = 8.0
+offset_top = 4.0
+offset_right = 1072.0
+offset_bottom = 40.0
+text = "Select an obstacle"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="BottomPanel/PropertiesPanel"]
+offset_left = 0.0
+offset_top = 44.0
+offset_right = 1080.0
+offset_bottom = 260.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BottomPanel/PropertiesPanel/ScrollContainer"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1080.0
+offset_bottom = 0.0
+size_flags_horizontal = 3
+
+[node name="PlaybackBar" type="Panel" parent="BottomPanel"]
+custom_minimum_size = Vector2(1080, 100)
+script = ExtResource("5")
+
+[node name="HBox" type="HBoxContainer" parent="BottomPanel/PlaybackBar"]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 1072.0
+offset_bottom = 92.0
+theme_override_constants/separation = 8
+
+[node name="PlayBtn" type="Button" parent="BottomPanel/PlaybackBar/HBox"]
+custom_minimum_size = Vector2(100, 76)
+text = "▶ Test"
+
+[node name="StopBtn" type="Button" parent="BottomPanel/PlaybackBar/HBox"]
+custom_minimum_size = Vector2(100, 76)
+text = "■ Stop"
+
+[node name="ZoomBtn" type="Button" parent="BottomPanel/PlaybackBar/HBox"]
+custom_minimum_size = Vector2(80, 76)
+text = "1×"
+
+[node name="BeatLabel" type="Label" parent="BottomPanel/PlaybackBar/HBox"]
+custom_minimum_size = Vector2(80, 76)
+text = "Beat:"
+vertical_alignment = 1
+
+[node name="BeatSpin" type="SpinBox" parent="BottomPanel/PlaybackBar/HBox"]
+custom_minimum_size = Vector2(140, 76)
+min_value = 0.0
+max_value = 256.0
+step = 0.25

@@ -57,7 +57,8 @@ run_stage "Economy test"   "tests/integration/economy_test.gd"          "ECONOMY
 run_stage "Obstacle Z3 test" "tests/integration/obstacle_z3_test.gd"    "OBSTACLE_Z3_OK"
 run_stage "Obstacle Z4 test" "tests/integration/obstacle_z4_test.gd"   "OBSTACLE_Z4_OK"
 run_stage "VBPM test"        "tests/integration/vbpm_test.gd"            "VBPM_OK"
-run_stage "Obstacle Z6 test" "tests/integration/obstacle_z6_test.gd"    "OBSTACLE_Z6_OK"
+run_stage "Obstacle Z6 test"  "tests/integration/obstacle_z6_test.gd"   "OBSTACLE_Z6_OK"
+run_stage "Build Mode test"  "tests/integration/buildmode_test.gd"       "BUILDMODE_OK"
 run_stage "Playtest"         "tests/integration/playtest.gd"             "PLAYTEST_OK"
 
 echo "==> All tests passed."
