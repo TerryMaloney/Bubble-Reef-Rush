@@ -91,8 +91,39 @@ Drop directory: `assets/art/characters/`
 | `sprite/obstacle/bubble_mine` | `assets/art/obstacles/bubble_mine.png` | 112×112 px PNG, round mine with spikes, 2 states (idle/warning) |
 | `sprite/collectible/pearl` | `assets/art/obstacles/pearl.png` | 40×40 px PNG, lustrous white/iridescent pearl |
 | `sprite/collectible/treasure_coin` | `assets/art/obstacles/treasure_coin.png` | 40×40 px PNG, gold coin with coral motif |
+| `sprite/obstacle/current_jet` | `assets/art/obstacles/current_jet.png` | 80×40 px PNG, water-jet nozzle, 4 frames (idle/telegraph/fire/cooldown) |
+| `sprite/obstacle/anchor_chain` | `assets/art/obstacles/anchor_chain.png` | 24×80 px PNG per link (6 links), rusted iron, 1 frame |
+| `sprite/obstacle/eel` | `assets/art/obstacles/eel.png` | 200×40 px PNG, green eel body, 2 states (coiled/striking) |
+| `sprite/obstacle/lava_burst` | `assets/art/obstacles/lava_burst.png` | 96×240 px PNG, magma pillar, 3 frames (dormant/telegraph/erupt) |
+| `sprite/obstacle/pressure_wave` | `assets/art/obstacles/pressure_wave.png` | 40×1920 px PNG, pulsing wall pair, 2 frames |
+| `sprite/obstacle/dark_void` | `assets/art/obstacles/dark_void_ring.png` | 240×240 px PNG, dark overlay with circular cutout for reduced-motion |
+| `sprite/obstacle/mirror_fish` | `assets/art/obstacles/mirror_fish.png` | 72×56 px PNG, silver reflective fish silhouette |
+| `sprite/obstacle/crystal_shard` | `assets/art/obstacles/crystal_shard.png` | 80×80 px PNG, octagonal crystal, 4 color variants (blue/purple/pink/teal) |
 
 Drop directory: `assets/art/obstacles/`
+
+---
+
+## Zone Backgrounds
+
+Each zone needs a background texture and optional shader + particle effect.
+
+| Key | Path | Spec |
+|-----|------|------|
+| `bg/zone_1` | `assets/art/backgrounds/bg_sunlit_shallows.png` | 1080×1920 px, bright turquoise gradient, sparse coral silhouettes |
+| `bg/zone_2` | `assets/art/backgrounds/bg_kelp_forest.png` | 1080×1920 px, dark green water, vertical kelp columns |
+| `bg/zone_3` | `assets/art/backgrounds/bg_shipwreck_alley.png` | 1080×1920 px, murky green-brown, sunken hull silhouettes |
+| `bg/zone_4` | `assets/art/backgrounds/bg_volcanic_vent.png` | 1080×1920 px, deep red-orange tones, volcanic rock silhouettes |
+| `bg/zone_5` | `assets/art/backgrounds/bg_twilight_trench.png` | 1080×1920 px, deep indigo gradient, bioluminescent speck overlay |
+| `bg/zone_6` | `assets/art/backgrounds/bg_crystal_caves.png` | 1080×1920 px, dark navy with geometric crystal formations |
+
+**Shaders** (`.gdshader` files drop into `assets/shaders/`):
+- `depth_distort.gdshader` — subtle warping UV shader for Zone 5 (simulates pressure distortion)
+- `prismatic_cycle.gdshader` — hue-cycling shader for Zone 6 crystal reflections
+
+**Particles** (CPUParticles2D `.tres` resource files drop into `assets/particles/`):
+- `deep_sea_motes.tres` — slow upward drift, small white dots (Zone 5 ambience)
+- `crystal_dust.tres` — spinning crystal sparkles, 4 colors (Zone 6 ambience)
 
 ---
 

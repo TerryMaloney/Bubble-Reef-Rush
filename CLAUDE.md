@@ -1,59 +1,164 @@
-# Bubble Reef Rush
+# Bubble Reef Rush — Developer Reference
 
-Underwater rhythm runner for kids (ages 6–12), inspired by Geometry Dash.
-Built in Godot 4 (GDScript). Android-first, also targets iOS.
+Underwater rhythm runner for kids (ages 6–12), Geometry Dash style.
+Godot 4.6 (GDScript, typed). Portrait 1080×1920. Android-first, iOS secondary.
 
-## Project Structure
+## Quick commands
 
-- `docs/design/` — Game Design Document, level schema, obstacle catalog
-- `docs/art/` — Art bible, asset manifest, placeholder specs
-- `docs/audio/` — Audio bible, AI music prompts, asset manifest
-- `docs/narrative/` — World bible, zone lore, all UI copy strings
-- `docs/compliance/` — COPPA, Google Play Families, Apple Kids checklists
-- `docs/business/` — Monetization spec, IAP catalog
-- `docs/store/` — Google Play and App Store listing copy
-- `docs/human/` — Step-by-step guide for everything a human must do
-- `docs/pm/` — Project state, agent team reference
-- `src/core/` — GameManager, PlayerController, ObstacleSpawner, ScoreSystem, SaveSystem
-- `src/rhythm/` — BeatConductor, TimingJudge, RhythmMap
-- `src/ui/` — All Godot UI scenes
-- `src/tools/level_editor/` — In-editor level builder plugin
-- `levels/` — Level JSON files (must conform to docs/design/level_schema.json)
-- `assets/art/` — Sprites, animations (populated by human/artist)
-- `assets/audio/music/` — Zone music tracks as OGG files
-- `assets/audio/sfx/` — Sound effects as OGG files
-- `export/` — Godot export presets
-- `ci/` — GitHub Actions workflows
+```bash
+# Run full test suite (21 stages, ~2 min)
+GODOT=/tmp/Godot_v4.6.3-stable_linux.x86_64 ./tools/run_tests.sh
 
-## Agent Team
+# Validate all 48 .brl level files (schema + movement budgets)
+python3 tools/validate_brl.py assets/levels/
+python3 tools/check_movements.py assets/levels/
 
-See `docs/pm/project_state.json` for current agent status.
-See `docs/pm/agent_team.md` for full role descriptions and handoff contracts.
+# Generate Zone click-track WAV stubs (used as audio fallbacks)
+python3 tools/gen_audio.py
+```
 
-## Key Docs
+## Project structure
 
-- GDD: `docs/design/GDD.md`
-- Level Schema: `docs/design/level_schema.json`
-- Art Bible: `docs/art/art_bible.md`
-- Audio Bible + AI Music Prompts: `docs/audio/audio_bible.md`
-- Human Setup Guide: `docs/human/setup_guide.md`
+```
+src/
+  core/           GameManager, SaveSystem, EventBus, GameConstants,
+                  AssetRegistry, VisualFactory, TransitionLayer,
+                  EconomyService, AchievementSystem, LevelLoader
+  rhythm/         BeatConductor, TimingJudge, RhythmMap, BeatVisualizer
+  gameplay/       LevelRoot, ObstacleSpawner, CollectibleSpawner,
+                  ScrollService, DifficultyDirector, PlayerController,
+                  JuiceDirector, FXFactory, FeverController,
+                  NearMissDetector, PracticeController, BackgroundController
+  gameplay/obstacles/   All 12 obstacle scripts
+  gameplay/collectibles/ Pearl, TreasureCoin
+  buildmode/      BuildSession, BrlSerializer, PlayabilityValidator,
+                  DifficultyTagger, ObstacleParamSchema,
+                  BuildModeRoot, TimelineView, PalettePanel,
+                  PropertiesPanel, PlaybackBar
+  ui/             PauseMenu, SettingsScreen, HUDController, AchievementToast
+  audio/          SFXManager
 
-## Tech Stack
+scenes/
+  gameplay/       LevelRoot, MainMenu, ZoneSelect, LevelSelect,
+                  ResultsScreen, SettingsScreen
+  buildmode/      BuildModeRoot.tscn
+  obstacles/      All 12 obstacle scenes
+  player/         Player.tscn
+  ui/             HUD.tscn, PauseMenu.tscn, AchievementToast.tscn
 
-- Engine: Godot 4.3 (GDScript, typed)
-- Platform: Android API 33+ (primary), iOS 16+ (secondary)
-- Audio sync: `AudioServer.get_time_since_last_mix()` + latency compensation
-- Level format: JSON (schema at `docs/design/level_schema.json`)
-- Architecture: Signal-based via EventBus autoload
+assets/
+  levels/         48 .brl files (z1-l1 … z6-l8)
+  data/           achievements.json
+  asset_manifest.json
 
-## Music Integration (Quick Reference)
+tests/
+  smoke/          run_smoke_tests.gd
+  integration/    21 headless test scripts
+tools/
+  run_tests.sh    21-stage headless suite runner
+  validate_brl.py JSON-schema validation for .brl files
+  check_movements.py  Movement budget + speed-zone readability checks
+  gen_audio.py    Procedural WAV click-track generator
+```
 
-Drop OGG files into `assets/audio/music/` with these exact names:
-- `zone_1_sunlit_shallows.ogg`
-- `zone_2_kelp_forest.ogg`
-- `zone_3_shipwreck_alley.ogg`
-- `zone_4_volcanic_vents.ogg`
-- `zone_5_twilight_trench.ogg`
-- `zone_6_crystal_caves.ogg`
+## Autoloads (project.godot order)
 
-See `docs/audio/audio_bible.md` for full spec and AI music generator prompts.
+| Name | Script | Purpose |
+|------|--------|---------|
+| `GameManager` | `src/core/GameManager.gd` | Scene state machine, level lifecycle |
+| `EventBus` | `src/core/EventBus.gd` | Cross-scene signals |
+| `SaveSystem` | `src/core/SaveSystem.gd` | Profile progress, v2 schema |
+| `BeatConductor` | `src/rhythm/BeatConductor.gd` | Fixed + variable BPM clock, beat/half-beat signals |
+| `Accessibility` | `src/core/Accessibility.gd` | Reduced motion, wide timing, text scale |
+| `GameConstants` | `src/core/GameConstants.gd` | Canvas 1080×1920, speeds, timing windows |
+| `AssetRegistry` | `src/core/AssetRegistry.gd` | Manifest-driven asset lookup with fallbacks |
+| `VisualFactory` | `src/core/VisualFactory.gd` | Texture-or-placeholder obstacle visuals |
+| `ScrollService` | `src/gameplay/ScrollService.gd` | Per-beat scroll speed table, distance_until_beat() |
+| `FXFactory` | `src/gameplay/FXFactory.gd` | Pooled CPUParticles2D one-shots |
+| `TransitionLayer` | `src/core/TransitionLayer.gd` | 0.25 s fade between scenes |
+| `SFXManager` | `src/audio/SFXManager.gd` | SFX playback routed through AssetRegistry |
+| `EconomyService` | `src/core/EconomyService.gd` | Coin grants, treasure coin persistence |
+| `AchievementSystem` | `src/core/AchievementSystem.gd` | Rule-engine over achievements.json |
+| `AchievementToast` | `src/ui/AchievementToast.gd` | Queued toast notifications |
+| `PlayerSkin` | `src/gameplay/PlayerSkin.gd` | Character + cosmetic equip state |
+
+## Test suite (21 stages)
+
+| Stage | Script | Marker |
+|-------|--------|--------|
+| 0 | `validate_brl.py` + `check_movements.py` | Python |
+| 1 | `tests/smoke/run_smoke_tests.gd` | `SMOKE_OK` |
+| 2 | `tests/integration/director_test.gd` | `DIRECTOR_OK` |
+| 3 | `tests/integration/collision_test.gd` | `COLLISION_OK` |
+| 4 | `tests/integration/obstacle_test.gd` | `OBSTACLE_OK` |
+| 5 | `tests/integration/geometry_test.gd` | `GEOMETRY_OK` |
+| 6 | `tests/integration/game_flow_test.gd` | `GAME_FLOW_OK` |
+| 7 | `tests/integration/save_test.gd` | `SAVE_OK` |
+| 8 | `tests/integration/settings_test.gd` | `SETTINGS_OK` |
+| 9 | `tests/integration/registry_test.gd` | `REGISTRY_OK` |
+| 10 | `tests/integration/speed_zone_test.gd` | `SPEED_ZONE_OK` |
+| 11 | `tests/integration/juice_test.gd` | `JUICE_OK` |
+| 12 | `tests/integration/checkpoint_test.gd` | `CHECKPOINT_OK` |
+| 13 | `tests/integration/economy_test.gd` | `ECONOMY_OK` |
+| 14 | `tests/integration/obstacle_z3_test.gd` | `OBSTACLE_Z3_OK` |
+| 15 | `tests/integration/obstacle_z4_test.gd` | `OBSTACLE_Z4_OK` |
+| 16 | `tests/integration/vbpm_test.gd` | `VBPM_OK` |
+| 17 | `tests/integration/obstacle_z6_test.gd` | `OBSTACLE_Z6_OK` |
+| 18 | `tests/integration/buildmode_test.gd` | `BUILDMODE_OK` |
+| 19 | `tests/integration/playtest.gd` | `PLAYTEST_OK` |
+
+## Level format (.brl)
+
+Schema: `docs/design/level_schema.json` (v1.1)
+
+Key fields:
+- `metadata.id`: official = `z1-l1` … `z6-l8`; player-created = UUID v4
+- `metadata.bpm_variable`: true only for Zone 5 levels; requires `bpm_changes` array
+- `beat_map[]`: each entry has `beat_index`, `lane_position`, `obstacle_type`, `parameters`
+- `speed_zones[]`: `{start_beat, end_beat, speed_multiplier}` — changes scroll speed, not beat clock
+
+Official levels: `assets/levels/z1-l1.brl` … `assets/levels/z6-l8.brl` (48 total)
+Player levels: `user://profiles/<id>/levels/<uuid>.brl`
+
+## Obstacle types (12 total)
+
+| Type | Zones | Notes |
+|------|-------|-------|
+| `coral_spike` | Z1–Z2 | Static wall attachment |
+| `jellyfish_drift` | Z1–Z3 | Sine-wave drift |
+| `kelp_curtain` | Z2–Z3 | Positional gate (gap_y_normalized) |
+| `bubble_mine` | Z2–Z4 | Proximity warning + explode |
+| `current_jet` | Z2–Z5 | Beat-phased IDLE→TELEGRAPH→FIRING→COOLDOWN |
+| `anchor_chain` | Z3 | Pendulum, 6 capsule segments |
+| `eel_snap` | Z3–Z5 | DORMANT→TELEGRAPH→STRIKE→RETRACT |
+| `lava_burst` | Z4, Z6 | DORMANT→TELEGRAPH→ERUPT |
+| `pressure_wall` | Z4–Z5 | Static DDA gate (no travel_speed) or moving PressureWave (travel_speed set) |
+| `dark_void` | Z5 | Screen overlay, beat-activated, no collision |
+| `crystal_shard` | Z6 | Own velocity vector, bounces off canvas edges |
+| `mirror_fish` | Z5–Z6 | Delays player y by N frames, approaches faster than scroll |
+
+## Zones + unlock chain
+
+| Zone | Name | BPM range | Unlock condition |
+|------|------|-----------|-----------------|
+| Z1 | Sunlit Shallows | 100 BPM | Always available |
+| Z2 | Kelp Forest Canyon | 120–130 BPM | Clear Z1-L4 |
+| Z3 | Shipwreck Alley | 130–145 BPM | Clear Z2-L4 |
+| Z4 | Volcanic Vent Fields | 145–165 BPM | Clear Z3-L4 |
+| Z5 | Twilight Trench | 80–165 BPM variable | Clear Z4-L4 |
+| Z6 | Crystal Caves | 170–180 BPM | 120 total stars (secret) |
+
+## Build Mode
+
+Entry: `GameManager.open_build_mode()` → `scenes/buildmode/BuildModeRoot.tscn`
+
+Key classes (all in `src/buildmode/`):
+- `BuildSession` — RefCounted data model; `dirty` + `played_through` flags
+- `BrlSerializer` — Atomic file write + JSON round-trip check; `played_through` gate
+- `PlayabilityValidator` — Movement budget + density cap + ±80 px overlap rule
+- `DifficultyTagger` — GDD §6.4 formula; override-down-only
+- `ObstacleParamSchema` — Per-type param definitions for the properties panel
+
+## Drop-in assets
+
+See `STUB_ASSETS.md` for every stub asset spec. Drop files at listed paths; zero code changes.
