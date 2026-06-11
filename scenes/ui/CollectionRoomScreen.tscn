@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://collection_room"]
+
+[ext_resource type="Script" path="res://src/ui/CollectionRoomScreen.gd" id="1"]
+
+[node name="CollectionRoomScreen" type="Node"]
+script = ExtResource("1")

@@ -1,6 +1,6 @@
 # Feature Status
 
-Last updated: 2026-06-11 (Phase 21 complete)
+Last updated: 2026-06-11 (Phase 22 complete)
 
 ## Phases 1–13 (Foundation) — ALL COMPLETE
 
@@ -32,7 +32,7 @@ Last updated: 2026-06-11 (Phase 21 complete)
 | 19 | Mutators (20 effects) | ✅ DONE | |
 | 20 | Rule Cards + Build Mode Unlock Progression | ✅ DONE | |
 | 21 | Special Levels: Character/Creator Trials + Boss Chase | ✅ DONE | 29-stage suite green |
-| 22 | Secret Exits + Collection Room | ⏳ | |
+| 22 | Secret Exits + Collection Room | ✅ DONE | 31-stage suite green; 65/65 BRL pass |
 | 23 | Daily Dive + Seeded Reef + Radio Shuffle | ⏳ | |
 | 24 | Co-Pilot Mode + Level Tennis | ⏳ | |
 | 25 | Reef Radio Architecture + Sticker Mode + Final Polish | ⏳ | |

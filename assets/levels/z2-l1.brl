@@ -3,7 +3,7 @@
   "metadata": {
     "id": "z2-l1",
     "name": "Pressure Zone",
-    "description": "Something new lurks in the kelp. Those glowing orbs aren't decorations — dodge them after threading each gate.",
+    "description": "Something new lurks in the kelp. Those glowing orbs aren't decorations \u2014 dodge them after threading each gate.",
     "zone": 2,
     "level_index": 1,
     "bpm": 120,
@@ -14,7 +14,10 @@
     "created_at": "2026-06-08T00:00:00Z",
     "is_official": true,
     "total_beats": 32,
-    "tags": ["bubble_mine", "intro"]
+    "tags": [
+      "bubble_mine",
+      "intro"
+    ]
   },
   "music": {
     "filename": "zone_2_kelp_forest.wav",
@@ -30,9 +33,9 @@
       "beat_index": 4,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.50,
+      "lane_position": 0.5,
       "parameters": {
-        "gap_y_normalized": 0.50,
+        "gap_y_normalized": 0.5,
         "intensity": 0.28,
         "section": "intro"
       }
@@ -41,10 +44,10 @@
       "beat_index": 6,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.50,
+      "lane_position": 0.5,
       "parameters": {
-        "gap_y_normalized": 0.50,
-        "intensity": 0.30,
+        "gap_y_normalized": 0.5,
+        "intensity": 0.3,
         "section": "intro"
       }
     },
@@ -83,9 +86,9 @@
       "beat_index": 12,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.40,
+      "lane_position": 0.4,
       "parameters": {
-        "gap_y_normalized": 0.40,
+        "gap_y_normalized": 0.4,
         "intensity": 0.38,
         "section": "build"
       }
@@ -94,9 +97,18 @@
       "beat_index": 13,
       "beat_subdivision": "quarter",
       "obstacle_type": "bubble_mine",
-      "lane_position": 0.40,
+      "lane_position": 0.4,
       "parameters": {
         "arm_radius": 160
+      }
+    },
+    {
+      "beat_index": 13,
+      "beat_subdivision": "quarter",
+      "obstacle_type": "secret_exit",
+      "lane_position": 0.2,
+      "parameters": {
+        "exit_id": "z2_sunken_chest"
       }
     },
     {
@@ -106,7 +118,7 @@
       "lane_position": 0.55,
       "parameters": {
         "gap_y_normalized": 0.55,
-        "intensity": 0.40,
+        "intensity": 0.4,
         "section": "build"
       }
     },
@@ -114,9 +126,9 @@
       "beat_index": 16,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.50,
+      "lane_position": 0.5,
       "parameters": {
-        "gap_y_normalized": 0.50,
+        "gap_y_normalized": 0.5,
         "intensity": 0.04,
         "section": "rest"
       }
@@ -145,9 +157,9 @@
       "beat_index": 20,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.60,
+      "lane_position": 0.6,
       "parameters": {
-        "gap_y_normalized": 0.60,
+        "gap_y_normalized": 0.6,
         "intensity": 0.45,
         "section": "build-2"
       }
@@ -170,7 +182,7 @@
       "lane_position": 0.55,
       "parameters": {
         "gap_y_normalized": 0.55,
-        "intensity": 0.50,
+        "intensity": 0.5,
         "section": "climax"
       }
     },
@@ -187,9 +199,9 @@
       "beat_index": 26,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.40,
+      "lane_position": 0.4,
       "parameters": {
-        "gap_y_normalized": 0.40,
+        "gap_y_normalized": 0.4,
         "intensity": 0.53,
         "section": "climax"
       }
@@ -198,9 +210,9 @@
       "beat_index": 28,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.60,
+      "lane_position": 0.6,
       "parameters": {
-        "gap_y_normalized": 0.60,
+        "gap_y_normalized": 0.6,
         "intensity": 0.56,
         "section": "finale"
       }
@@ -209,9 +221,9 @@
       "beat_index": 30,
       "beat_subdivision": "quarter",
       "obstacle_type": "pressure_wall",
-      "lane_position": 0.50,
+      "lane_position": 0.5,
       "parameters": {
-        "gap_y_normalized": 0.50,
+        "gap_y_normalized": 0.5,
         "intensity": 0.58,
         "section": "finale"
       }
@@ -222,7 +234,7 @@
       "beat_index": 5,
       "beat_subdivision": "quarter",
       "collectible_type": "pearl",
-      "lane_position": 0.50,
+      "lane_position": 0.5,
       "value": 10
     },
     {
@@ -243,7 +255,7 @@
       "beat_index": 21,
       "beat_subdivision": "quarter",
       "collectible_type": "pearl",
-      "lane_position": 0.60,
+      "lane_position": 0.6,
       "value": 10
     },
     {
@@ -257,14 +269,14 @@
       "beat_index": 27,
       "beat_subdivision": "quarter",
       "collectible_type": "pearl",
-      "lane_position": 0.40,
+      "lane_position": 0.4,
       "value": 15
     },
     {
       "beat_index": 31,
       "beat_subdivision": "quarter",
       "collectible_type": "pearl",
-      "lane_position": 0.50,
+      "lane_position": 0.5,
       "value": 20
     }
   ],

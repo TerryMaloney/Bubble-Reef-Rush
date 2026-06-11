@@ -580,6 +580,30 @@ func set_secret_exit_found(profile_id: String, level_id: String, exit_id: String
 	EventBus.secret_exit_found.emit(level_id, exit_id)
 
 
+# ── Boss Trophies ──────────────────────────────────────────────────────────────
+
+func get_boss_trophy(profile_id: String, boss_id: String) -> bool:
+	var data: Dictionary = load_progress(profile_id)
+	var coll: Dictionary = data.get("collection", {}) as Dictionary
+	var trophies: Array = coll.get("boss_trophies", []) as Array
+	return trophies.has(boss_id)
+
+
+func add_boss_trophy(profile_id: String, boss_id: String) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if not data.has("collection"):
+		data["collection"] = {"boss_trophies": [], "family_records": {}}
+	var coll: Dictionary = data["collection"] as Dictionary
+	if not coll.has("boss_trophies"):
+		coll["boss_trophies"] = []
+	var trophies: Array = coll["boss_trophies"] as Array
+	if not trophies.has(boss_id):
+		trophies.append(boss_id)
+		coll["boss_trophies"] = trophies
+		data["collection"] = coll
+		save_progress(profile_id, data)
+
+
 # ── Mutators ──────────────────────────────────────────────────────────────────
 
 func get_mutator_unlocked(profile_id: String, mutator_id: String) -> bool:

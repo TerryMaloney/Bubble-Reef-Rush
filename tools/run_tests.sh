@@ -69,5 +69,7 @@ run_stage "Mutator test"       "tests/integration/mutator_test.gd"         "MUTA
 run_stage "Rule card test"    "tests/integration/rule_card_test.gd"      "RULE_CARD_OK"
 run_stage "Build unlock test" "tests/integration/build_unlock_test.gd"   "BUILD_UNLOCK_OK"
 run_stage "Special level test" "tests/integration/special_level_test.gd" "SPECIAL_LEVEL_OK"
+run_stage "Secret exit test"   "tests/integration/secret_exit_test.gd"   "SECRET_EXIT_OK"
+run_stage "Collection room test" "tests/integration/collection_room_test.gd" "COLLECTION_ROOM_OK"
 
 echo "==> All tests passed."

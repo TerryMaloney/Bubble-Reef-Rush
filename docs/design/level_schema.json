@@ -286,7 +286,8 @@
               "pressure_wall",
               "dark_void",
               "crystal_shard",
-              "mirror_fish"
+              "mirror_fish",
+              "secret_exit"
             ]
           },
           "lane_position": {

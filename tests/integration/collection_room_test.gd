@@ -1,0 +1,127 @@
+## collection_room_test.gd — Phase 22 contracts for CollectionRoomScreen data sources.
+##
+## Tests:
+##   1. characters_count      — get_collection_data returns 8 character entries.
+##   2. boss_trophy_round_trip — add_boss_trophy / get_boss_trophy persists correctly.
+##   3. family_records_best   — get_collection_data family_records shows best across profiles.
+##   4. character_unlock_flag — unlocking a character is reflected in collection data.
+##
+## Run with:
+##   godot --headless --path . --script tests/integration/collection_room_test.gd
+extends SceneTree
+
+var _pass_count := 0
+var _fail_count := 0
+
+
+func _initialize() -> void:
+	var root := get_root()
+
+	_test_characters_count(root)
+	_test_boss_trophy_round_trip(root)
+	_test_family_records_best(root)
+	_test_character_unlock_flag(root)
+
+	print("Collection room tests: %d passed, %d failed" % [_pass_count, _fail_count])
+	if _fail_count == 0:
+		print("COLLECTION_ROOM_OK")
+	quit()
+
+
+func _ok(label: String) -> void:
+	print("  PASS: " + label)
+	_pass_count += 1
+
+
+func _fail(label: String, detail: String = "") -> void:
+	print("  FAIL: " + label + ("  -- " + detail if detail != "" else ""))
+	_fail_count += 1
+
+
+## 1. characters_count
+func _test_characters_count(root: Node) -> void:
+	var ss: Node = root.get_node("SaveSystem")
+	var pid: String = "cr_chars_%d" % Time.get_ticks_msec()
+	ss.ensure_profile(pid)
+
+	var screen = load("res://src/ui/CollectionRoomScreen.gd").new()
+	var data: Dictionary = screen.get_collection_data(pid)
+	var chars: Array = data.get("characters", []) as Array
+
+	if chars.size() == 8:
+		_ok("characters_count")
+	else:
+		_fail("characters_count", "expected 8 chars, got %d" % chars.size())
+
+
+## 2. boss_trophy_round_trip
+func _test_boss_trophy_round_trip(root: Node) -> void:
+	var ss: Node = root.get_node("SaveSystem")
+	var pid: String = "cr_boss_%d" % Time.get_ticks_msec()
+	ss.ensure_profile(pid)
+
+	if ss.get_boss_trophy(pid, "boss_z3"):
+		_fail("boss_trophy_round_trip", "should not have trophy before add")
+		return
+
+	ss.add_boss_trophy(pid, "boss_z3")
+
+	if ss.get_boss_trophy(pid, "boss_z3"):
+		_ok("boss_trophy_round_trip")
+	else:
+		_fail("boss_trophy_round_trip", "trophy not found after add_boss_trophy")
+
+
+## 3. family_records_best
+func _test_family_records_best(root: Node) -> void:
+	var ss: Node = root.get_node("SaveSystem")
+	var pid_a: String = "cr_rec_a_%d" % Time.get_ticks_msec()
+	var pid_b: String = "cr_rec_b_%d" % Time.get_ticks_msec()
+	ss.ensure_profile(pid_a)
+	ss.ensure_profile(pid_b)
+
+	ss.update_level_result(pid_a, "z1-l1", 400, 2)
+	ss.update_level_result(pid_b, "z1-l1", 700, 3)
+
+	var screen = load("res://src/ui/CollectionRoomScreen.gd").new()
+	# get_collection_data is per-profile for character/trophy tabs; family_records spans all.
+	var data: Dictionary = screen.get_collection_data(pid_a)
+	var records: Dictionary = data.get("family_records", {}) as Dictionary
+
+	if not records.has("z1-l1"):
+		_fail("family_records_best", "z1-l1 not in family_records")
+		return
+
+	var best_score: int = int((records["z1-l1"] as Dictionary).get("score", 0))
+	if best_score == 700:
+		_ok("family_records_best")
+	else:
+		_fail("family_records_best", "expected best_score=700, got %d" % best_score)
+
+
+## 4. character_unlock_flag
+func _test_character_unlock_flag(root: Node) -> void:
+	var ss: Node = root.get_node("SaveSystem")
+	var pid: String = "cr_unlock_%d" % Time.get_ticks_msec()
+	ss.ensure_profile(pid)
+
+	ss.set_character_unlocked(pid, "zap")
+
+	var screen = load("res://src/ui/CollectionRoomScreen.gd").new()
+	var data: Dictionary = screen.get_collection_data(pid)
+	var chars: Array = data.get("characters", []) as Array
+
+	var zap_entry: Dictionary = {}
+	for c: Variant in chars:
+		if str((c as Dictionary).get("id", "")) == "zap":
+			zap_entry = c as Dictionary
+			break
+
+	if zap_entry.is_empty():
+		_fail("character_unlock_flag", "zap not found in characters array")
+		return
+
+	if bool(zap_entry.get("unlocked", false)):
+		_ok("character_unlock_flag")
+	else:
+		_fail("character_unlock_flag", "zap unlocked flag expected true")
