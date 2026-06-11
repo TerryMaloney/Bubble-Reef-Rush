@@ -30,8 +30,13 @@ text = "Radio Shuffle"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 48
 
+[node name="DailyDiveButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 80)
+text = "Today's Daily Dive"
+theme_override_font_sizes/font_size = 28
+
 [node name="SubtitleLabel" type="Label" parent="Panel/VBox"]
-text = "Choose your vibe:"
+text = "Endless shuffle:"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 24
 modulate = Color(1, 1, 1, 0.7)

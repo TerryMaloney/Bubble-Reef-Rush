@@ -5,15 +5,23 @@ extends Control
 class_name RadioShuffleScreen
 
 const BOSS_LEVELS: Array[String] = ["boss_z3", "boss_z4", "boss_z5", "boss_z6"]
+const DAILY_DIVE_SCENE: String = "res://scenes/ui/DailyDiveScreen.tscn"
 
 
 func _ready() -> void:
+	$Panel/VBox/DailyDiveButton.pressed.connect(_on_daily_dive_pressed)
 	$Panel/VBox/RelaxedButton.pressed.connect(func() -> void: _start_mode("relaxed"))
 	$Panel/VBox/StandardButton.pressed.connect(func() -> void: _start_mode("standard"))
 	$Panel/VBox/WildButton.pressed.connect(func() -> void: _start_mode("wild"))
 	$Panel/VBox/BossRushButton.pressed.connect(func() -> void: _start_mode("boss_rush"))
 	$Panel/VBox/TreasureHuntButton.pressed.connect(func() -> void: _start_mode("treasure_hunt"))
 	$Panel/VBox/CloseButton.pressed.connect(func() -> void: queue_free())
+
+
+func _on_daily_dive_pressed() -> void:
+	var screen: Control = load(DAILY_DIVE_SCENE).instantiate() as Control
+	get_parent().add_child(screen)
+	queue_free()
 
 
 func _start_mode(mode: String) -> void:
