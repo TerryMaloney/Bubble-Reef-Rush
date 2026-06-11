@@ -6,7 +6,7 @@ Godot 4.6 (GDScript, typed). Portrait 1080×1920. Android-first, iOS secondary.
 ## Quick commands
 
 ```bash
-# Run full test suite (24 stages, ~2 min)
+# Run full test suite (25 stages, ~2 min)
 GODOT=/tmp/Godot_v4.6.3-stable_linux.x86_64 ./tools/run_tests.sh
 
 # Validate all 48 .brl level files (schema + movement budgets)
@@ -87,7 +87,7 @@ tools/
 | `MutatorSystem` | `src/core/MutatorSystem.gd` | Active mutators for current run; apply() at level load |
 | `GhostLibrary` | `src/core/GhostLibrary.gd` | Persists and retrieves ghost run data (personal_best, family_champion, imported) |
 
-## Test suite (24 stages)
+## Test suite (25 stages)
 
 | Stage | Script | Marker |
 |-------|--------|--------|
@@ -114,6 +114,7 @@ tools/
 | 20 | `tests/integration/save_v3_test.gd` | `SAVE_V3_OK` |
 | 21 | `tests/integration/resonance_test.gd` | `RESONANCE_OK` |
 | 22 | `tests/integration/ghost_test.gd` | `GHOST_OK` |
+| 23 | `tests/integration/capsule_test.gd` | `CAPSULE_OK` |
 
 ## Level format (.brl)
 
