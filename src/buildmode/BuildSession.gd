@@ -123,6 +123,57 @@ func beat_count() -> int:
 	return (_data.get("beat_map", []) as Array).size()
 
 
+# ── Level Tennis ──────────────────────────────────────────────────────────────
+
+## When true, beats owned by other profiles are read-only.
+var lock_previous_sections: bool = false
+
+var _sections: Array = []  # Array of {start_beat, end_beat, owner}
+
+
+func add_tennis_section(owner: String, start_beat: int, beats: int) -> void:
+	_sections.append({
+		"start_beat": start_beat,
+		"end_beat": start_beat + beats,
+		"owner": owner,
+	})
+	dirty = true
+	played_through = false
+
+
+## Returns the owner string for the section containing beat, or "" if none.
+func get_section_owner(beat: float) -> String:
+	for s: Variant in _sections:
+		var sd: Dictionary = s as Dictionary
+		if float(sd.get("start_beat", 0)) <= beat and beat < float(sd.get("end_beat", 0)):
+			return str(sd.get("owner", ""))
+	return ""
+
+
+## Returns true when lock_previous_sections is on and beat belongs to a different owner.
+func is_beat_locked_for(owner: String, beat: float) -> bool:
+	if not lock_previous_sections:
+		return false
+	var beat_owner: String = get_section_owner(beat)
+	if beat_owner.is_empty():
+		return false
+	return beat_owner != owner
+
+
+func get_tennis_sections() -> Array:
+	return _sections.duplicate()
+
+
+## Returns unique contributor profile IDs, in order of first appearance.
+func get_contributors() -> Array[String]:
+	var seen: Array[String] = []
+	for s: Variant in _sections:
+		var o: String = str((s as Dictionary).get("owner", ""))
+		if not o.is_empty() and not seen.has(o):
+			seen.append(o)
+	return seen
+
+
 ## Generate a UUID v4 for player-created level IDs.
 static func _generate_uuid() -> String:
 	var rng := RandomNumberGenerator.new()

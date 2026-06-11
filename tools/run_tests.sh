@@ -73,5 +73,7 @@ run_stage "Secret exit test"   "tests/integration/secret_exit_test.gd"   "SECRET
 run_stage "Collection room test" "tests/integration/collection_room_test.gd" "COLLECTION_ROOM_OK"
 run_stage "Seeded test"          "tests/integration/seeded_test.gd"           "SEEDED_OK"
 run_stage "Daily dive test"      "tests/integration/daily_dive_test.gd"       "DAILY_DIVE_OK"
+run_stage "Co-pilot test"        "tests/integration/copilot_test.gd"          "COPILOT_OK"
+run_stage "Level Tennis test"    "tests/integration/level_tennis_test.gd"     "LEVEL_TENNIS_OK"
 
 echo "==> All tests passed."

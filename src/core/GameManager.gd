@@ -38,6 +38,8 @@ var _settings_return_scene: String = MAIN_MENU_SCENE
 var is_practice_mode: bool = false
 ## Ghost type to show during a run: "" = none, "personal_best", "family_champion", "imported"
 var show_ghost: String = ""
+## Co-Pilot mode: profile ID of Player B; "" = disabled.
+var copilot_profile_b: String = ""
 
 
 func _ready() -> void:
