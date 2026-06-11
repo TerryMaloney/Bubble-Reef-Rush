@@ -86,8 +86,10 @@ tools/
 | `PlayerSkin` | `src/gameplay/PlayerSkin.gd` | Character + cosmetic equip state |
 | `MutatorSystem` | `src/core/MutatorSystem.gd` | Active mutators for current run; apply() at level load |
 | `GhostLibrary` | `src/core/GhostLibrary.gd` | Persists and retrieves ghost run data (personal_best, family_champion, imported) |
+| `RuleCardSystem` | `src/core/RuleCardSystem.gd` | Active rule cards for a run; evaluate_run() post-completion |
+| `BuildUnlockRegistry` | `src/buildmode/BuildUnlockRegistry.gd` | Maps level clears to Build Mode palette unlocks |
 
-## Test suite (27 stages)
+## Test suite (29 stages)
 
 | Stage | Script | Marker |
 |-------|--------|--------|
@@ -117,6 +119,8 @@ tools/
 | 23 | `tests/integration/capsule_test.gd` | `CAPSULE_OK` |
 | 24 | `tests/integration/pass_play_test.gd` | `PASS_PLAY_OK` |
 | 25 | `tests/integration/mutator_test.gd` | `MUTATOR_OK` |
+| 26 | `tests/integration/rule_card_test.gd` | `RULE_CARD_OK` |
+| 27 | `tests/integration/build_unlock_test.gd` | `BUILD_UNLOCK_OK` |
 
 ## Level format (.brl)
 

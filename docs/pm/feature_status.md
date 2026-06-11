@@ -30,7 +30,7 @@ Last updated: 2026-06-11 (Phase 16 complete)
 | 17 | Challenge Capsules (.brrc) | ✅ DONE | 25-stage suite green |
 | 18 | Pass & Play + Family Tournament | ✅ DONE | 26-stage suite green |
 | 19 | Mutators (20 effects) | ✅ DONE | 27-stage suite green |
-| 20 | Rule Cards + Build Mode Unlock Progression | ⏳ | |
+| 20 | Rule Cards + Build Mode Unlock Progression | ✅ DONE | 29-stage suite green |
 | 21 | Special Levels: Character/Creator Trials + Boss Chase | ⏳ | |
 | 22 | Secret Exits + Collection Room | ⏳ | |
 | 23 | Daily Dive + Seeded Reef + Radio Shuffle | ⏳ | |

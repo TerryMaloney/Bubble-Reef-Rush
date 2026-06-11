@@ -7,56 +7,55 @@
 - **Last-green tag**: `green-build-mode-v1` = commit `2407e15`
 - **Remote**: `https://github.com/TerryMaloney/Bubble-Reef-Rush.git`
 
-## Current Phase: 19 COMPLETE → Starting Phase 20
+## Current Phase: 20 COMPLETE → Starting Phase 21
 
-### Phase 19 deliverables (done):
+### Phase 20 deliverables (done):
 
-- `assets/data/mutators.json` — 20 mutators with `{id, name, description, effect_type, effect_params, unlock_condition}`
-- `src/core/MutatorSystem.gd` — full apply() implementing all 20 effects:
-  - tiny_pebble / giant_pebble: player.scale
-  - reverse_buoyancy: negate float_force + dive_force
-  - slippery_water: drag = 0.998
-  - double_pearls: CollectibleSpawner.pearl_value_multiplier = 2
-  - treasure_only: CollectibleSpawner.pearls_visible = false
-  - one_hit_shield: ResonanceController.grant_shield()
-  - no_powers: ResonanceController._mode = "disabled" (via Object.set)
-  - bubble_burst_only: ResonanceController.equipped_power = "bubble_burst"
-  - ghost_mode: player.modulate.a = 0.3
-  - mirror_controls: swap float_force / dive_force
-  - faster_scroll: scroll.speed_now *= 1.3
-  - gentle_gaps / sudden_darkness / fever_forever / one_attempt / random_character / invisible_hud / beat_rings_only / chaos_background: pass or delegate to child nodes
-- `tests/integration/mutator_test.gd` — 5 contracts, all PASS:
-  1. tiny_pebble_scales: player scale == (0.5, 0.5)
-  2. reverse_buoyancy_flips: float_force negated
-  3. reverse_buoyancy_flips: dive_force negated
-  4. no_powers_blocks_fire: fire() blocked when mode=disabled
-  5. faster_scroll_increases: speed_now x1.3
-- `tools/run_tests.sh` — stage 25 MUTATOR_OK added
-- 27-stage suite: all green
+- `assets/data/rule_cards.json` — 14 rule cards (no_miss, one_miss, collect_all_pearls, beat_my_score, treasure_hunt, no_powers, one_burst, shield_only, speed_run, tiny_challenge, upside_down, find_secret, family_run, high_tide)
+- `src/core/RuleCardSystem.gd` (autoload):
+  - `active_rules: Array[String]` — set before a run
+  - `set_active_rules(cards: Array) -> void`
+  - `evaluate_run(level_id, run_data) -> {passed: bool, results: Array}`
+  - Emits `EventBus.rule_card_result(card_id, passed)` per card
+  - Lazy-loads rule_cards.json on first evaluate_run call (res:// VFS not ready during _ready())
+- `src/buildmode/BuildUnlockRegistry.gd` (autoload):
+  - `check_unlocks(profile_id, level_id, stars) -> void`
+  - Zone-based unlock table: z2→current_jet, z3→anchor_chain+eel_snap, z4→lava_burst+pressure_wall, z5→dark_void+mirror_fish, z6→crystal_shard
+  - Called from AchievementSystem.evaluate_run() after every run
+- `src/buildmode/PalettePanel.gd` modified:
+  - `_available_types: Array[String]` — only unlocked obstacle types shown
+  - refresh_palette() filters by `SaveSystem.has_build_unlock(profile_id, "obstacles", otype)`
+  - `_on_btn_pressed()` uses `_available_types.find()` for indexing (not raw types_for_zone)
+- `src/core/AchievementSystem.gd` modified:
+  - `evaluate_run()` now calls `BuildUnlockRegistry.check_unlocks(profile_id, _level_id, _stars)` at end
+- `project.godot` modified: RuleCardSystem and BuildUnlockRegistry added as autoloads
+- `tests/integration/rule_card_test.gd` — 9 contracts, all PASS
+- `tests/integration/build_unlock_test.gd` — 5 contracts, all PASS
+- `tools/run_tests.sh` — stages 26+27 added (RULE_CARD_OK, BUILD_UNLOCK_OK)
+- 29-stage suite: all green
 
 ### Key implementation notes:
 
-- `_force_power_mode()` sets ResonanceController `_mode` via `rc.set("_mode", mode)` (Object.set bypasses GDScript private access)
-- Test mocks use inline GDScript (`GDScript.new()` + `source_code` + `reload()`) so properties are real GDScript variables (needed for `in` operator and direct dot access)
-- No `await` in signal-based tests — Godot signals fire synchronously
+- **Lazy loading**: RuleCardSystem._load_cards() called lazily on first evaluate_run(), not in _ready(). This is because FileAccess.open("res://...") fails silently during _ready() for late-position autoloads in headless mode. FileAccess.get_file_as_string() always fails in this context. Use FileAccess.open() pattern like AchievementSystem, plus lazy call from the first method that needs data.
+- **Test profile creation**: build_unlock tests require ss.ensure_profile(profile_id) before calling add_build_unlock, since SaveSystem won't create the profile directory automatically.
+- **Default build unlocks**: Save schema v3 already has default obstacles: ["coral_spike", "jellyfish_drift", "kelp_curtain", "bubble_mine"]. Only z3-z6 content needs to be earned via play.
 
-## Next Phase: 20 — Rule Cards + Build Mode Unlock Progression
+## Next Phase: 21 — Special Levels: Character Trials, Creator Trials, Boss Chase
 
 Files to create:
-- `assets/data/rule_cards.json` — 14 rule cards with `{id, name, check_type, check_params, description}`
-- `src/core/RuleCardSystem.gd` (autoload) — `set_active_rules(cards)`, `evaluate_run(level_id, run_data) → {passed, results}`
-- `src/buildmode/BuildUnlockRegistry.gd` — maps level completions → `SaveSystem.add_build_unlock(category, id)`
-- `tests/integration/rule_card_test.gd` — rule evaluation, pass/fail, capsule stores rules
-- `tests/integration/build_unlock_test.gd` — clearing level → palette entry appears
+- Level metadata extension: add `level_type` ("standard"|"boss_chase"|"character_trial"|"creator_trial"|"treasure_hunt"), `character_id`, `boss_id`, `trial_unlock_id` fields
+- `src/gameplay/SpecialLevelController.gd` — reads metadata.level_type at LevelRoot._ready, applies setup
+- `assets/levels/trials/ct_default.brl` through `ct_grumble.brl` — 8 character trial levels (Z1 difficulty)
+- `assets/levels/trials/crtr_jets.brl` through `crtr_boss.brl` — 5 creator trial levels
+- `assets/levels/bosses/boss_z3.brl` through `boss_z6.brl` — 4 boss chase levels
+- `src/gameplay/bosses/boss_z3.gd` through `boss_z6.gd` — boss pattern scripts
 
 Files to modify:
-- `src/core/SaveSystem.gd` — `add_build_unlock(category, id)` + `has_build_unlock(category, id)` methods
-- `src/core/AchievementSystem.gd` — hook to BuildUnlockRegistry on evaluate_run
-- `src/buildmode/PalettePanel.gd` — check `SaveSystem.has_build_unlock("obstacles", otype)` before showing
-- `project.godot` — add RuleCardSystem autoload
-- `CLAUDE.md` — add RuleCardSystem to autoloads table, update stage count
+- `tools/validate_brl.py` — accept new level_type values in schema check
+- `STUB_ASSETS.md` — boss sprite keys, trial completion banner sprites
+- `CLAUDE.md` — updated stage count + SpecialLevelController
 
-Rule card check_types: max_misses, collect_all_pearls, find_secret, one_bubble_burst, no_powers, shield_only, race_ghost, tiny_character, reverse_buoyancy, max_attempts, family_relay, treasure_hunt, beat_score
+Tests: `special_level_test.gd` — trial unlock logic, boss state machine phases, character trial → save flag
 
 ## Test Suite Status
 
@@ -69,8 +68,10 @@ Rule card check_types: max_misses, collect_all_pearls, find_secret, one_bubble_b
 | 23 | capsule_test.gd | PASS |
 | 24 | pass_play_test.gd | PASS |
 | 25 | mutator_test.gd | PASS |
+| 26 | rule_card_test.gd | PASS |
+| 27 | build_unlock_test.gd | PASS |
 
-27 stages, all green.
+29 stages, all green.
 
 ## Expansion Plan Summary
 
@@ -82,8 +83,8 @@ Rule card check_types: max_misses, collect_all_pearls, find_secret, one_bubble_b
 | 17 | Challenge Capsules (.brrc) | DONE |
 | 18 | Pass & Play + Family Tournament | DONE |
 | 19 | Mutators (20 effects) | DONE |
-| 20 | Rule Cards + Build Mode Unlock Progression | NEXT |
-| 21 | Special Levels: Trials + Boss Chase | pending |
+| 20 | Rule Cards + Build Mode Unlock Progression | DONE |
+| 21 | Special Levels: Trials + Boss Chase | NEXT |
 | 22 | Secret Exits + Collection Room | pending |
 | 23 | Daily Dive + Seeded Reef + Radio Shuffle | pending |
 | 24 | Co-Pilot Mode + Level Tennis | pending |

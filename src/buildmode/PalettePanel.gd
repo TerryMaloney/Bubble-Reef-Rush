@@ -14,6 +14,7 @@ var highest_cleared_zone: int = 1
 var selected_type: String = ""
 
 var _buttons: Array[Button] = []
+var _available_types: Array[String] = []
 
 
 func _ready() -> void:
@@ -21,15 +22,22 @@ func _ready() -> void:
 
 
 ## Rebuild palette buttons for the given cleared-zone level.
+## Only shows obstacle types that the active profile has unlocked in Build Mode.
 func refresh_palette(max_zone: int) -> void:
 	highest_cleared_zone = max_zone
 	for b: Button in _buttons:
 		b.queue_free()
 	_buttons.clear()
+	_available_types.clear()
 
-	var available: Array[String] = ObstacleParamSchema.types_for_zone(max_zone)
+	var all_types: Array[String] = ObstacleParamSchema.types_for_zone(max_zone)
+	var profile_id: String = SaveSystem.get_active_profile_id()
+	for otype: String in all_types:
+		if SaveSystem.has_build_unlock(profile_id, "obstacles", otype):
+			_available_types.append(otype)
+
 	var y: float = 10.0
-	for otype: String in available:
+	for otype: String in _available_types:
 		var btn: Button = Button.new()
 		btn.text = _label(otype)
 		btn.custom_minimum_size = Vector2(220.0, 60.0)
@@ -49,9 +57,7 @@ func _on_btn_pressed(otype: String) -> void:
 	selected_type = otype
 	for btn: Button in _buttons:
 		btn.modulate = Color(1, 1, 1)
-	# Re-highlight selected button.
-	var available: Array[String] = ObstacleParamSchema.types_for_zone(highest_cleared_zone)
-	var idx: int = available.find(otype)
+	var idx: int = _available_types.find(otype)
 	if idx >= 0 and idx < _buttons.size():
 		_buttons[idx].modulate = Color(1.0, 0.85, 0.2)
 	obstacle_type_selected.emit(otype)

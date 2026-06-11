@@ -29,6 +29,8 @@ AchievementToast="*res://src/ui/AchievementToast.gd"
 PlayerSkin="*res://src/gameplay/PlayerSkin.gd"
 MutatorSystem="*res://src/core/MutatorSystem.gd"
 GhostLibrary="*res://src/core/GhostLibrary.gd"
+RuleCardSystem="*res://src/core/RuleCardSystem.gd"
+BuildUnlockRegistry="*res://src/buildmode/BuildUnlockRegistry.gd"
 
 [display]
 

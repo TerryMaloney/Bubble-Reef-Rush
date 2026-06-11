@@ -65,6 +65,8 @@ run_stage "Resonance test"  "tests/integration/resonance_test.gd"       "RESONAN
 run_stage "Ghost test"      "tests/integration/ghost_test.gd"           "GHOST_OK"
 run_stage "Capsule test"    "tests/integration/capsule_test.gd"         "CAPSULE_OK"
 run_stage "Pass Play test"  "tests/integration/pass_play_test.gd"       "PASS_PLAY_OK"
-run_stage "Mutator test"   "tests/integration/mutator_test.gd"         "MUTATOR_OK"
+run_stage "Mutator test"       "tests/integration/mutator_test.gd"         "MUTATOR_OK"
+run_stage "Rule card test"    "tests/integration/rule_card_test.gd"      "RULE_CARD_OK"
+run_stage "Build unlock test" "tests/integration/build_unlock_test.gd"   "BUILD_UNLOCK_OK"
 
 echo "==> All tests passed."

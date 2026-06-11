@@ -60,6 +60,8 @@ func evaluate_run(profile_id: String, _level_id: String, _score: int, _stars: in
 			SaveSystem.set_character_unlocked(profile_id, char_id)
 			AchievementToast.show_achievement(str(char_dict.get("name", char_id)) + " Unlocked!", str(char_dict.get("desc", "")))
 
+	BuildUnlockRegistry.check_unlocks(profile_id, _level_id, _stars)
+
 
 ## Get all achievement definitions (for UI display).
 func get_all_achievements() -> Array:
