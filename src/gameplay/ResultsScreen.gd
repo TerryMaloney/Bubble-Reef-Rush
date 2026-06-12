@@ -43,7 +43,12 @@ func _best_score_text(current_score: int) -> String:
 
 func _setup_next_level_button() -> void:
 	var btn: Button = $Center/VBox/NextLevelButton
-	var next_id: String = _next_level_id(GameManager.current_level_id)
+	var current_id: String = GameManager.current_level_id
+	# User-created levels have no campaign "next level".
+	if current_id.begins_with("user://"):
+		btn.visible = false
+		return
+	var next_id: String = _next_level_id(current_id)
 	if next_id.is_empty():
 		btn.disabled = true
 		btn.text = "ZONE COMPLETE!"
@@ -66,7 +71,10 @@ func _next_level_id(level_id: String) -> String:
 	var level_num: int = level_num_str.to_int()
 	if level_num >= LEVELS_PER_ZONE:
 		return ""
-	return "%s-l%d" % [zone_part, level_num + 1]
+	var next_id: String = "%s-l%d" % [zone_part, level_num + 1]
+	if not FileAccess.file_exists("res://assets/levels/%s.brl" % next_id):
+		return ""
+	return next_id
 
 
 func _on_retry_pressed() -> void:

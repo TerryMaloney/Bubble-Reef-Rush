@@ -9,7 +9,7 @@ class_name ObstacleParamSchema
 extends RefCounted
 
 
-## Kid-friendly display names for each obstacle type.
+## Display names for each obstacle type shown in the Build Mode palette.
 static func display_name(obstacle_type: String) -> String:
 	match obstacle_type:
 		"coral_spike":     return "Spike"
@@ -88,7 +88,7 @@ static func _coral_spike() -> Array[Dictionary]:
 	return [
 		{"key": "wall_attachment", "label": "Attach To", "type": "enum",
 			"options": ["top", "bottom"], "default": "bottom"},
-		{"key": "height", "label": "How Tall", "type": "enum",
+		{"key": "height", "label": "Height", "type": "enum",
 			"options": [120, 180, 240], "default": 120},
 	]
 
@@ -97,7 +97,7 @@ static func _jellyfish_drift() -> Array[Dictionary]:
 	return [
 		{"key": "drift_speed", "label": "Speed", "type": "float",
 			"min": 50.0, "max": 300.0, "default": 120.0},
-		{"key": "oscillation_amplitude", "label": "How Far It Wiggles", "type": "float",
+		{"key": "oscillation_amplitude", "label": "Wiggle Range", "type": "float",
 			"min": 20.0, "max": 200.0, "default": 80.0},
 		{"key": "oscillation_period", "label": "Wiggle Speed", "type": "float",
 			"min": 1.0, "max": 8.0, "default": 2.0},
@@ -125,16 +125,16 @@ static func _bubble_mine() -> Array[Dictionary]:
 
 static func _current_jet() -> Array[Dictionary]:
 	return [
-		{"key": "origin_wall", "label": "Comes From", "type": "enum",
+		{"key": "origin_wall", "label": "Origin Side", "type": "enum",
 			"options": ["left", "right", "top", "bottom"], "default": "left"},
-		{"key": "cycle_beats", "label": "How Often", "type": "int",
+		{"key": "cycle_beats", "label": "Repeat Every", "type": "int",
 			"min": 1, "max": 8, "default": 2},
 	]
 
 
 static func _anchor_chain() -> Array[Dictionary]:
 	return [
-		{"key": "max_angle_degrees", "label": "How Far It Swings", "type": "float",
+		{"key": "max_angle_degrees", "label": "Swing Angle", "type": "float",
 			"min": 10.0, "max": 60.0, "default": 35.0},
 		{"key": "pendulum_frequency", "label": "Swing Speed", "type": "float",
 			"min": 0.2, "max": 1.0, "default": 0.5},
@@ -145,18 +145,18 @@ static func _anchor_chain() -> Array[Dictionary]:
 
 static func _eel_snap() -> Array[Dictionary]:
 	return [
-		{"key": "origin_wall", "label": "Comes From", "type": "enum",
+		{"key": "origin_wall", "label": "Origin Side", "type": "enum",
 			"options": ["left", "right"], "default": "left"},
-		{"key": "strike_length", "label": "How Far It Strikes", "type": "float",
+		{"key": "strike_length", "label": "Strike Length", "type": "float",
 			"min": 100.0, "max": 500.0, "default": 300.0},
-		{"key": "dormant_beats", "label": "How Long It Waits", "type": "int",
+		{"key": "dormant_beats", "label": "Wait Time", "type": "int",
 			"min": 1, "max": 16, "default": 4},
 	]
 
 
 static func _lava_burst() -> Array[Dictionary]:
 	return [
-		{"key": "cycle_beats", "label": "How Often", "type": "int",
+		{"key": "cycle_beats", "label": "Repeat Every", "type": "int",
 			"min": 2, "max": 8, "default": 4},
 	]
 
@@ -174,9 +174,9 @@ static func _pressure_wall() -> Array[Dictionary]:
 
 static func _dark_void() -> Array[Dictionary]:
 	return [
-		{"key": "duration_beats", "label": "How Long", "type": "int",
+		{"key": "duration_beats", "label": "Duration", "type": "int",
 			"min": 1, "max": 16, "default": 4},
-		{"key": "pulse_with_beat", "label": "Flashes to Music", "type": "bool",
+		{"key": "pulse_with_beat", "label": "Pulse with Beat", "type": "bool",
 			"default": true},
 	]
 
@@ -185,7 +185,7 @@ static func _crystal_shard() -> Array[Dictionary]:
 	return [
 		{"key": "lateral_speed", "label": "Speed", "type": "float",
 			"min": 200.0, "max": 900.0, "default": 400.0},
-		{"key": "entry_side", "label": "Comes From", "type": "enum",
+		{"key": "entry_side", "label": "Entry Side", "type": "enum",
 			"options": ["left", "right"], "default": "right"},
 		{"key": "diagonal_speed_initial", "label": "First Direction", "type": "enum",
 			"options": ["up", "down"], "default": "down"},
@@ -198,8 +198,8 @@ static func _crystal_shard() -> Array[Dictionary]:
 
 static func _mirror_fish() -> Array[Dictionary]:
 	return [
-		{"key": "delay_frames", "label": "How Long It Waits", "type": "int",
+		{"key": "delay_frames", "label": "Mirror Delay", "type": "int",
 			"min": 10, "max": 60, "default": 30},
-		{"key": "approach_speed_bonus", "label": "How Fast It Chases", "type": "float",
+		{"key": "approach_speed_bonus", "label": "Chase Speed", "type": "float",
 			"min": 0.0, "max": 300.0, "default": 100.0},
 	]

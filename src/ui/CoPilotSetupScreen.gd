@@ -31,7 +31,7 @@ func _populate_profile_buttons(profile_a: String) -> void:
 			continue
 		var btn: Button = Button.new()
 		btn.text = pid
-		btn.custom_minimum_size = Vector2(0, 64)
+		btn.custom_minimum_size = Vector2(0, 88)
 		btn.pressed.connect(func() -> void: _select_profile_b(pid))
 		_profile_container.add_child(btn)
 
