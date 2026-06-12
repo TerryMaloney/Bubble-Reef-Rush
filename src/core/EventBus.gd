@@ -68,3 +68,6 @@ signal secret_exit_found(level_id: String, exit_id: String)
 
 ## Deterministic replay (Phase 23)
 signal daily_dive_completed(date: String, score: int)
+
+## Hazard warnings (Batch C) — emitted by obstacles and mutators before they activate.
+signal hazard_warning(text: String)

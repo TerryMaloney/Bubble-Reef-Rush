@@ -37,6 +37,7 @@ func _ready() -> void:
 	BeatConductor.beat_fired.connect(_on_beat_fired)
 	EventBus.power_charged.connect(_on_power_charged)
 	EventBus.power_cooldown_started.connect(_on_power_cooldown_started)
+	EventBus.hazard_warning.connect(_on_hazard_warning)
 
 	if retry_button != null:
 		retry_button.pressed.connect(_on_retry_pressed)
@@ -226,7 +227,11 @@ func _update_combo_label() -> void:
 		combo_label.hide()
 
 
-func _flash_judgment(text: String, color: Color) -> void:
+func _on_hazard_warning(text: String) -> void:
+	_flash_judgment(text, Color(1.0, 0.65, 0.0), 2.0)
+
+
+func _flash_judgment(text: String, color: Color, duration: float = 0.4) -> void:
 	if judgment_label == null:
 		return
 	judgment_label.text = text
@@ -236,7 +241,7 @@ func _flash_judgment(text: String, color: Color) -> void:
 	if _judgment_tween != null:
 		_judgment_tween.kill()
 	_judgment_tween = create_tween()
-	_judgment_tween.tween_interval(0.4)
+	_judgment_tween.tween_interval(duration)
 	_judgment_tween.tween_callback(func() -> void: judgment_label.text = "")
 
 

@@ -90,5 +90,6 @@ run_stage "Theme test"                  "tests/integration/theme_test.gd"       
 run_stage "Profile manager scene test"  "tests/integration/profile_manager_scene_test.gd"  "PROFILE_MANAGER_SCENE_OK"
 run_stage "Zone select scene test"      "tests/integration/zone_select_scene_test.gd"      "ZONE_SELECT_SCENE_OK"
 run_stage "Pass play setup scene test"  "tests/integration/pass_play_setup_scene_test.gd"  "PASS_PLAY_SETUP_SCENE_OK"
+run_stage "Hazard warning test"         "tests/integration/hazard_warning_test.gd"          "HAZARD_WARNING_OK"
 
 echo "==> All tests passed."

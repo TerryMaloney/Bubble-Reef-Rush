@@ -37,6 +37,9 @@ func _on_run_started(level_id: String) -> void:
 		if z_str.is_valid_int():
 			zone = int(z_str)
 	_base_color = ZONE_COLORS.get(zone, ZONE_COLORS[1])
+	if MutatorSystem.is_active("sudden_darkness"):
+		_base_color = _base_color.darkened(0.65)
+		EventBus.hazard_warning.emit("DARKNESS FALLS")
 	if _background != null:
 		_background.color = _base_color
 

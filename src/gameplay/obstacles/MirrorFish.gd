@@ -3,6 +3,7 @@ extends Area2D
 class_name MirrorFish
 
 const MAX_HISTORY: int = 60
+const SPEED_TUNING: float = 0.8
 
 var _delay_frames: int = 30
 var _approach_speed_bonus: float = 100.0
@@ -18,12 +19,13 @@ func _ready() -> void:
 		_player_ref = players[0] as Node2D
 	for _i: int in range(MAX_HISTORY):
 		_y_history.append(960.0)
+	EventBus.hazard_warning.emit("SHADOW APPROACHING")
 
 
 func setup(entry: Dictionary) -> void:
 	var p: Dictionary = entry.get("parameters", {}) as Dictionary
 	_delay_frames = int(p.get("delay_frames", 30))
-	_approach_speed_bonus = float(p.get("approach_speed_bonus", 100))
+	_approach_speed_bonus = float(p.get("approach_speed_bonus", 100)) * SPEED_TUNING
 
 
 func _process(delta: float) -> void:

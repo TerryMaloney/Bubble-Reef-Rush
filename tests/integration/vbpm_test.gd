@@ -275,7 +275,7 @@ func _test_mirror_fish_speed() -> void:
 		"parameters": {"delay_frames": 30, "approach_speed_bonus": 100}})
 
 	var scroll_speed: float = 408.0  # ScrollService.speed_now() when inactive (default)
-	var expected_speed: float = scroll_speed + 100.0
+	var expected_speed: float = scroll_speed + 100.0 * 0.8  # SPEED_TUNING=0.8 applied in setup()
 
 	var x_before: float = fish.position.x
 	fish._process(1.0)
