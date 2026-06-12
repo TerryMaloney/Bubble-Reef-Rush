@@ -13,8 +13,8 @@ var selected_type: String = ""
 var _buttons: Array[Button] = []
 var _available_types: Array[String] = []
 
-const CARD_SIZE: Vector2 = Vector2(130.0, 130.0)
-const CARD_FONT_SIZE: int = 20
+const CARD_SIZE: Vector2 = Vector2(150.0, 150.0)
+const CARD_FONT_SIZE: int = 24
 
 const TYPE_COLORS: Dictionary = {
 	"pressure_wall":   Color(0.18, 0.52, 0.88),
@@ -112,4 +112,9 @@ func _on_btn_pressed(otype: String) -> void:
 
 
 static func _label(otype: String) -> String:
-	return otype.replace("_", "\n").capitalize()
+	var name: String = ObstacleParamSchema.display_name(otype)
+	# Split into two lines at the first space so the card text fits nicely.
+	var space_idx: int = name.find(" ")
+	if space_idx > 0:
+		return name.substr(0, space_idx) + "\n" + name.substr(space_idx + 1)
+	return name

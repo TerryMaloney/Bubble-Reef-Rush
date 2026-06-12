@@ -65,7 +65,7 @@ func _ready() -> void:
 	_timeline.delete_requested.connect(_on_delete_obstacle)
 
 	for i: int in range(1, 7):
-		_zone_opt.add_item("Zone %d" % i, i)
+		_zone_opt.add_item("World %d" % i, i)
 
 	EventBus.run_completed.connect(_on_run_completed)
 
@@ -191,31 +191,30 @@ func _on_save_pressed() -> void:
 	if _session == null:
 		return
 	if not _session.played_through:
-		_validate_label.text = "Test-play the level before saving."
+		_validate_label.text = "Try your level first!"
 		_validate_label.modulate = Color(1.0, 0.6, 0.1)
 		return
 	if not _validation_errors.is_empty():
-		_validate_label.text = "Fix %d error(s) before saving." % _validation_errors.size()
+		_validate_label.text = "Fix the problems first!"
 		_validate_label.modulate = Color(1.0, 0.2, 0.2)
 		return
 	var err: String = BrlSerializer.save(_session, _profile_id)
 	if err.is_empty():
 		EventBus.buildmode_level_saved.emit(BrlSerializer.level_path(str(_session.get_metadata("id")), _profile_id))
-		_validate_label.text = "Saved!"
+		_validate_label.text = "Level Saved!"
 		_validate_label.modulate = Color(0.3, 1.0, 0.3)
 
-		# RhythmMap round-trip: load saved file back through RhythmMap for full validation.
+		# RhythmMap round-trip: verify saved file loads correctly.
 		var level_id: String = str(_session.get_metadata("id"))
 		var saved_path: String = "user://profiles/%s/levels/%s.brl" % [_profile_id, level_id]
 		var rm: RhythmMap = RhythmMap.new()
 		add_child(rm)
 		rm.map_loaded.connect(func(_id: String) -> void:
 			rm.queue_free()
-			_validate_label.text += " ✓ Round-trip OK"
 		)
 		rm.map_load_failed.connect(func(reason: String) -> void:
 			rm.queue_free()
-			_validate_label.text = "Save OK but round-trip failed: " + reason
+			_validate_label.text = "Oops! Could not save: " + reason
 			_validate_label.modulate = Color(1.0, 0.5, 0.1)
 		)
 		rm.load_level(saved_path)
@@ -228,7 +227,7 @@ func _on_run_completed(_level_id: String, _score: int, _stars: int) -> void:
 	if _awaiting_playtest:
 		_awaiting_playtest = false
 		_session.mark_played_through()
-		_validate_label.text = "Played through — ready to save."
+		_validate_label.text = "Great job! Ready to save!"
 		_validate_label.modulate = Color(0.5, 1.0, 0.5)
 
 
@@ -299,10 +298,10 @@ func _validate_and_tag() -> void:
 		return
 	_validation_errors = PlayabilityValidator.validate(_session.get_data())
 	if _validation_errors.is_empty():
-		_validate_label.text = "Valid"
+		_validate_label.text = "Looks Good!"
 		_validate_label.modulate = Color(0.5, 1.0, 0.5)
 	else:
-		_validate_label.text = "%d error(s)" % _validation_errors.size()
+		_validate_label.text = "%d Problem(s)" % _validation_errors.size()
 		_validate_label.modulate = Color(1.0, 0.3, 0.3)
 
 	var tag: String = DifficultyTagger.compute_tag(_session.get_data())

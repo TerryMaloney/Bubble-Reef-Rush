@@ -47,7 +47,7 @@ min_value = 60.0
 max_value = 220.0
 step = 0.5
 value = 120.0
-prefix = "BPM "
+prefix = "Speed "
 theme_override_font_sizes/font_size = 24
 
 [node name="ZoneOpt" type="OptionButton" parent="TopBar/HBox"]
@@ -81,7 +81,7 @@ theme_override_font_sizes/font_size = 22
 
 [node name="SaveBtn" type="Button" parent="TopBar/HBox"]
 custom_minimum_size = Vector2(140, 86)
-text = "💾 SAVE"
+text = "💾 Save Level"
 theme_override_font_sizes/font_size = 26
 
 [node name="MainArea" type="HBoxContainer" parent="."]
@@ -104,7 +104,7 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 12
 
 [node name="SectionLabel" type="Label" parent="MainArea/PalettePanel/VBox"]
-text = "OBSTACLES"
+text = "Choose an Obstacle"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 22
 
@@ -129,7 +129,7 @@ offset_left = 8.0
 offset_top = 4.0
 offset_right = 900.0
 offset_bottom = 44.0
-text = "Select an obstacle"
+text = "Tap an obstacle\nto change it"
 theme_override_font_sizes/font_size = 24
 
 [node name="DeleteBtn" type="Button" parent="BottomPanel/PropertiesPanel"]
@@ -137,7 +137,7 @@ offset_left = 910.0
 offset_top = 4.0
 offset_right = 1072.0
 offset_bottom = 44.0
-text = "🗑 DELETE"
+text = "🗑 Remove"
 modulate = Color(1, 0.4, 0.4, 1)
 theme_override_font_sizes/font_size = 22
 
@@ -167,7 +167,7 @@ theme_override_constants/separation = 12
 
 [node name="PlayBtn" type="Button" parent="BottomPanel/PlaybackBar/HBox"]
 custom_minimum_size = Vector2(180, 96)
-text = "▶ TEST PLAY"
+text = "▶ Try It!"
 theme_override_font_sizes/font_size = 28
 
 [node name="StopBtn" type="Button" parent="BottomPanel/PlaybackBar/HBox"]
@@ -182,7 +182,7 @@ theme_override_font_sizes/font_size = 24
 
 [node name="BeatLabel" type="Label" parent="BottomPanel/PlaybackBar/HBox"]
 custom_minimum_size = Vector2(80, 96)
-text = "Beat:"
+text = "Start:"
 vertical_alignment = 1
 theme_override_font_sizes/font_size = 24
 

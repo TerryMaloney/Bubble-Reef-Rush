@@ -9,6 +9,24 @@ class_name ObstacleParamSchema
 extends RefCounted
 
 
+## Kid-friendly display names for each obstacle type.
+static func display_name(obstacle_type: String) -> String:
+	match obstacle_type:
+		"coral_spike":     return "Spike"
+		"jellyfish_drift": return "Jellyfish"
+		"kelp_curtain":    return "Seaweed Wall"
+		"bubble_mine":     return "Mine"
+		"current_jet":     return "Water Jet"
+		"anchor_chain":    return "Anchor"
+		"eel_snap":        return "Eel"
+		"lava_burst":      return "Lava"
+		"pressure_wall":   return "Wall"
+		"dark_void":       return "Darkness"
+		"crystal_shard":   return "Crystal"
+		"mirror_fish":     return "Shadow Fish"
+	return obstacle_type.replace("_", " ").capitalize()
+
+
 ## Returns the list of editable parameter definitions for the given obstacle type.
 ## Returns an empty array for unknown types.
 static func params_for(obstacle_type: String) -> Array[Dictionary]:
@@ -68,110 +86,110 @@ static func types_for_zone(highest_cleared_zone: int) -> Array[String]:
 
 static func _coral_spike() -> Array[Dictionary]:
 	return [
-		{"key": "wall_attachment", "label": "Wall", "type": "enum",
+		{"key": "wall_attachment", "label": "Attach To", "type": "enum",
 			"options": ["top", "bottom"], "default": "bottom"},
-		{"key": "height", "label": "Height (px)", "type": "enum",
+		{"key": "height", "label": "How Tall", "type": "enum",
 			"options": [120, 180, 240], "default": 120},
 	]
 
 
 static func _jellyfish_drift() -> Array[Dictionary]:
 	return [
-		{"key": "drift_speed", "label": "Drift Speed (px/s)", "type": "float",
+		{"key": "drift_speed", "label": "Speed", "type": "float",
 			"min": 50.0, "max": 300.0, "default": 120.0},
-		{"key": "oscillation_amplitude", "label": "Oscillation Amp (px)", "type": "float",
+		{"key": "oscillation_amplitude", "label": "How Far It Wiggles", "type": "float",
 			"min": 20.0, "max": 200.0, "default": 80.0},
-		{"key": "oscillation_period", "label": "Oscillation Period (beats)", "type": "float",
+		{"key": "oscillation_period", "label": "Wiggle Speed", "type": "float",
 			"min": 1.0, "max": 8.0, "default": 2.0},
 	]
 
 
 static func _kelp_curtain() -> Array[Dictionary]:
 	return [
-		{"key": "gap_y_normalized", "label": "Gap Centre Y (0–1)", "type": "float",
+		{"key": "gap_y_normalized", "label": "Gap Position", "type": "float",
 			"min": 0.1, "max": 0.9, "default": 0.5},
-		{"key": "gap_height", "label": "Gap Height (px)", "type": "float",
+		{"key": "gap_height", "label": "Gap Size", "type": "float",
 			"min": 120.0, "max": 400.0, "default": 240.0},
-		{"key": "sway_enabled", "label": "Sway", "type": "bool", "default": true},
+		{"key": "sway_enabled", "label": "Sways?", "type": "bool", "default": true},
 	]
 
 
 static func _bubble_mine() -> Array[Dictionary]:
 	return [
-		{"key": "drift_speed", "label": "Drift Speed (px/s)", "type": "float",
+		{"key": "drift_speed", "label": "Speed", "type": "float",
 			"min": 20.0, "max": 200.0, "default": 60.0},
-		{"key": "explosion_radius", "label": "Explosion Radius (px)", "type": "float",
+		{"key": "explosion_radius", "label": "Blast Size", "type": "float",
 			"min": 40.0, "max": 120.0, "default": 80.0},
 	]
 
 
 static func _current_jet() -> Array[Dictionary]:
 	return [
-		{"key": "origin_wall", "label": "Origin Wall", "type": "enum",
+		{"key": "origin_wall", "label": "Comes From", "type": "enum",
 			"options": ["left", "right", "top", "bottom"], "default": "left"},
-		{"key": "cycle_beats", "label": "Cycle (beats)", "type": "int",
+		{"key": "cycle_beats", "label": "How Often", "type": "int",
 			"min": 1, "max": 8, "default": 2},
 	]
 
 
 static func _anchor_chain() -> Array[Dictionary]:
 	return [
-		{"key": "max_angle_degrees", "label": "Max Angle (°)", "type": "float",
+		{"key": "max_angle_degrees", "label": "How Far It Swings", "type": "float",
 			"min": 10.0, "max": 60.0, "default": 35.0},
-		{"key": "pendulum_frequency", "label": "Frequency (Hz)", "type": "float",
+		{"key": "pendulum_frequency", "label": "Swing Speed", "type": "float",
 			"min": 0.2, "max": 1.0, "default": 0.5},
-		{"key": "chain_length", "label": "Chain Length (px)", "type": "float",
+		{"key": "chain_length", "label": "Chain Length", "type": "float",
 			"min": 200.0, "max": 800.0, "default": 500.0},
 	]
 
 
 static func _eel_snap() -> Array[Dictionary]:
 	return [
-		{"key": "origin_wall", "label": "Origin Wall", "type": "enum",
+		{"key": "origin_wall", "label": "Comes From", "type": "enum",
 			"options": ["left", "right"], "default": "left"},
-		{"key": "strike_length", "label": "Strike Length (px)", "type": "float",
+		{"key": "strike_length", "label": "How Far It Strikes", "type": "float",
 			"min": 100.0, "max": 500.0, "default": 300.0},
-		{"key": "dormant_beats", "label": "Dormant Beats", "type": "int",
+		{"key": "dormant_beats", "label": "How Long It Waits", "type": "int",
 			"min": 1, "max": 16, "default": 4},
 	]
 
 
 static func _lava_burst() -> Array[Dictionary]:
 	return [
-		{"key": "cycle_beats", "label": "Cycle (beats)", "type": "int",
+		{"key": "cycle_beats", "label": "How Often", "type": "int",
 			"min": 2, "max": 8, "default": 4},
 	]
 
 
 static func _pressure_wall() -> Array[Dictionary]:
 	return [
-		{"key": "intensity", "label": "Gap Intensity (0–1)", "type": "float",
+		{"key": "intensity", "label": "Gap Size", "type": "float",
 			"min": 0.0, "max": 1.0, "default": 0.5},
-		{"key": "gap_y_normalized", "label": "Gap Centre Y (0–1)", "type": "float",
+		{"key": "gap_y_normalized", "label": "Gap Position", "type": "float",
 			"min": 0.1, "max": 0.9, "default": 0.5},
-		{"key": "travel_speed", "label": "Travel Speed (0=static)", "type": "float",
+		{"key": "travel_speed", "label": "Moving Speed", "type": "float",
 			"min": 0.0, "max": 600.0, "default": 0.0},
 	]
 
 
 static func _dark_void() -> Array[Dictionary]:
 	return [
-		{"key": "duration_beats", "label": "Duration (beats)", "type": "int",
+		{"key": "duration_beats", "label": "How Long", "type": "int",
 			"min": 1, "max": 16, "default": 4},
-		{"key": "pulse_with_beat", "label": "Pulse With Beat", "type": "bool",
+		{"key": "pulse_with_beat", "label": "Flashes to Music", "type": "bool",
 			"default": true},
 	]
 
 
 static func _crystal_shard() -> Array[Dictionary]:
 	return [
-		{"key": "lateral_speed", "label": "Speed (px/s)", "type": "float",
+		{"key": "lateral_speed", "label": "Speed", "type": "float",
 			"min": 200.0, "max": 900.0, "default": 400.0},
-		{"key": "entry_side", "label": "Entry Side", "type": "enum",
+		{"key": "entry_side", "label": "Comes From", "type": "enum",
 			"options": ["left", "right"], "default": "right"},
-		{"key": "diagonal_speed_initial", "label": "Initial Diagonal", "type": "enum",
+		{"key": "diagonal_speed_initial", "label": "First Direction", "type": "enum",
 			"options": ["up", "down"], "default": "down"},
-		{"key": "rotation_direction", "label": "Rotation", "type": "enum",
+		{"key": "rotation_direction", "label": "Spins", "type": "enum",
 			"options": ["clockwise", "counter_clockwise"], "default": "clockwise"},
 		{"key": "color_variant", "label": "Color", "type": "enum",
 			"options": ["blue", "purple", "pink", "teal"], "default": "blue"},
@@ -180,8 +198,8 @@ static func _crystal_shard() -> Array[Dictionary]:
 
 static func _mirror_fish() -> Array[Dictionary]:
 	return [
-		{"key": "delay_frames", "label": "Mirror Delay (frames)", "type": "int",
+		{"key": "delay_frames", "label": "How Long It Waits", "type": "int",
 			"min": 10, "max": 60, "default": 30},
-		{"key": "approach_speed_bonus", "label": "Speed Bonus (px/s)", "type": "float",
+		{"key": "approach_speed_bonus", "label": "How Fast It Chases", "type": "float",
 			"min": 0.0, "max": 300.0, "default": 100.0},
 	]
