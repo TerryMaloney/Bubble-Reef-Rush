@@ -34,7 +34,7 @@ func _populate_ui() -> void:
 	]
 
 	for i: int in range(_today_levels.size()):
-		labels[i].text = _today_levels[i]
+		labels[i].text = _get_level_display_name(_today_levels[i])
 		var best: int = int((level_results.get(_today_levels[i], {}) as Dictionary).get("best_score", 0))
 		score_labels[i].text = "Best: %d" % best if best > 0 else ""
 
@@ -44,6 +44,19 @@ func _on_start_pressed() -> void:
 		return
 	GameManager.start_playlist(_today_levels, "daily_dive")
 	queue_free()
+
+
+func _get_level_display_name(level_id: String) -> String:
+	var parts: Array = level_id.split("-")
+	if parts.size() != 2:
+		return level_id
+	var zone_key: String = str(parts[0])
+	var level_num: String = str(parts[1]).lstrip("l")
+	for zone: Variant in ZoneSelect.ZONES:
+		var z: Dictionary = zone as Dictionary
+		if str(z.get("id", "")) == zone_key:
+			return "%s — Lv.%s" % [str(z.get("name", zone_key)), level_num]
+	return level_id
 
 
 func get_today_levels() -> Array[String]:
