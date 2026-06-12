@@ -63,6 +63,10 @@ var playlist_context: String = ""
 
 ## BuildMode: session stashed before test-play, restored in BuildModeRoot._ready().
 var pending_build_session = null  # BuildSession ref — untyped to avoid forward dep
+## Temp BRL path written before test-play; deleted after the run completes/fails.
+var pending_build_test_path: String = ""
+## Physics overrides set by PhysicsTuner (debug builds only). Empty = use defaults.
+var physics_overrides: Dictionary = {}
 
 
 func _ready() -> void:

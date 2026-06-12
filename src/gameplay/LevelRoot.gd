@@ -91,6 +91,25 @@ func _ready() -> void:
 		add_child(_copilot)
 		_copilot.setup(GameManager.copilot_profile_b, _resonance)
 
+	# Pause button — touch-friendly pause trigger.
+	if $HUD.has_node("PauseButton"):
+		($HUD/PauseButton as Button).pressed.connect(func() -> void: EventBus.pause_requested.emit())
+
+	# Test-play banner.
+	if $HUD.has_node("TestBanner") and GameManager.pending_build_session != null:
+		var banner: Label = $HUD/TestBanner as Label
+		var sd: Dictionary = (GameManager.pending_build_session as Node).call("get_data") as Dictionary
+		var meta: Dictionary = sd.get("metadata", {}) as Dictionary
+		var beat_count: int = (sd.get("beat_map", []) as Array).size()
+		banner.text = "TESTING: %s  |  Objects: %d" % [str(meta.get("name", "My Level")), beat_count]
+		banner.show()
+
+	# Physics tuner overlay — debug builds only.
+	if OS.is_debug_build():
+		var tuner_scene: PackedScene = load("res://scenes/debug/PhysicsTuner.tscn")
+		if tuner_scene != null:
+			add_child(tuner_scene.instantiate())
+
 	_level_loader.level_ended.connect(_on_level_ended)
 	_level_loader.load_level(GameManager.current_level_id)
 

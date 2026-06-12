@@ -47,3 +47,14 @@ text = "RESTART"
 layout_mode = 2
 custom_minimum_size = Vector2(0, 80)
 text = "QUIT TO ZONES"
+
+[node name="MainMenuButton" type="Button" parent="Panel/VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 80)
+text = "MAIN MENU"
+
+[node name="ReturnToEditorButton" type="Button" parent="Panel/VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 80)
+text = "RETURN TO EDITOR"
+visible = false

@@ -30,7 +30,7 @@ func _on_pass_play() -> void:
 func _on_ghost_challenge() -> void:
 	# Launch level select with ghost mode set to "family_champion".
 	GameManager.show_ghost = "family_champion"
-	GameManager.go_to_level_select("zone_1")
+	GameManager.go_to_level_select("z1")
 	queue_free()
 
 

@@ -3,16 +3,15 @@ extends CharacterBody2D
 
 class_name PlayerController
 
-@export var float_force: float = 480.0
+@export var float_force: float = 1050.0
 @export var dive_force: float = 1220.0
-@export var max_float_speed: float = 480.0
+@export var max_float_speed: float = 560.0
 @export var max_dive_speed: float = 720.0
-# drag = 1 - (float_force/fps) / terminal_float_speed = 1 - (480/60)/480 = 0.983
 @export var drag: float = 0.983
 
-## On tap, velocity is SET (not added) to this value — guarantees immediate
-## direction reversal with identical feel every time (Flappy Bird-style).
-@export var dive_impulse: float = 480.0
+## On tap, velocity is SET (not added) — guarantees identical feel every time.
+## Tuned for ~50–70px dip with 0.25–0.35s recovery after release.
+@export var dive_impulse: float = 290.0
 
 # Fixed logical canvas height — matches project.godot viewport_height. Gameplay
 # coordinates are always in the 1080×1920 space; never query the viewport for
@@ -45,7 +44,8 @@ func _input(event: InputEvent) -> void:
 	# which would double-judge every input and double-apply the impulse.
 	if event.is_action_pressed("swim_dive") and not diving:
 		diving = true
-		velocity.y = dive_impulse
+		var ov: Dictionary = GameManager.physics_overrides
+		velocity.y = float(ov.get("dive_impulse", dive_impulse))
 		timing_judge.judge_input(BeatConductor.get_current_beat_time_ms())
 		if _ghost_recorder != null:
 			_ghost_recorder.record_event(BeatConductor.get_current_beat_position(), "dive_start")
@@ -59,15 +59,23 @@ func _physics_process(delta: float) -> void:
 	if not alive:
 		return
 
+	# Allow live physics tuner to override values (debug builds only).
+	var ov: Dictionary = GameManager.physics_overrides
+	var _float_force: float = float(ov.get("float_force", float_force))
+	var _dive_force: float = float(ov.get("dive_force", dive_force))
+	var _max_float: float = float(ov.get("max_float_speed", max_float_speed))
+	var _max_dive: float = float(ov.get("max_dive_speed", max_dive_speed))
+	var _impulse: float = float(ov.get("dive_impulse", dive_impulse))
+
 	# Buoyancy — always float upward.
-	velocity.y -= float_force * delta
+	velocity.y -= _float_force * delta
 
 	# Dive — pull downward while input is held.
 	if diving:
-		velocity.y += dive_force * delta
+		velocity.y += _dive_force * delta
 
 	# Clamp to terminal velocities (upward speed is negative Y in Godot).
-	velocity.y = clamp(velocity.y, -max_float_speed, max_dive_speed)
+	velocity.y = clamp(velocity.y, -_max_float, _max_dive)
 
 	# Light water drag applied every frame.
 	velocity *= drag
