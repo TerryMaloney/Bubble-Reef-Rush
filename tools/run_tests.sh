@@ -84,5 +84,7 @@ run_stage "Co-pilot test"        "tests/integration/copilot_test.gd"          "C
 run_stage "Level Tennis test"    "tests/integration/level_tennis_test.gd"     "LEVEL_TENNIS_OK"
 run_stage "Reef Radio test"      "tests/integration/reef_radio_test.gd"       "REEF_RADIO_OK"
 run_stage "Settings scene test" "tests/integration/settings_scene_test.gd"  "SETTINGS_SCENE_OK"
+run_stage "Collection room scene test" "tests/integration/collection_room_scene_test.gd" "COLLECTION_ROOM_SCENE_OK"
+run_stage "Challenge import scene test" "tests/integration/challenge_import_scene_test.gd" "CHALLENGE_IMPORT_SCENE_OK"
 
 echo "==> All tests passed."

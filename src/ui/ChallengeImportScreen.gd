@@ -14,9 +14,11 @@ class_name ChallengeImportScreen
 @onready var _close_btn: Button = $Panel/VBox/CloseButton
 
 var _pending_data: Dictionary = {}
+var _serializer: CapsuleSerializer
 
 
 func _ready() -> void:
+	_serializer = CapsuleSerializer.new()
 	_paste_btn.pressed.connect(_on_paste_pressed)
 	_import_btn.pressed.connect(_on_import_pressed)
 	_close_btn.pressed.connect(_on_close_pressed)
@@ -31,14 +33,19 @@ func _on_paste_pressed() -> void:
 func _on_import_pressed() -> void:
 	if _pending_data.is_empty():
 		return
-	var raw: String = _paste_edit.text.strip_edges()
-	var path: String = CapsuleSerializer.save_capsule(raw)
-	if path.is_empty():
+	var level_ref: String = str(_pending_data.get("level_ref", "imported_%d" % Time.get_ticks_msec()))
+	var profile: String = SaveSystem.get_active_profile_id()
+	var dir: String = "user://profiles/%s/capsules" % profile
+	DirAccess.make_dir_recursive_absolute(dir)
+	var path: String = "%s/%s.brrc" % [dir, level_ref]
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
 		_status_label.text = "Failed to save capsule."
 		return
-	var level_id: String = str(_pending_data.get("level_id", ""))
+	file.store_string(JSON.stringify(_pending_data))
+	file.close()
 	_status_label.text = "Capsule imported!"
-	EventBus.capsule_imported.emit(level_id)
+	EventBus.capsule_imported.emit(level_ref)
 	await get_tree().create_timer(1.0).timeout
 	queue_free()
 
@@ -54,13 +61,13 @@ func _validate_pasted() -> void:
 		_import_btn.disabled = true
 		_pending_data = {}
 		return
-	var data: Dictionary = CapsuleSerializer.unpack(raw)
+	var data: Dictionary = _serializer.unpack(raw)
 	if data.is_empty():
 		_status_label.text = "Invalid capsule: could not decode."
 		_import_btn.disabled = true
 		_pending_data = {}
 		return
-	var issues: Array[String] = CapsuleSerializer.validate(data)
+	var issues: Array[String] = _serializer.validate(data)
 	var hard_errors: Array[String] = issues.filter(func(s: String) -> bool: return not s.begins_with("WARN:"))
 	if not hard_errors.is_empty():
 		_status_label.text = "Invalid capsule: " + hard_errors[0]
@@ -70,9 +77,9 @@ func _validate_pasted() -> void:
 	# Soft warnings shown but not blocking.
 	var warnings: Array[String] = issues.filter(func(s: String) -> bool: return s.begins_with("WARN:"))
 	var creator: String = str(data.get("creator_nick", "Unknown"))
-	var level_id: String = str(data.get("level_id", "?"))
+	var level_ref: String = str(data.get("level_ref", "?"))
 	var score: int = int(data.get("target", {}).get("score", 0))
-	_preview_label.text = "From: %s   Level: %s   Target: %d pts" % [creator, level_id, score]
+	_preview_label.text = "From: %s   Level: %s   Target: %d pts" % [creator, level_ref, score]
 	if warnings.is_empty():
 		_status_label.text = "Capsule looks good!"
 	else:

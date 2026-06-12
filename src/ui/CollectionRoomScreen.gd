@@ -40,7 +40,7 @@ func _populate_ui() -> void:
 			lbl.modulate = Color(0.3, 0.3, 0.3)
 		char_grid.add_child(lbl)
 
-	var trophy_grid: GridContainer = $TabContainer/Boss\ Trophies/TrophyGrid
+	var trophy_grid: GridContainer = get_node("TabContainer/Boss Trophies/TrophyGrid") as GridContainer
 	for t: Dictionary in (data.get("boss_trophies", []) as Array):
 		var bid: String = str(t.get("boss_id", ""))
 		var defeated: bool = bool(t.get("defeated", false))
