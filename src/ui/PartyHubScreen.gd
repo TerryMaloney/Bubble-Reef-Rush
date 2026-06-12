@@ -36,21 +36,24 @@ func get_mode(mode_id: String) -> Dictionary:
 
 
 func _on_pass_and_play() -> void:
-	var screen: Control = load(PASS_PLAY_SETUP_SCENE).instantiate() as Control
-	get_parent().add_child(screen)
-	queue_free()
+	_open_child_screen(PASS_PLAY_SETUP_SCENE)
 
 
 func _on_family_tournament() -> void:
-	var screen: Control = load(PASS_PLAY_SETUP_SCENE).instantiate() as Control
-	get_parent().add_child(screen)
-	queue_free()
+	_open_child_screen(PASS_PLAY_SETUP_SCENE)
 
 
 func _on_copilot() -> void:
-	var screen: Control = load(COPILOT_SETUP_SCENE).instantiate() as Control
+	_open_child_screen(COPILOT_SETUP_SCENE)
+
+
+## Opens a sub-screen and hides this hub; closing the sub-screen (queue_free /
+## Back) re-shows the hub so Back never lands on a bare MainMenu.
+func _open_child_screen(scene_path: String) -> void:
+	var screen: Control = (load(scene_path) as PackedScene).instantiate() as Control
 	get_parent().add_child(screen)
-	queue_free()
+	hide()
+	screen.tree_exited.connect(show)
 
 
 func _on_ghost_challenge() -> void:

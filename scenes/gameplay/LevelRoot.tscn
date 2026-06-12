@@ -89,6 +89,34 @@ offset_bottom = 40.0
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="GhostIntroLabel" type="Label" parent="HUD"]
+anchor_left = 0.5
+anchor_top = 0.35
+anchor_right = 0.5
+anchor_bottom = 0.35
+offset_left = -350.0
+offset_top = -60.0
+offset_right = 350.0
+offset_bottom = 60.0
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 40
+modulate = Color(0.6, 0.9, 1.0, 1)
+visible = false
+
+[node name="GhostDeltaLabel" type="Label" parent="HUD"]
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 0.0
+offset_left = -180.0
+offset_top = 90.0
+offset_right = 180.0
+offset_bottom = 140.0
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 32
+visible = false
+
 [node name="ProgressBar" type="ProgressBar" parent="HUD"]
 anchor_right = 1.0
 offset_top = 1860.0

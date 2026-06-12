@@ -29,7 +29,8 @@ func _build_zone_list() -> void:
 	for zone: Variant in ZONES:
 		var z: Dictionary = zone as Dictionary
 		var btn: Button = Button.new()
-		btn.custom_minimum_size = Vector2(0, 100)
+		btn.custom_minimum_size = Vector2(0, 200)
+		btn.add_theme_font_size_override("font_size", 36)
 		var locked: bool = not _is_unlocked(z, total_stars)
 
 		if locked:
@@ -39,7 +40,7 @@ func _build_zone_list() -> void:
 				else:
 					btn.text = "???"
 			elif z.has("requires"):
-				btn.text = "[LOCKED] %s  (complete %s)" % [
+				btn.text = "[LOCKED] %s\nComplete %s" % [
 					z["name"] as String,
 					(z["requires"] as String).to_upper()
 				]
@@ -47,7 +48,7 @@ func _build_zone_list() -> void:
 				btn.text = "[LOCKED] %s" % (z["name"] as String)
 			btn.disabled = true
 		else:
-			btn.text = "%s   %s" % [z["name"] as String, z.get("bpm", "") as String]
+			btn.text = "%s\n%s" % [z["name"] as String, z.get("bpm", "") as String]
 			var zone_id: String = z["id"] as String
 			btn.pressed.connect(func() -> void: GameManager.go_to_level_select(zone_id))
 

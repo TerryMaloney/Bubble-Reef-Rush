@@ -12,6 +12,8 @@ class_name HUDController
 @export var drop_cp_button: Button
 @export var resonance_bar: ProgressBar
 @export var power_button: Button
+@export var ghost_intro_label: Label
+@export var ghost_delta_label: Label
 
 var score: int = 0
 
@@ -70,6 +72,8 @@ func _on_run_started(level_id: String) -> void:
 		retry_button.hide()
 	if progress_bar != null:
 		progress_bar.value = 0.0
+	if ghost_delta_label != null:
+		ghost_delta_label.visible = false
 	# Show total attempts for this level so far (this run will be recorded on fail/complete).
 	if attempt_label != null:
 		var profile: String = SaveSystem.get_active_profile_id()
@@ -80,6 +84,48 @@ func _on_run_started(level_id: String) -> void:
 func _on_run_progress(_level_id: String, pct: float) -> void:
 	if progress_bar != null:
 		progress_bar.value = pct
+	if ghost_delta_label != null and GhostLibrary.last_ghost_score >= 0:
+		var delta: int = score - _ghost_pace(GhostLibrary.last_ghost_score, pct)
+		ghost_delta_label.text = format_ghost_delta(score, GhostLibrary.last_ghost_score, pct)
+		ghost_delta_label.modulate = Color(0.3, 1.0, 0.5) if delta >= 0 else Color(1.0, 0.45, 0.45)
+		ghost_delta_label.visible = true
+
+
+## Ghost score scaled to current progress — the pace the player must beat.
+static func _ghost_pace(ghost_score: int, pct: float) -> int:
+	return int(ghost_score * clampf(pct, 0.0, 100.0) / 100.0)
+
+
+## Pure helper so headless tests can verify the delta formatting.
+static func format_ghost_delta(current_score: int, ghost_score: int, pct: float) -> String:
+	var delta: int = current_score - _ghost_pace(ghost_score, pct)
+	return "+%d" % delta if delta >= 0 else "%d" % delta
+
+
+## Shows "Racing: <ghost name> — <score>" for a few seconds at run start.
+func show_ghost_intro(ghost_type: String, ghost_score: int) -> void:
+	if ghost_intro_label == null:
+		return
+	var score_text: String = "" if ghost_score < 0 else " — %d" % ghost_score
+	ghost_intro_label.text = "Racing: %s%s" % [_ghost_display_name(ghost_type), score_text]
+	ghost_intro_label.visible = true
+	ghost_intro_label.modulate.a = 1.0
+	var tween: Tween = create_tween()
+	tween.tween_interval(2.5)
+	tween.tween_property(ghost_intro_label, "modulate:a", 0.0, 0.5)
+	tween.tween_callback(func() -> void: ghost_intro_label.visible = false)
+
+
+static func _ghost_display_name(ghost_type: String) -> String:
+	match ghost_type:
+		"personal_best":
+			return "Personal Best"
+		"family_champion":
+			return "Family Champion"
+		"imported":
+			return "Imported Challenge"
+		_:
+			return ghost_type.capitalize()
 
 
 func _on_run_failed_hud(_level_id: String, _score: int) -> void:

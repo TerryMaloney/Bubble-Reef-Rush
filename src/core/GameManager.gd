@@ -95,6 +95,9 @@ func retry_level() -> void:
 func go_to_menu() -> void:
 	current_state = State.MENU
 	_clear_session_state()
+	# Cleared here (not in _clear_session_state) so PartyHub's
+	# show_ghost → go_to_zone_select() flow survives navigation.
+	show_ghost = ""
 	TransitionLayer.go_to(MAIN_MENU_SCENE)
 
 

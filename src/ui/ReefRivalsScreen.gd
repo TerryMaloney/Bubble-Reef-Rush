@@ -21,10 +21,7 @@ func _ready() -> void:
 
 
 func _on_pass_play() -> void:
-	var scene: PackedScene = load(PASS_PLAY_SETUP_SCENE)
-	var screen: Control = scene.instantiate() as Control
-	get_parent().add_child(screen)
-	queue_free()
+	_open_child_screen(PASS_PLAY_SETUP_SCENE)
 
 
 func _on_ghost_challenge() -> void:
@@ -35,6 +32,13 @@ func _on_ghost_challenge() -> void:
 
 
 func _on_import() -> void:
-	var scene: PackedScene = load(IMPORT_SCENE)
-	var screen: Control = scene.instantiate() as Control
+	_open_child_screen(IMPORT_SCENE)
+
+
+## Opens a sub-screen and hides this hub; closing the sub-screen (queue_free /
+## Back) re-shows the hub so Back never lands on a bare MainMenu.
+func _open_child_screen(scene_path: String) -> void:
+	var screen: Control = (load(scene_path) as PackedScene).instantiate() as Control
 	get_parent().add_child(screen)
+	hide()
+	screen.tree_exited.connect(show)

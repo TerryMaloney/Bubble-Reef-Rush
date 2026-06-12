@@ -15,7 +15,9 @@ var _pass_count := 0
 var _fail_count := 0
 
 
-func _initialize() -> void:
+func _init() -> void:
+	# Wait one frame so autoload _ready() has run (TransitionLayer overlay).
+	await process_frame
 	var root := get_root()
 
 	_test_recorder_records_events(root)
@@ -23,6 +25,8 @@ func _initialize() -> void:
 	_test_ghost_data_roundtrip(root)
 	_test_ghost_library_save_load(root)
 	_test_ghost_signal_emitted(root)
+	_test_ghost_delta_format()
+	_test_show_ghost_cleared_on_menu(root)
 
 	print("Ghost tests: %d passed, %d failed" % [_pass_count, _fail_count])
 	if _fail_count == 0:
@@ -145,3 +149,32 @@ func _test_ghost_signal_emitted(root: Node) -> void:
 		_ok("ghost_signal_emitted")
 	else:
 		_fail("ghost_signal_emitted", "ghost_saved signal was not received")
+
+
+## 6. ghost_delta_format — pure pace/delta formatting used by the HUD label.
+## Loaded at runtime (not via class_name) so autoload deps resolve in --script mode.
+func _test_ghost_delta_format() -> void:
+	var hud: GDScript = load("res://src/ui/HUDController.gd") as GDScript
+	# On pace exactly: ghost 2000 at 50% → pace 1000; score 1000 → "+0".
+	var cases: Array = [
+		[1000, 2000, 50.0, "+0"],
+		[1500, 2000, 50.0, "+500"],
+		[400, 2000, 50.0, "-600"],
+	]
+	for c: Array in cases:
+		var got: String = str(hud.format_ghost_delta(int(c[0]), int(c[1]), float(c[2])))
+		if got != str(c[3]):
+			_fail("ghost_delta_format", "expected '%s', got '%s'" % [c[3], got])
+			return
+	_ok("ghost_delta_format")
+
+
+## 7. show_ghost_cleared_on_menu — returning to the menu stops ghost spawning.
+func _test_show_ghost_cleared_on_menu(root: Node) -> void:
+	var gm: Node = root.get_node("GameManager")
+	gm.show_ghost = "family_champion"
+	gm.go_to_menu()
+	if str(gm.show_ghost) != "":
+		_fail("show_ghost_cleared_on_menu", "show_ghost still '%s' after go_to_menu" % gm.show_ghost)
+		return
+	_ok("show_ghost_cleared_on_menu")

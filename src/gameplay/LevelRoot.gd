@@ -33,6 +33,8 @@ func _ready() -> void:
 	_hud_controller.attempt_label = $HUD/AttemptLabel
 	_hud_controller.resonance_bar = $HUD/ResonanceChargeBar if $HUD.has_node("ResonanceChargeBar") else null
 	_hud_controller.power_button = $HUD/PowerButton if $HUD.has_node("PowerButton") else null
+	_hud_controller.ghost_intro_label = $HUD/GhostIntroLabel if $HUD.has_node("GhostIntroLabel") else null
+	_hud_controller.ghost_delta_label = $HUD/GhostDeltaLabel if $HUD.has_node("GhostDeltaLabel") else null
 
 	var retry_btn: Button = $HUD/RetryButton
 	_hud_controller.retry_button = retry_btn
@@ -189,6 +191,7 @@ func _maybe_spawn_ghost_player(_player: PlayerController) -> void:
 	add_child(gp)
 	gp.setup(ghost_data)
 	EventBus.run_started.connect(func(_id: String) -> void: gp.play())
+	_hud_controller.show_ghost_intro(ghost_type, GhostLibrary.last_ghost_score)
 
 
 # ── Co-Pilot ─────────────────────────────────────────────────────────────────
