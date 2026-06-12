@@ -47,6 +47,7 @@ func _ready() -> void:
 	_timeline.obstacle_placed.connect(_on_obstacle_placed)
 	_timeline.obstacle_selected.connect(_on_obstacle_selected)
 	_timeline.obstacle_deselected.connect(_on_obstacle_deselected)
+	_timeline.obstacle_moved.connect(_on_obstacle_moved)
 	if _props != null:
 		_props.property_changed.connect(_on_property_changed)
 	if _playback != null:
@@ -152,6 +153,22 @@ func _on_obstacle_selected(index: int) -> void:
 func _on_obstacle_deselected() -> void:
 	if _props != null:
 		_props.clear()
+
+
+func _on_obstacle_moved(index: int, new_beat: float, new_lane: float) -> void:
+	if _session == null:
+		return
+	var beat_map: Array = (_session.get_data().get("beat_map", []) as Array)
+	if index < 0 or index >= beat_map.size():
+		return
+	_push_undo_snapshot()
+	var entry: Dictionary = (beat_map[index] as Dictionary).duplicate(true)
+	entry["beat_index"] = new_beat
+	entry["lane_position"] = new_lane
+	_session.update_beat_entry(index, entry)
+	_timeline.selected_index = index
+	_timeline.refresh()
+	_validate_and_tag()
 
 
 func _on_property_changed(beat_map_index: int, key: String, value: Variant) -> void:
