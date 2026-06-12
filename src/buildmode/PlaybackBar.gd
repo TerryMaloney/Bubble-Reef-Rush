@@ -40,16 +40,31 @@ func _ready() -> void:
 
 
 func _on_play_pressed() -> void:
-	if level_id.is_empty():
-		return
-	# Stash session + set flag so BuildModeRoot can restore state after test-play.
 	var bmr: Node = get_tree().get_first_node_in_group("build_mode_root")
-	if bmr != null and bmr.has_method("get_session"):
-		GameManager.pending_build_session = bmr.call("get_session")
-		bmr.call("set_awaiting_playtest", true)
-	# Mark as practice so SaveSystem writes are suppressed.
+	if bmr == null or not bmr.has_method("get_session"):
+		return
+	var session: BuildSession = bmr.call("get_session") as BuildSession
+	if session == null:
+		return
+
+	GameManager.pending_build_session = session
+	bmr.call("set_awaiting_playtest", true)
 	GameManager.is_practice_mode = true
-	EventBus.level_load_requested.emit(level_id)
+
+	# Write session to disk so RhythmMap can load it by full user:// path.
+	var profile: String = SaveSystem.get_active_profile_id()
+	var session_id: String = str(session.get_metadata("id", "test_level"))
+	var temp_path: String = "user://profiles/%s/levels/%s_test.brl" % [profile, session_id]
+	DirAccess.make_dir_recursive_absolute(temp_path.get_base_dir())
+	var f := FileAccess.open(temp_path, FileAccess.WRITE)
+	if f == null:
+		push_warning("PlaybackBar: cannot write temp BRL at %s" % temp_path)
+		return
+	f.store_string(JSON.stringify(session.get_data()))
+	f.close()
+	GameManager.pending_build_test_path = temp_path
+
+	EventBus.level_load_requested.emit(temp_path)
 
 
 func _on_stop_pressed() -> void:
@@ -74,10 +89,8 @@ func _on_beat_spin_changed(value: float) -> void:
 
 
 func _on_run_completed(_level_id: String, _score: int, _stars: int) -> void:
-	# Return to Build Mode after test-play completion.
-	GameManager.open_build_mode()
+	pass  # GameManager._on_run_completed handles return to editor for build test-plays.
 
 
 func _on_run_failed(_reason: String, _score: int) -> void:
-	# Return to Build Mode on death during test-play.
-	GameManager.open_build_mode()
+	pass  # GameManager._on_run_failed handles return to editor for build test-plays.

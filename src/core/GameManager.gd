@@ -174,7 +174,20 @@ func _on_run_progress(_level_id: String, pct: float) -> void:
 	_last_progress_pct = pct
 
 
+func _cleanup_build_test() -> void:
+	if not pending_build_test_path.is_empty():
+		DirAccess.remove_absolute(pending_build_test_path)
+		pending_build_test_path = ""
+	is_practice_mode = false
+
+
 func _on_run_failed(level_id: String, _score: int) -> void:
+	# Build test-play: auto-return to editor on death.
+	if pending_build_session != null:
+		_cleanup_build_test()
+		open_build_mode()
+		return
+
 	if is_practice_mode:
 		return  # PracticeController handles respawn; no death/progress tracking
 
@@ -208,6 +221,13 @@ func _on_run_completed(level_id: String, score: int, stars: int) -> void:
 	consecutive_deaths = 0
 	_active_profile = SaveSystem.get_active_profile_id()
 	SaveSystem.record_attempt(_active_profile, level_id)
+
+	# Build test-play: mark session played_through and return to editor.
+	if pending_build_session != null:
+		pending_build_session.call("mark_played_through")
+		_cleanup_build_test()
+		open_build_mode()
+		return
 
 	# Pass & Play: route the score to the session, then advance turn.
 	if active_pass_play_session != null and active_pass_play_session.is_active():

@@ -20,83 +20,132 @@ color = Color(0.04, 0.04, 0.1, 1)
 offset_left = 0.0
 offset_top = 0.0
 offset_right = 1080.0
-offset_bottom = 100.0
+offset_bottom = 110.0
 
 [node name="HBox" type="HBoxContainer" parent="TopBar"]
 offset_left = 8.0
 offset_top = 8.0
 offset_right = 1072.0
-offset_bottom = 92.0
+offset_bottom = 102.0
 theme_override_constants/separation = 8
 
+[node name="BackBtn" type="Button" parent="TopBar/HBox"]
+custom_minimum_size = Vector2(130, 86)
+text = "← BACK"
+theme_override_font_sizes/font_size = 22
+
 [node name="NameEdit" type="LineEdit" parent="TopBar/HBox"]
-custom_minimum_size = Vector2(280, 60)
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 86)
 placeholder_text = "Level name…"
 text = "My Level"
+theme_override_font_sizes/font_size = 26
 
 [node name="BpmSpin" type="SpinBox" parent="TopBar/HBox"]
-custom_minimum_size = Vector2(120, 60)
+custom_minimum_size = Vector2(140, 86)
 min_value = 60.0
 max_value = 220.0
 step = 0.5
 value = 120.0
 prefix = "BPM "
+theme_override_font_sizes/font_size = 24
 
 [node name="ZoneOpt" type="OptionButton" parent="TopBar/HBox"]
-custom_minimum_size = Vector2(130, 60)
+custom_minimum_size = Vector2(140, 86)
+theme_override_font_sizes/font_size = 22
+
+[node name="UndoBtn" type="Button" parent="TopBar/HBox"]
+custom_minimum_size = Vector2(90, 86)
+text = "↩ UNDO"
+theme_override_font_sizes/font_size = 20
+disabled = true
+
+[node name="RedoBtn" type="Button" parent="TopBar/HBox"]
+custom_minimum_size = Vector2(90, 86)
+text = "↪ REDO"
+theme_override_font_sizes/font_size = 20
+disabled = true
 
 [node name="DiffLabel" type="Label" parent="TopBar/HBox"]
-custom_minimum_size = Vector2(130, 60)
+custom_minimum_size = Vector2(130, 86)
 text = "Beginner"
 vertical_alignment = 1
+theme_override_font_sizes/font_size = 22
 
 [node name="ValidateLabel" type="Label" parent="TopBar/HBox"]
-custom_minimum_size = Vector2(200, 60)
+custom_minimum_size = Vector2(160, 86)
 text = "Valid"
 modulate = Color(0.4, 1, 0.4, 1)
 vertical_alignment = 1
+theme_override_font_sizes/font_size = 22
 
 [node name="SaveBtn" type="Button" parent="TopBar/HBox"]
-custom_minimum_size = Vector2(110, 60)
-text = "Save"
+custom_minimum_size = Vector2(140, 86)
+text = "💾 SAVE"
+theme_override_font_sizes/font_size = 26
 
 [node name="MainArea" type="HBoxContainer" parent="."]
 offset_left = 0.0
-offset_top = 100.0
+offset_top = 110.0
 offset_right = 1080.0
-offset_bottom = 1560.0
+offset_bottom = 1570.0
 
 [node name="TimelineView" type="Control" parent="MainArea"]
-custom_minimum_size = Vector2(840, 1460)
+custom_minimum_size = Vector2(800, 1460)
 size_flags_horizontal = 3
 script = ExtResource("2")
 
-[node name="PalettePanel" type="Panel" parent="MainArea"]
-custom_minimum_size = Vector2(240, 1460)
+[node name="PalettePanel" type="ScrollContainer" parent="MainArea"]
+custom_minimum_size = Vector2(280, 1460)
 script = ExtResource("3")
+
+[node name="VBox" type="VBoxContainer" parent="MainArea/PalettePanel"]
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="SectionLabel" type="Label" parent="MainArea/PalettePanel/VBox"]
+text = "OBSTACLES"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+
+[node name="Grid" type="GridContainer" parent="MainArea/PalettePanel/VBox"]
+size_flags_horizontal = 3
+columns = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
 
 [node name="BottomPanel" type="VBoxContainer" parent="."]
 offset_left = 0.0
-offset_top = 1560.0
+offset_top = 1570.0
 offset_right = 1080.0
 offset_bottom = 1920.0
 
 [node name="PropertiesPanel" type="Panel" parent="BottomPanel"]
-custom_minimum_size = Vector2(1080, 260)
+custom_minimum_size = Vector2(1080, 230)
 script = ExtResource("4")
 
 [node name="TitleLabel" type="Label" parent="BottomPanel/PropertiesPanel"]
 offset_left = 8.0
 offset_top = 4.0
-offset_right = 1072.0
-offset_bottom = 40.0
+offset_right = 900.0
+offset_bottom = 44.0
 text = "Select an obstacle"
+theme_override_font_sizes/font_size = 24
+
+[node name="DeleteBtn" type="Button" parent="BottomPanel/PropertiesPanel"]
+offset_left = 910.0
+offset_top = 4.0
+offset_right = 1072.0
+offset_bottom = 44.0
+text = "🗑 DELETE"
+modulate = Color(1, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 22
 
 [node name="ScrollContainer" type="ScrollContainer" parent="BottomPanel/PropertiesPanel"]
 offset_left = 0.0
-offset_top = 44.0
+offset_top = 48.0
 offset_right = 1080.0
-offset_bottom = 260.0
+offset_bottom = 230.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="BottomPanel/PropertiesPanel/ScrollContainer"]
 offset_left = 0.0
@@ -106,35 +155,40 @@ offset_bottom = 0.0
 size_flags_horizontal = 3
 
 [node name="PlaybackBar" type="Panel" parent="BottomPanel"]
-custom_minimum_size = Vector2(1080, 100)
+custom_minimum_size = Vector2(1080, 120)
 script = ExtResource("5")
 
 [node name="HBox" type="HBoxContainer" parent="BottomPanel/PlaybackBar"]
 offset_left = 8.0
 offset_top = 8.0
 offset_right = 1072.0
-offset_bottom = 92.0
-theme_override_constants/separation = 8
+offset_bottom = 112.0
+theme_override_constants/separation = 12
 
 [node name="PlayBtn" type="Button" parent="BottomPanel/PlaybackBar/HBox"]
-custom_minimum_size = Vector2(100, 76)
-text = "▶ Test"
+custom_minimum_size = Vector2(180, 96)
+text = "▶ TEST PLAY"
+theme_override_font_sizes/font_size = 28
 
 [node name="StopBtn" type="Button" parent="BottomPanel/PlaybackBar/HBox"]
-custom_minimum_size = Vector2(100, 76)
-text = "■ Stop"
+custom_minimum_size = Vector2(130, 96)
+text = "■ STOP"
+theme_override_font_sizes/font_size = 24
 
 [node name="ZoomBtn" type="Button" parent="BottomPanel/PlaybackBar/HBox"]
-custom_minimum_size = Vector2(80, 76)
+custom_minimum_size = Vector2(100, 96)
 text = "1×"
+theme_override_font_sizes/font_size = 24
 
 [node name="BeatLabel" type="Label" parent="BottomPanel/PlaybackBar/HBox"]
-custom_minimum_size = Vector2(80, 76)
+custom_minimum_size = Vector2(80, 96)
 text = "Beat:"
 vertical_alignment = 1
+theme_override_font_sizes/font_size = 24
 
 [node name="BeatSpin" type="SpinBox" parent="BottomPanel/PlaybackBar/HBox"]
-custom_minimum_size = Vector2(140, 76)
+custom_minimum_size = Vector2(160, 96)
 min_value = 0.0
 max_value = 256.0
 step = 0.25
+theme_override_font_sizes/font_size = 24

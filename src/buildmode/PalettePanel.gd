@@ -1,27 +1,39 @@
 ## PalettePanel.gd
-## Scrollable list of obstacle buttons filtered by player's cleared zone AND build unlocks.
-## Emits obstacle_selected when the user taps an obstacle type.
-extends Panel
+## Scrollable grid of colored obstacle cards (130×130 each, 2-column layout).
+## Emits obstacle_type_selected when the player picks an obstacle type.
+extends ScrollContainer
 
 class_name PalettePanel
 
 signal obstacle_type_selected(obstacle_type: String)
 
-## Highest zone the current profile has cleared (set by BuildModeRoot on load).
 var highest_cleared_zone: int = 1
-
-## Currently selected type (highlighted).
 var selected_type: String = ""
 
 var _buttons: Array[Button] = []
 var _available_types: Array[String] = []
+
+const CARD_SIZE: Vector2 = Vector2(130.0, 130.0)
+const CARD_FONT_SIZE: int = 20
+
+const TYPE_COLORS: Dictionary = {
+	"pressure_wall":   Color(0.18, 0.52, 0.88),
+	"jellyfish_drift": Color(0.72, 0.25, 0.82),
+	"boss_projectile": Color(0.88, 0.25, 0.18),
+	"speed_ring":      Color(0.18, 0.80, 0.45),
+	"gravity_flip":    Color(0.82, 0.65, 0.10),
+	"secret_exit":     Color(0.75, 0.70, 0.12),
+}
+const TYPE_COLOR_DEFAULT: Color = Color(0.25, 0.55, 0.70)
+
+@onready var _grid: GridContainer = $VBox/Grid
+@onready var _section_label: Label = $VBox/SectionLabel
 
 
 func _ready() -> void:
 	refresh_palette(highest_cleared_zone)
 
 
-## Rebuild palette buttons for the given cleared-zone level.
 func refresh_palette(max_zone: int) -> void:
 	highest_cleared_zone = max_zone
 	for b: Button in _buttons:
@@ -36,32 +48,68 @@ func refresh_palette(max_zone: int) -> void:
 		if SaveSystem.has_build_unlock(profile_id, "obstacles", otype):
 			_available_types.append(otype)
 
-	var y: float = 10.0
 	for otype: String in _available_types:
-		var btn: Button = Button.new()
-		btn.text = _label(otype)
-		btn.custom_minimum_size = Vector2(220.0, 60.0)
-		btn.position = Vector2(10.0, y)
-		btn.pressed.connect(_on_btn_pressed.bind(otype))
-		btn.add_theme_font_size_override("font_size", 20)
-		if otype == selected_type:
-			btn.modulate = Color(1.0, 0.85, 0.2)
-		add_child(btn)
+		var btn: Button = _make_card(otype)
+		_grid.add_child(btn)
 		_buttons.append(btn)
-		y += 70.0
 
-	custom_minimum_size = Vector2(240.0, y + 10.0)
+
+func _make_card(otype: String) -> Button:
+	var btn: Button = Button.new()
+	btn.custom_minimum_size = CARD_SIZE
+	btn.clip_contents = true
+
+	# Background color from type map.
+	var base_col: Color = TYPE_COLORS.get(otype, TYPE_COLOR_DEFAULT) as Color
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = base_col.darkened(0.25)
+	style.border_width_left = 3
+	style.border_width_right = 3
+	style.border_width_top = 3
+	style.border_width_bottom = 3
+	style.border_color = base_col
+	style.corner_radius_top_left = 10
+	style.corner_radius_top_right = 10
+	style.corner_radius_bottom_left = 10
+	style.corner_radius_bottom_right = 10
+	btn.add_theme_stylebox_override("normal", style)
+
+	var hover_style: StyleBoxFlat = style.duplicate() as StyleBoxFlat
+	hover_style.bg_color = base_col.darkened(0.05)
+	hover_style.border_color = Color.WHITE
+	btn.add_theme_stylebox_override("hover", hover_style)
+
+	var label: String = _label(otype)
+	btn.text = label
+	btn.add_theme_font_size_override("font_size", CARD_FONT_SIZE)
+	btn.add_theme_color_override("font_color", Color.WHITE)
+	btn.add_theme_color_override("font_hover_color", Color.WHITE)
+	btn.pressed.connect(_on_btn_pressed.bind(otype))
+	return btn
 
 
 func _on_btn_pressed(otype: String) -> void:
 	selected_type = otype
-	for btn: Button in _buttons:
-		btn.modulate = Color(1, 1, 1)
-	var idx: int = _available_types.find(otype)
-	if idx >= 0 and idx < _buttons.size():
-		_buttons[idx].modulate = Color(1.0, 0.85, 0.2)
+	for i: int in range(_buttons.size()):
+		var t: String = _available_types[i]
+		var base: Color = TYPE_COLORS.get(t, TYPE_COLOR_DEFAULT) as Color
+		var s: StyleBoxFlat = _buttons[i].get_theme_stylebox("normal") as StyleBoxFlat
+		if t == otype:
+			s.border_color = Color.WHITE
+			s.border_width_left = 5
+			s.border_width_right = 5
+			s.border_width_top = 5
+			s.border_width_bottom = 5
+			s.bg_color = base.lightened(0.1)
+		else:
+			s.border_color = base
+			s.border_width_left = 3
+			s.border_width_right = 3
+			s.border_width_top = 3
+			s.border_width_bottom = 3
+			s.bg_color = base.darkened(0.25)
 	obstacle_type_selected.emit(otype)
 
 
 static func _label(otype: String) -> String:
-	return otype.replace("_", " ").capitalize()
+	return otype.replace("_", "\n").capitalize()

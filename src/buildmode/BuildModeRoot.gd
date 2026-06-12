@@ -17,6 +17,10 @@ class_name BuildModeRoot
 @onready var _save_btn: Button = $TopBar/HBox/SaveBtn
 @onready var _validate_label: Label = $TopBar/HBox/ValidateLabel
 @onready var _diff_label: Label = $TopBar/HBox/DiffLabel
+@onready var _back_btn: Button = $TopBar/HBox/BackBtn
+@onready var _undo_btn: Button = $TopBar/HBox/UndoBtn
+@onready var _redo_btn: Button = $TopBar/HBox/RedoBtn
+@onready var _delete_btn: Button = $BottomPanel/PropertiesPanel/DeleteBtn
 
 # ── State ─────────────────────────────────────────────────────────────────────
 var _session: BuildSession = null
@@ -25,6 +29,10 @@ var _validation_errors: Array[String] = []
 
 ## When true: next run_completed marks the session as played_through.
 var _awaiting_playtest: bool = false
+
+var _undo_stack: Array[Dictionary] = []
+var _redo_stack: Array[Dictionary] = []
+const MAX_UNDO: int = 30
 
 
 func _ready() -> void:
@@ -48,6 +56,13 @@ func _ready() -> void:
 	_name_edit.text_changed.connect(_on_name_changed)
 	_bpm_spin.value_changed.connect(_on_bpm_changed)
 	_zone_opt.item_selected.connect(_on_zone_changed)
+	_back_btn.pressed.connect(_on_back_pressed)
+	_undo_btn.pressed.connect(_on_undo_pressed)
+	_redo_btn.pressed.connect(_on_redo_pressed)
+	if _delete_btn != null:
+		_delete_btn.pressed.connect(_on_delete_selected)
+
+	_timeline.delete_requested.connect(_on_delete_obstacle)
 
 	for i: int in range(1, 7):
 		_zone_opt.add_item("Zone %d" % i, i)
@@ -113,6 +128,7 @@ func _on_obstacle_type_selected(otype: String) -> void:
 func _on_obstacle_placed(beat_index: float, lane_y_normalized: float) -> void:
 	if _session == null or _timeline.active_type.is_empty():
 		return
+	_push_undo_snapshot()
 	var entry: Dictionary = {
 		"beat_index": beat_index,
 		"lane_position": lane_y_normalized,
@@ -143,6 +159,7 @@ func _on_property_changed(beat_map_index: int, key: String, value: Variant) -> v
 		return
 	var beat_map: Array = (_session.get_data().get("beat_map", []) as Array)
 	if beat_map_index < beat_map.size():
+		_push_undo_snapshot()
 		var entry: Dictionary = (beat_map[beat_map_index] as Dictionary).duplicate(true)
 		var params: Dictionary = entry.get("parameters", {}) as Dictionary
 		params[key] = value
@@ -213,6 +230,66 @@ func _on_run_completed(_level_id: String, _score: int, _stars: int) -> void:
 		_session.mark_played_through()
 		_validate_label.text = "Played through — ready to save."
 		_validate_label.modulate = Color(0.5, 1.0, 0.5)
+
+
+# ── Back / Undo / Redo / Delete ───────────────────────────────────────────────
+
+func _on_back_pressed() -> void:
+	GameManager.go_to_menu()
+
+
+func _push_undo_snapshot() -> void:
+	if _session == null:
+		return
+	_undo_stack.push_back(_session.get_data().duplicate(true))
+	if _undo_stack.size() > MAX_UNDO:
+		_undo_stack.pop_front()
+	_redo_stack.clear()
+	_undo_btn.disabled = false
+	_redo_btn.disabled = true
+
+
+func _on_undo_pressed() -> void:
+	if _undo_stack.is_empty() or _session == null:
+		return
+	_redo_stack.push_back(_session.get_data().duplicate(true))
+	var snap: Dictionary = _undo_stack.pop_back()
+	_session.load_from_dict(snap)
+	_apply_session_to_ui()
+	_undo_btn.disabled = _undo_stack.is_empty()
+	_redo_btn.disabled = false
+
+
+func _on_redo_pressed() -> void:
+	if _redo_stack.is_empty() or _session == null:
+		return
+	_undo_stack.push_back(_session.get_data().duplicate(true))
+	var snap: Dictionary = _redo_stack.pop_back()
+	_session.load_from_dict(snap)
+	_apply_session_to_ui()
+	_undo_btn.disabled = false
+	_redo_btn.disabled = _redo_stack.is_empty()
+
+
+func _on_delete_selected() -> void:
+	if _session == null or _timeline.selected_index < 0:
+		return
+	_on_delete_obstacle(_timeline.selected_index)
+
+
+func _on_delete_obstacle(index: int) -> void:
+	if _session == null:
+		return
+	var beat_map: Array = (_session.get_data().get("beat_map", []) as Array)
+	if index < 0 or index >= beat_map.size():
+		return
+	_push_undo_snapshot()
+	_session.remove_beat_entry(index)
+	_timeline.selected_index = -1
+	if _props != null:
+		_props.clear()
+	_timeline.refresh()
+	_validate_and_tag()
 
 
 # ── Validation + tagging ──────────────────────────────────────────────────────
