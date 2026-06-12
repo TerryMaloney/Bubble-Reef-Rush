@@ -39,37 +39,31 @@ custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 custom_minimum_size = Vector2(0, 88)
 text = "Journey"
-theme_override_font_sizes/font_size = 32
 
 [node name="CreateButton" type="Button" parent="Layout"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 88)
 text = "Create"
-theme_override_font_sizes/font_size = 32
 
 [node name="ReefRivalsButton" type="Button" parent="Layout"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 88)
 text = "Reef Rivals"
-theme_override_font_sizes/font_size = 32
 
 [node name="PartyButton" type="Button" parent="Layout"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 88)
 text = "Party"
-theme_override_font_sizes/font_size = 32
 
 [node name="RadioShuffleButton" type="Button" parent="Layout"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 88)
 text = "Radio Shuffle"
-theme_override_font_sizes/font_size = 32
 
 [node name="CollectionRoomButton" type="Button" parent="Layout"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 88)
 text = "Collection Room"
-theme_override_font_sizes/font_size = 32
 
 [node name="ProfileBadge" type="Label" parent="."]
 anchor_left = 0.0
@@ -82,7 +76,6 @@ offset_right = 340.0
 offset_bottom = 56.0
 text = "player1"
 modulate = Color(1, 1, 1, 0.85)
-theme_override_font_sizes/font_size = 22
 
 [node name="PlayersButton" type="Button" parent="."]
 anchor_left = 1.0
@@ -94,7 +87,6 @@ offset_top = 8.0
 offset_right = -16.0
 offset_bottom = 64.0
 text = "Players"
-theme_override_font_sizes/font_size = 22
 
 [node name="SettingsButton" type="Button" parent="."]
 anchor_left = 0.0
@@ -106,7 +98,6 @@ offset_top = -80.0
 offset_right = 240.0
 offset_bottom = -16.0
 text = "Settings"
-theme_override_font_sizes/font_size = 24
 
 [node name="BuildLabel" type="Label" parent="."]
 anchor_left = 0.0

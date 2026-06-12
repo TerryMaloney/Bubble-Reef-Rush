@@ -86,10 +86,8 @@ text = "Random"
 [node name="StartButton" type="Button" parent="Panel/VBox"]
 custom_minimum_size = Vector2(0, 88)
 text = "Let's Dive!"
-theme_override_font_sizes/font_size = 32
 disabled = true
 
 [node name="CloseButton" type="Button" parent="Panel/VBox"]
-custom_minimum_size = Vector2(0, 64)
+custom_minimum_size = Vector2(0, 88)
 text = "Back"
-theme_override_font_sizes/font_size = 24

@@ -86,5 +86,7 @@ run_stage "Reef Radio test"      "tests/integration/reef_radio_test.gd"       "R
 run_stage "Settings scene test" "tests/integration/settings_scene_test.gd"  "SETTINGS_SCENE_OK"
 run_stage "Collection room scene test" "tests/integration/collection_room_scene_test.gd" "COLLECTION_ROOM_SCENE_OK"
 run_stage "Challenge import scene test" "tests/integration/challenge_import_scene_test.gd" "CHALLENGE_IMPORT_SCENE_OK"
+run_stage "Theme test"                  "tests/integration/theme_test.gd"                  "THEME_OK"
+run_stage "Profile manager scene test"  "tests/integration/profile_manager_scene_test.gd"  "PROFILE_MANAGER_SCENE_OK"
 
 echo "==> All tests passed."

@@ -41,13 +41,11 @@ theme_override_constants/separation = 12
 [node name="NameInput" type="LineEdit" parent="Panel/VBox/AddRow"]
 size_flags_horizontal = 3
 placeholder_text = "New player name"
-theme_override_font_sizes/font_size = 26
 max_length = 20
 
 [node name="AddButton" type="Button" parent="Panel/VBox/AddRow"]
 text = "+ Add"
-theme_override_font_sizes/font_size = 26
-custom_minimum_size = Vector2(140, 64)
+custom_minimum_size = Vector2(160, 88)
 
 [node name="ErrorLabel" type="Label" parent="Panel/VBox"]
 text = ""
@@ -57,6 +55,5 @@ horizontal_alignment = 1
 theme_override_font_sizes/font_size = 22
 
 [node name="CloseButton" type="Button" parent="Panel/VBox"]
-custom_minimum_size = Vector2(0, 72)
+custom_minimum_size = Vector2(0, 88)
 text = "Done"
-theme_override_font_sizes/font_size = 28

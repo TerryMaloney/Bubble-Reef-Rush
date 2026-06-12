@@ -42,6 +42,10 @@ window/size/window_height_override=960
 window/stretch/mode="canvas_items"
 window/stretch/aspect="keep"
 
+[gui]
+
+theme/custom="res://assets/theme/theme.tres"
+
 [input]
 
 swim_dive={

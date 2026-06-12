@@ -54,7 +54,6 @@ modulate = Color(1.0, 0.85, 0.2, 1)
 text = ""
 horizontal_alignment = 1
 vertical_alignment = 1
-theme_override_font_sizes/font_size = 22
 modulate = Color(0.4, 0.8, 1.0, 1)
 visible = false
 
@@ -67,20 +66,16 @@ custom_minimum_size = Vector2(0, 8)
 [node name="NextLevelButton" type="Button" parent="Center/VBox"]
 custom_minimum_size = Vector2(0, 72)
 text = "NEXT LEVEL"
-theme_override_font_sizes/font_size = 26
 
 [node name="RetryButton" type="Button" parent="Center/VBox"]
 custom_minimum_size = Vector2(0, 72)
 text = "PLAY AGAIN"
-theme_override_font_sizes/font_size = 26
 
 [node name="LevelsButton" type="Button" parent="Center/VBox"]
 custom_minimum_size = Vector2(0, 72)
 text = "LEVELS"
-theme_override_font_sizes/font_size = 26
 
 [node name="MenuButton" type="Button" parent="Center/VBox"]
-custom_minimum_size = Vector2(0, 64)
+custom_minimum_size = Vector2(0, 88)
 text = "MENU"
-theme_override_font_sizes/font_size = 22
 modulate = Color(1, 1, 1, 0.75)

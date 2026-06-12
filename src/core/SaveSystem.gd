@@ -89,6 +89,47 @@ func set_active_profile(profile_id: String) -> void:
 	EventBus.active_profile_changed.emit(profile_id)
 
 
+## Deletes a profile and all its saved data. Refuses to delete the last
+## remaining profile. If the deleted profile was active, the first remaining
+## profile becomes active.
+func delete_profile(profile_id: String) -> bool:
+	var profiles: Array[String] = list_profiles()
+	if profiles.size() <= 1:
+		return false
+	if not (profile_id in profiles):
+		return false
+
+	profiles.erase(profile_id)
+	var cfg: ConfigFile = ConfigFile.new()
+	cfg.load(PROFILE_INDEX_PATH)
+	cfg.set_value("profiles", "list", profiles)
+	cfg.save(PROFILE_INDEX_PATH)
+
+	if get_active_profile_id() == profile_id:
+		set_active_profile(profiles[0])
+
+	_remove_dir_recursive("user://profiles/%s" % profile_id)
+	return true
+
+
+func _remove_dir_recursive(path: String) -> void:
+	var dir: DirAccess = DirAccess.open(path)
+	if dir == null:
+		return
+	dir.list_dir_begin()
+	var entry: String = dir.get_next()
+	while entry != "":
+		if entry != "." and entry != "..":
+			var full: String = path.path_join(entry)
+			if dir.current_is_dir():
+				_remove_dir_recursive(full)
+			else:
+				DirAccess.remove_absolute(full)
+		entry = dir.get_next()
+	dir.list_dir_end()
+	DirAccess.remove_absolute(path)
+
+
 func list_profiles() -> Array[String]:
 	var cfg: ConfigFile = ConfigFile.new()
 	var err: Error = cfg.load(PROFILE_INDEX_PATH)
