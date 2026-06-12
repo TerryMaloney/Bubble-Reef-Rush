@@ -142,8 +142,8 @@ func _process(_delta: float) -> void:
 func start_level(bpm: float, music_stream: AudioStream, from_beat: float = 0.0) -> void:
 	_stop_internal()
 
-	_current_bpm = bpm
-	_beat_duration_sec = 60.0 / bpm
+	_current_bpm = maxf(1.0, bpm)
+	_beat_duration_sec = 60.0 / _current_bpm
 	_variable_bpm_mode = false
 	_beat_map_timestamps.clear()
 

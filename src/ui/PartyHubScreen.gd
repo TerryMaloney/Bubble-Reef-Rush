@@ -50,7 +50,11 @@ func _on_copilot() -> void:
 ## Opens a sub-screen and hides this hub; closing the sub-screen (queue_free /
 ## Back) re-shows the hub so Back never lands on a bare MainMenu.
 func _open_child_screen(scene_path: String) -> void:
-	var screen: Control = (load(scene_path) as PackedScene).instantiate() as Control
+	var packed: PackedScene = load(scene_path) as PackedScene
+	if packed == null:
+		push_error("PartyHubScreen: cannot load scene %s" % scene_path)
+		return
+	var screen: Control = packed.instantiate() as Control
 	get_parent().add_child(screen)
 	hide()
 	screen.tree_exited.connect(show)

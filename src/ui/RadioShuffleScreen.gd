@@ -22,7 +22,11 @@ func _ready() -> void:
 
 
 func _on_daily_dive_pressed() -> void:
-	var screen: Control = load(DAILY_DIVE_SCENE).instantiate() as Control
+	var packed: PackedScene = load(DAILY_DIVE_SCENE) as PackedScene
+	if packed == null:
+		push_error("RadioShuffleScreen: cannot load %s" % DAILY_DIVE_SCENE)
+		return
+	var screen: Control = packed.instantiate() as Control
 	get_parent().add_child(screen)
 	queue_free()
 

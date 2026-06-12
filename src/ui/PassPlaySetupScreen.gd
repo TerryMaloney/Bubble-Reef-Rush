@@ -55,7 +55,11 @@ func _on_mode_pressed(mode: PassPlaySession.Mode) -> void:
 
 
 func _on_add_player() -> void:
-	var pm: Control = (load(PROFILE_MANAGER_SCENE) as PackedScene).instantiate() as Control
+	var packed: PackedScene = load(PROFILE_MANAGER_SCENE) as PackedScene
+	if packed == null:
+		push_error("PassPlaySetupScreen: cannot load %s" % PROFILE_MANAGER_SCENE)
+		return
+	var pm: Control = packed.instantiate() as Control
 	add_child(pm)
 	pm.tree_exited.connect(_populate_profiles)
 

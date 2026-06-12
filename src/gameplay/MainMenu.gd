@@ -38,31 +38,36 @@ func _on_journey_pressed() -> void:
 
 
 func _on_create_pressed() -> void:
-	GameManager.open_build_mode()
+	var screen: MyLevelsScreen = MyLevelsScreen.new()
+	add_child(screen)
 
 
 func _on_reef_rivals_pressed() -> void:
-	var screen: Control = load("res://scenes/ui/ReefRivalsScreen.tscn").instantiate() as Control
-	add_child(screen)
+	_open_screen("res://scenes/ui/ReefRivalsScreen.tscn")
 
 
 func _on_party_pressed() -> void:
-	var screen: Control = load("res://scenes/ui/PartyHubScreen.tscn").instantiate() as Control
-	add_child(screen)
+	_open_screen("res://scenes/ui/PartyHubScreen.tscn")
 
 
 func _on_radio_shuffle_pressed() -> void:
-	var screen: Control = load("res://scenes/ui/RadioShuffleScreen.tscn").instantiate() as Control
-	add_child(screen)
+	_open_screen("res://scenes/ui/RadioShuffleScreen.tscn")
 
 
 func _on_collection_room_pressed() -> void:
-	var screen: Control = load("res://scenes/ui/CollectionRoomScreen.tscn").instantiate() as Control
-	add_child(screen)
+	_open_screen("res://scenes/ui/CollectionRoomScreen.tscn")
 
 
 func _on_players_pressed() -> void:
-	var screen: Control = load("res://scenes/ui/ProfileManagerScreen.tscn").instantiate() as Control
+	_open_screen("res://scenes/ui/ProfileManagerScreen.tscn")
+
+
+func _open_screen(scene_path: String) -> void:
+	var packed: PackedScene = load(scene_path) as PackedScene
+	if packed == null:
+		push_error("MainMenu: cannot load scene %s" % scene_path)
+		return
+	var screen: Control = packed.instantiate() as Control
 	add_child(screen)
 
 
