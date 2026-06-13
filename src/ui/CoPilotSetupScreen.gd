@@ -57,7 +57,7 @@ func _on_start_pressed() -> void:
 	queue_free()
 
 
-func start_copilot(profile_a: String, profile_b: String, level_id: String) -> void:
+func start_copilot(_profile_a: String, profile_b: String, level_id: String) -> void:
+	# _profile_a is already the active profile; only B and the level are needed here.
 	GameManager.copilot_profile_b = profile_b
 	GameManager.start_level(level_id)
-	_ = profile_a  # profile_a is already set as the active profile
