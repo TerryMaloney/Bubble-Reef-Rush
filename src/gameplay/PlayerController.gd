@@ -26,11 +26,28 @@ var alive: bool = true
 @onready var timing_judge: TimingJudge = $TimingJudge
 
 var _ghost_recorder: GhostRecorder = null
+## Set by LevelRoot so the death path can report the live HUD score.
+var score_provider: Callable
+
+const _ART_PATH: String = "res://assets/characters/player.png"
 
 
 func _ready() -> void:
 	add_to_group("player")
 	timing_judge.input_judged.connect(_on_input_judged)
+	_try_load_art()
+
+
+func _try_load_art() -> void:
+	if not ResourceLoader.exists(_ART_PATH):
+		return
+	var tex: Texture2D = load(_ART_PATH) as Texture2D
+	if tex == null:
+		return
+	$Visual.hide()
+	var sp := Sprite2D.new()
+	sp.texture = tex
+	add_child(sp)
 
 
 func set_ghost_recorder(recorder: GhostRecorder) -> void:
@@ -103,7 +120,8 @@ func on_hit() -> void:
 
 func _die_after_delay() -> void:
 	await get_tree().create_timer(0.8).timeout
-	EventBus.run_failed.emit(GameManager.current_level_id, 0)
+	var s: int = score_provider.call() if score_provider.is_valid() else 0
+	EventBus.run_failed.emit(GameManager.current_level_id, s)
 
 
 func _on_input_judged(result: TimingJudge.TimingResult, _offset_ms: float, _beat_index: int) -> void:

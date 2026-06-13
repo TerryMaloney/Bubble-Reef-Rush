@@ -13,6 +13,7 @@ var _player_ref: Node2D = null
 
 func _ready() -> void:
 	add_to_group("scrolling")
+	add_to_group("bubble_destructible")
 	body_entered.connect(_on_body_entered)
 	var players: Array[Node] = get_tree().get_nodes_in_group("player")
 	if players.size() > 0:

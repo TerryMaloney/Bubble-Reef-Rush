@@ -48,6 +48,7 @@ func _ready() -> void:
 		($HUD/PowerButton as Button).pressed.connect(_on_power_button_pressed)
 
 	var player: PlayerController = $Player
+	player.score_provider = func() -> int: return _hud_controller.score
 	_hud_controller.connect_timing_judge(player.timing_judge)
 	player.timing_judge.combo_updated.connect(director.on_combo_updated)
 

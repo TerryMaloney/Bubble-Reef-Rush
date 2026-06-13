@@ -15,8 +15,9 @@ var profiles: Array[String] = []
 var mode: int = Mode.ONE_ATTEMPT
 
 var _profiles: Array[String] = []
-var _scores: Dictionary = {}   # profile_id -> int
-var _attempts: Dictionary = {}  # profile_id -> int
+var _scores: Dictionary = {}     # profile_id -> int
+var _attempts: Dictionary = {}   # profile_id -> int
+var _completed: Dictionary = {}  # profile_id -> bool
 var _current_idx: int = 0
 var _max_attempts: int = 1
 var _level_id: String = ""
@@ -34,6 +35,7 @@ func setup(profiles_in: Array[String], level_id_in: String, attempts_per_player:
 	for pid: String in _profiles:
 		_scores[pid] = 0
 		_attempts[pid] = 0
+		_completed[pid] = false
 	# Expose public view.
 	level_id = _level_id
 	profiles = _profiles.duplicate()
@@ -46,13 +48,15 @@ func get_current_profile() -> String:
 	return _profiles[_current_idx % _profiles.size()]
 
 
-func submit_score(profile_id: String, score: int) -> void:
+func submit_score(profile_id: String, score: int, completed: bool = false) -> void:
 	if not _active:
 		return
 	if profile_id in _scores:
 		_scores[profile_id] = maxi(int(_scores[profile_id]), score)
 	if profile_id in _attempts:
 		_attempts[profile_id] = int(_attempts[profile_id]) + 1
+	if completed and profile_id in _completed:
+		_completed[profile_id] = true
 
 
 func advance_turn() -> bool:
@@ -77,6 +81,13 @@ func get_results() -> Array[Dictionary]:
 	return _build_results()
 
 
+func any_completed() -> bool:
+	for pid: String in _profiles:
+		if bool(_completed.get(pid, false)):
+			return true
+	return false
+
+
 func _build_results() -> Array[Dictionary]:
 	var results: Array[Dictionary] = []
 	for pid: String in _profiles:
@@ -84,8 +95,14 @@ func _build_results() -> Array[Dictionary]:
 			"profile_id": pid,
 			"total_score": int(_scores.get(pid, 0)),
 			"funny_title": funny_title(pid),
+			"completed": bool(_completed.get(pid, false)),
 		})
+	# Completed players rank above non-completed; ties broken by score.
 	results.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		var ac: bool = bool(a.get("completed", false))
+		var bc: bool = bool(b.get("completed", false))
+		if ac != bc:
+			return ac
 		return int(a.get("total_score", 0)) > int(b.get("total_score", 0))
 	)
 	return results

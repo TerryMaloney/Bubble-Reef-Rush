@@ -26,8 +26,17 @@ theme_override_font_sizes/font_size = 48
 
 [node name="Results" type="VBoxContainer" parent="Panel/VBox"]
 
+[node name="NextButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 88)
+text = "Next Level! ▶"
+theme_override_font_sizes/font_size = 36
+
 [node name="PlayAgainButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 88)
 text = "Play Again"
+theme_override_font_sizes/font_size = 32
 
 [node name="MenuButton" type="Button" parent="Panel/VBox"]
+custom_minimum_size = Vector2(0, 88)
 text = "Main Menu"
+theme_override_font_sizes/font_size = 32

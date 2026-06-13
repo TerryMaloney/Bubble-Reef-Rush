@@ -36,6 +36,7 @@ func _process(delta: float) -> void:
 			var dist: float = global_position.distance_to((node as Node2D).global_position)
 			if dist < HIT_RADIUS + 40.0:
 				node.queue_free()
+				EventBus.score_bonus.emit(150)
 				_pop()
 				return
 

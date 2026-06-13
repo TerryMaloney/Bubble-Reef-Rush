@@ -184,7 +184,7 @@ func _cleanup_build_test() -> void:
 	is_practice_mode = false
 
 
-func _on_run_failed(level_id: String, _score: int) -> void:
+func _on_run_failed(level_id: String, score: int) -> void:
 	# Build test-play: auto-return to editor on death.
 	if pending_build_session != null:
 		_cleanup_build_test()
@@ -198,8 +198,9 @@ func _on_run_failed(level_id: String, _score: int) -> void:
 	if active_pass_play_session != null and active_pass_play_session.is_active():
 		_active_profile = SaveSystem.get_active_profile_id()
 		pp_prev_profile = _active_profile
-		pp_prev_score = 0
-		active_pass_play_session.submit_score(_active_profile, 0)
+		var distance_bonus: int = int(_last_progress_pct * 5.0)
+		pp_prev_score = score + distance_bonus
+		active_pass_play_session.submit_score(_active_profile, score + distance_bonus, false)
 		var still_going: bool = active_pass_play_session.advance_turn()
 		if still_going:
 			current_state = State.MENU
@@ -235,8 +236,9 @@ func _on_run_completed(level_id: String, score: int, stars: int) -> void:
 	# Pass & Play: route the score to the session, then advance turn.
 	if active_pass_play_session != null and active_pass_play_session.is_active():
 		pp_prev_profile = _active_profile
-		pp_prev_score = score
-		active_pass_play_session.submit_score(_active_profile, score)
+		var distance_bonus: int = int(_last_progress_pct * 5.0)
+		pp_prev_score = score + distance_bonus
+		active_pass_play_session.submit_score(_active_profile, score + distance_bonus, true)
 		var still_going: bool = active_pass_play_session.advance_turn()
 		if still_going:
 			current_state = State.MENU
