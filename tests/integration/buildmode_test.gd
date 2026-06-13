@@ -169,7 +169,7 @@ func _test_validator_valid() -> void:
 
 ## ── 5. PlayabilityValidator: impossible movement flagged ────────────────────
 func _test_validator_impossible_movement() -> void:
-	# At 120 BPM, 1 beat = 0.5s.  Max up in 0.5s = 480*0.5/1920 = 0.125 normalized.
+	# At 120 BPM, 1 beat = 0.5s.  Max up in 0.5s = 700*0.5/1920 = 0.182 normalized.
 	# Jump from 0.9 to 0.1 in 1 beat = delta -0.8 upward >> budget 0.125 → error.
 	var data: Dictionary = _make_simple_level(1, [
 		{"beat_index": 4.0, "lane_position": 0.9, "obstacle_type": "pressure_wall",

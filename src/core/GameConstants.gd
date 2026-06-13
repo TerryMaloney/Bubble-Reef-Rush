@@ -25,12 +25,12 @@ const JUDGMENT_X: float = 200.0
 # Player physics (research-derived, never change without full re-tuning)
 # ---------------------------------------------------------------------------
 
-const PLAYER_FLOAT_FORCE: float = 480.0
-const PLAYER_DIVE_FORCE: float = 1220.0
-const PLAYER_MAX_FLOAT_SPEED: float = 480.0
-const PLAYER_MAX_DIVE_SPEED: float = 720.0
+const PLAYER_FLOAT_FORCE: float = 1250.0
+const PLAYER_DIVE_FORCE: float = 1080.0
+const PLAYER_MAX_FLOAT_SPEED: float = 700.0
+const PLAYER_MAX_DIVE_SPEED: float = 640.0
 const PLAYER_DRAG: float = 0.983
-const PLAYER_DIVE_IMPULSE: float = 480.0
+const PLAYER_DIVE_IMPULSE: float = 200.0
 
 ## Canvas-px height of the player collision capsule.
 const PLAYER_HEIGHT_PX: float = 56.0

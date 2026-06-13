@@ -19,12 +19,12 @@ eyeballed. Re-derive from source formulas if any underlying value changes.
 
 | Parameter | Value | Formula / Source |
 |-----------|-------|-----------------|
-| `float_force` | 480 px/s² | Tuned feel — net buoyancy at rest |
-| `drag` | 0.983 | `1 - (float_force/fps) / terminal_float` = 1-(480/60)/480 |
-| `max_float_speed` | 480 px/s | Terminal float velocity (drag formula target) |
-| `dive_force` | 1220 px/s² | Gives net terminal dive ~720 px/s vs float 480 |
-| `max_dive_speed` | 720 px/s | Terminal dive velocity |
-| `dive_impulse` | 480 px/s | SET (not +=); equals float terminal → instant reversal |
+| `float_force` | 1250 px/s² | Playtest-tuned — snappy buoyant rise |
+| `drag` | 0.983 | Light per-frame water drag; cap dominates terminal |
+| `max_float_speed` | 700 px/s | Terminal float velocity (rise cap) |
+| `dive_force` | 1080 px/s² | Net terminal dive ~640 px/s vs float 700 |
+| `max_dive_speed` | 640 px/s | Terminal dive velocity |
+| `dive_impulse` | 200 px/s | SET (not +=); shallow tap dip, fast recovery |
 | Player height | 56 px | CapsuleShape2D radius=20, height=56 in Player.tscn |
 
 **Movement budget per 2-beat window at 100 BPM (1.2 s):**
