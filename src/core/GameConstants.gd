@@ -26,9 +26,9 @@ const JUDGMENT_X: float = 200.0
 # ---------------------------------------------------------------------------
 
 const PLAYER_FLOAT_FORCE: float = 1250.0
-const PLAYER_DIVE_FORCE: float = 1120.0
+const PLAYER_DIVE_FORCE: float = 1550.0
 const PLAYER_MAX_FLOAT_SPEED: float = 700.0
-const PLAYER_MAX_DIVE_SPEED: float = 670.0
+const PLAYER_MAX_DIVE_SPEED: float = 880.0
 const PLAYER_DRAG: float = 0.983
 const PLAYER_DIVE_IMPULSE: float = 220.0
 

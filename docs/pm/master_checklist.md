@@ -22,9 +22,9 @@ eyeballed. Re-derive from source formulas if any underlying value changes.
 | `float_force` | 1250 px/s² | Playtest-tuned — snappy buoyant rise |
 | `drag` | 0.983 | Light per-frame water drag; cap dominates terminal |
 | `max_float_speed` | 700 px/s | Terminal float velocity (rise cap) |
-| `dive_force` | 1080 px/s² | Net terminal dive ~640 px/s vs float 700 |
-| `max_dive_speed` | 640 px/s | Terminal dive velocity |
-| `dive_impulse` | 200 px/s | SET (not +=); shallow tap dip, fast recovery |
+| `dive_force` | 1550 px/s² | Holding accelerates into a fast sustained dive |
+| `max_dive_speed` | 880 px/s | Terminal dive velocity (faster than float 700) |
+| `dive_impulse` | 220 px/s | SET (not +=); shallow tap dip, fast recovery |
 | Player height | 56 px | CapsuleShape2D radius=20, height=56 in Player.tscn |
 
 **Movement budget per 2-beat window at 100 BPM (1.2 s):**

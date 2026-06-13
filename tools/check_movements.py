@@ -9,7 +9,7 @@ the previous one within the given beat window. Uses research-derived physics:
   max_up_per_beat   = (float_terminal_px_s * beat_s) / screen_h
                     = (700 * 60/bpm_at_that_beat) / 1920
   max_down_per_beat = (dive_terminal_px_s * beat_s) / screen_h
-                    = (670 * 60/bpm_at_that_beat) / 1920
+                    = (880 * 60/bpm_at_that_beat) / 1920
 
 For variable-BPM levels (bpm_variable=true), per-beat BPM is interpolated
 from bpm_changes so that budget calculations are always beat-clock accurate.
@@ -39,7 +39,7 @@ CANVAS_W: float = 1080.0
 JUDGMENT_X: float = 200.0
 BASE_SPEED: float = 408.0
 FLOAT_TERMINAL: float = 700.0   # px/s, matches PlayerController.max_float_speed
-DIVE_TERMINAL: float = 670.0    # px/s, matches PlayerController.max_dive_speed
+DIVE_TERMINAL: float = 880.0    # px/s, matches PlayerController.max_dive_speed
 SKIP_INTENSITY: float = 0.08    # matches ObstacleSpawner.SKIP_INTENSITY
 # Float subtraction epsilon — prevents false positives when delta == budget exactly
 EPS: float = 1e-9
