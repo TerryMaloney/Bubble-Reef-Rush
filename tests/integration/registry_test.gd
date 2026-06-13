@@ -108,7 +108,7 @@ func _test_game_constants() -> void:
 		"CANVAS_H":           1920.0,
 		"SCROLL_SPEED":        408.0,
 		"PLAYER_FLOAT_FORCE": 1250.0,
-		"PLAYER_DIVE_FORCE":  1550.0,
+		"PLAYER_DIVE_FORCE":  1940.0,
 		"TIMING_PERFECT_HALF_MS": 80.0,
 		"TIMING_GOOD_OUTER_HALF_MS": 160.0,
 	}

@@ -22,8 +22,8 @@ eyeballed. Re-derive from source formulas if any underlying value changes.
 | `float_force` | 1250 px/s² | Playtest-tuned — snappy buoyant rise |
 | `drag` | 0.983 | Light per-frame water drag; cap dominates terminal |
 | `max_float_speed` | 700 px/s | Terminal float velocity (rise cap) |
-| `dive_force` | 1550 px/s² | Holding accelerates into a fast sustained dive |
-| `max_dive_speed` | 880 px/s | Terminal dive velocity (faster than float 700) |
+| `dive_force` | 1940 px/s² | Holding accelerates into a fast sustained dive |
+| `max_dive_speed` | 1100 px/s | Terminal dive velocity (faster than float 700) |
 | `dive_impulse` | 220 px/s | SET (not +=); shallow tap dip, fast recovery |
 | Player height | 56 px | CapsuleShape2D radius=20, height=56 in Player.tscn |
 

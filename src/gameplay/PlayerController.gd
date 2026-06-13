@@ -4,14 +4,14 @@ extends CharacterBody2D
 class_name PlayerController
 
 @export var float_force: float = 1250.0
-@export var dive_force: float = 1550.0
+@export var dive_force: float = 1940.0
 @export var max_float_speed: float = 700.0
-@export var max_dive_speed: float = 880.0
+@export var max_dive_speed: float = 1100.0
 @export var drag: float = 0.983
 
 ## On tap, velocity is SET (not added) — guarantees identical feel every time.
 ## Tuned for a shallow ~40–55px dip with fast (~0.2s) buoyant recovery; holding
-## then accelerates into a fast sustained dive (terminal 880 px/s).
+## then accelerates into a fast sustained dive (terminal 1100 px/s).
 @export var dive_impulse: float = 220.0
 
 # Fixed logical canvas height — matches project.godot viewport_height. Gameplay

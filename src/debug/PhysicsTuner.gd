@@ -8,8 +8,8 @@ const PARAMS: Array = [
 	{"key": "dive_impulse",    "label": "Tap impulse",   "min": 100.0, "max": 600.0, "default": 220.0},
 	{"key": "float_force",     "label": "Rise force",    "min": 400.0, "max": 1600.0, "default": 1250.0},
 	{"key": "max_float_speed", "label": "Max rise spd",  "min": 200.0, "max": 900.0, "default": 700.0},
-	{"key": "dive_force",      "label": "Hold force",    "min": 400.0, "max": 2000.0, "default": 1550.0},
-	{"key": "max_dive_speed",  "label": "Max dive spd",  "min": 200.0, "max": 1200.0, "default": 880.0},
+	{"key": "dive_force",      "label": "Hold force",    "min": 400.0, "max": 2200.0, "default": 1940.0},
+	{"key": "max_dive_speed",  "label": "Max dive spd",  "min": 200.0, "max": 1400.0, "default": 1100.0},
 ]
 
 var _rows: Dictionary = {}
