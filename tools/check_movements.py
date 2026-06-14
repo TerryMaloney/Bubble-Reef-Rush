@@ -2,28 +2,42 @@
 """
 Check movement constraints in .brl level files.
 
-For each consecutive pair of active positional obstacles (pressure_wall,
-kelp_curtain), verifies the player can physically reach the next gap_y from
-the previous one within the given beat window. Uses research-derived physics:
+REACHABLE-BAND ENGINE
+---------------------
+Rather than checking gates pairwise (which ignored the point hazards sitting
+between them), we propagate the *set of heights the player can occupy* forward
+through every obstacle in beat order. This is standard forward-reachability
+analysis and is the only consistent way to prove a level is beatable.
 
-  max_up_per_beat   = (float_terminal_px_s * beat_s) / screen_h
-                    = (700 * 60/bpm_at_that_beat) / 1920
-  max_down_per_beat = (dive_terminal_px_s * beat_s) / screen_h
-                    = (1100 * 60/bpm_at_that_beat) / 1920
+  time between events  t   = Δbeats × (60 / BPM)            [beat-clock accurate]
+  rise budget (px)         = max_float_speed (700)  × t × SAFETY
+  dive budget (px)         = max_dive_speed  (1100) × t × SAFETY
 
-For variable-BPM levels (bpm_variable=true), per-beat BPM is interpolated
-from bpm_changes so that budget calculations are always beat-clock accurate.
-Speed zones change horizontal scroll speed but NOT the beat clock, so vertical
-budgets are computed from beat durations only (speed multipliers are excluded).
+State is a list of feasible height-intervals (usually one, but a point hazard
+can split it into two — which is exactly how an upper/lower "choose your path"
+section is validated). Each step:
 
-Speed-zone readability rules (checked independently of movement budgets):
+  1. EXPAND every interval by the budgets   [lo - rise, hi + dive]  (up is -y)
+  2. At each obstacle on this beat:
+       - GATE  (pressure_wall / kelp_curtain): INTERSECT with its gap corridor
+       - POINT HAZARD (jellyfish / mine / shard): SUBTRACT its exclusion band
+  3. Drop empty intervals. If none remain → the level is IMPOSSIBLE here.
+
+SAFETY (<1.0) leaves a little slack so sections are hard but not frame-perfect.
+
+Geometry mirrors ObstacleSpawner.gd exactly:
+  gap_px      = lerp(280, 200, effective_intensity)
+  corridor    = [center - gap/2 + PLAYER_HALF, center + gap/2 - PLAYER_HALF]
+  hazard band = [y - EXCL_HALF[type], y + EXCL_HALF[type]]   (EXCL incl. player)
+
+Reactive / screen-spanning hazards (mirror_fish, lava_burst, current_jet,
+anchor_chain, eel_snap, dark_void, gravity_well) are NOT simple vertical-position
+gates and are left out of the band (they are handled by their own runtime logic);
+the band still validates the gates and avoidable point hazards around them.
+
+Speed-zone readability rules (checked independently):
   - On-screen lead time ≥ 1.0 s per gate: (CANVAS_W - JUDGMENT_X) / (408 × mult) ≥ 1.0
   - Multiplier > 1.3: consecutive positional gates must be ≥ 2 beats apart
-
-Rest gates (pressure_wall intensity <= SKIP_INTENSITY) are excluded — they
-produce open water and impose no positional constraint.
-BubbleMines and jellyfish_drift are point hazards (not positional gates) and
-are also excluded from consecutive-gap analysis.
 
 Usage:
   python3 tools/check_movements.py assets/levels/z2-l1.brl [more...]
@@ -43,6 +57,26 @@ DIVE_TERMINAL: float = 1100.0   # px/s, matches PlayerController.max_dive_speed
 SKIP_INTENSITY: float = 0.08    # matches ObstacleSpawner.SKIP_INTENSITY
 # Float subtraction epsilon — prevents false positives when delta == budget exactly
 EPS: float = 1e-9
+
+# ── Reachable-band geometry (mirrors ObstacleSpawner.gd + Player.tscn) ─────────
+PLAYER_HALF: float = 28.0       # px, half of the 56px player capsule height
+SAFETY: float = 0.90            # use 90% of theoretical budget — leave a little room
+CLAMP_MARGIN: float = 60.0      # PlayerController clamps centre to [60, H-60]
+Y_MIN: float = CLAMP_MARGIN
+Y_MAX: float = SCREEN_H - CLAMP_MARGIN
+GAP_MAX_PX: float = 280.0       # easiest gate gap
+GAP_MIN_PX: float = 200.0       # hardest gate gap
+
+# Centre-to-centre danger half-height (px) for avoidable POINT hazards.
+# Already includes PLAYER_HALF; jellyfish adds its ±drift sweep.
+EXCL_HALF = {
+    # Jelly sweeps its full ±60 drift by the time it reaches the player, so the
+    # honest danger band is body(40) + player(28) + drift(60).
+    "jellyfish_drift": 40.0 + PLAYER_HALF + 60.0,
+    "bubble_mine": 56.0 + PLAYER_HALF,             # body 56 + player 28
+    "crystal_shard": 40.0 + PLAYER_HALF,           # capsule half 40 + player 28
+}
+POINT_HAZARDS = set(EXCL_HALF)
 
 POSITIONAL_TYPES = {"pressure_wall", "kelp_curtain"}
 
@@ -118,6 +152,114 @@ def is_active_positional(entry: dict) -> bool:
     return True
 
 
+# ── Interval algebra (lists of (lo, hi) px intervals, kept sorted & disjoint) ──
+
+def _merge(intervals: list) -> list:
+    """Merge overlapping/touching intervals; drop empty ones."""
+    cleaned = [(lo, hi) for lo, hi in intervals if hi - lo > EPS]
+    if not cleaned:
+        return []
+    cleaned.sort()
+    out = [cleaned[0]]
+    for lo, hi in cleaned[1:]:
+        if lo <= out[-1][1] + EPS:
+            out[-1] = (out[-1][0], max(out[-1][1], hi))
+        else:
+            out.append((lo, hi))
+    return out
+
+
+def _intersect(intervals: list, lo: float, hi: float) -> list:
+    """Intersect every interval with [lo, hi]."""
+    if hi - lo <= EPS:
+        return []
+    out = [(max(a, lo), min(b, hi)) for a, b in intervals]
+    return _merge(out)
+
+
+def _subtract(intervals: list, lo: float, hi: float) -> list:
+    """Remove the open band (lo, hi) from every interval — may split intervals."""
+    out = []
+    for a, b in intervals:
+        if hi <= a + EPS or lo >= b - EPS:   # no overlap
+            out.append((a, b))
+            continue
+        if a < lo - EPS:                     # left remainder
+            out.append((a, lo))
+        if b > hi + EPS:                     # right remainder
+            out.append((hi, b))
+    return _merge(out)
+
+
+def gate_corridor(entry: dict) -> tuple | None:
+    """Safe centre-band (px) for a gate, or None if it is open water / no gap."""
+    otype = entry.get("obstacle_type", "")
+    if otype not in POSITIONAL_TYPES:
+        return None
+    y = get_gap_y(entry)
+    if y is None:
+        return None
+    params = entry.get("parameters") or {}
+    intensity = float(params.get("intensity", 0.5))
+    if otype == "pressure_wall" and intensity <= SKIP_INTENSITY:
+        return None  # rest gate → open water, no constraint
+    gap_px = GAP_MAX_PX + (GAP_MIN_PX - GAP_MAX_PX) * max(0.0, min(1.0, intensity))
+    center = max(gap_px * 0.5 + 40.0, min(SCREEN_H - gap_px * 0.5 - 40.0, y * SCREEN_H))
+    lo = center - gap_px * 0.5 + PLAYER_HALF
+    hi = center + gap_px * 0.5 - PLAYER_HALF
+    return (lo, hi)
+
+
+def reachability_errors(data: dict, base_bpm: float, bpm_changes: list) -> list:
+    """Forward-propagate the feasible height-band; report where it empties."""
+    events = [e for e in data.get("beat_map", [])
+              if gate_corridor(e) is not None or e.get("obstacle_type") in POINT_HAZARDS]
+    events.sort(key=lambda e: float(e["beat_index"]))
+    if not events:
+        return []
+
+    # Group by beat so simultaneous obstacles are applied together.
+    groups: list = []
+    for e in events:
+        b = float(e["beat_index"])
+        if groups and abs(groups[-1][0] - b) < EPS:
+            groups[-1][1].append(e)
+        else:
+            groups.append((b, [e]))
+
+    bands = [(Y_MIN, Y_MAX)]
+    prev_beat = groups[0][0]
+    errors: list = []
+
+    for beat, group in groups:
+        if beat > prev_beat:
+            dt = beats_to_seconds(prev_beat, beat, base_bpm, bpm_changes)
+            rise = FLOAT_TERMINAL * dt * SAFETY
+            dive = DIVE_TERMINAL * dt * SAFETY
+            bands = _merge([(max(Y_MIN, lo - rise), min(Y_MAX, hi + dive)) for lo, hi in bands])
+        prev_beat = beat
+
+        for e in group:
+            corridor = gate_corridor(e)
+            if corridor is not None:
+                bands = _intersect(bands, corridor[0], corridor[1])
+            else:  # point hazard
+                y = (get_gap_y(e) or 0.5) * SCREEN_H
+                h = EXCL_HALF[e["obstacle_type"]]
+                bands = _subtract(bands, y - h, y + h)
+
+        if not bands:
+            kinds = ", ".join(sorted({str(e.get("obstacle_type")) for e in group}))
+            errors.append(
+                f"  B{beat:.1f}: no reachable path through [{kinds}] "
+                f"— player cannot be anywhere safe on this beat"
+            )
+            # Reset to full band so we can surface additional independent breaks.
+            bands = [(Y_MIN, Y_MAX)]
+
+    return errors
+
+
 def check_file(path: str) -> bool:
     try:
         with open(path, encoding="utf-8") as f:
@@ -137,34 +279,8 @@ def check_file(path: str) -> bool:
 
     errors: list[str] = []
 
-    # ── Movement budget check ─────────────────────────────────────────────────
-    for i in range(1, len(gates)):
-        prev, curr = gates[i - 1], gates[i]
-        b_prev = float(prev["beat_index"])
-        b_curr = float(curr["beat_index"])
-        beats = b_curr - b_prev
-        if beats <= 0:
-            continue
-
-        actual_seconds = beats_to_seconds(b_prev, b_curr, base_bpm, bpm_changes)
-        max_up   = (FLOAT_TERMINAL * actual_seconds) / SCREEN_H
-        max_down = (DIVE_TERMINAL  * actual_seconds) / SCREEN_H
-
-        y0, y1 = get_gap_y(prev), get_gap_y(curr)
-        delta = y1 - y0  # positive = downward
-
-        if delta < -(max_up + EPS):
-            errors.append(
-                f"  B{b_prev:.1f}({y0:.3f}) → B{b_curr:.1f}({y1:.3f}): "
-                f"up Δ {-delta:.4f} > budget {max_up:.4f}  "
-                f"({beats:.1f} beats, {actual_seconds:.3f}s)"
-            )
-        elif delta > max_down + EPS:
-            errors.append(
-                f"  B{b_prev:.1f}({y0:.3f}) → B{b_curr:.1f}({y1:.3f}): "
-                f"down Δ {delta:.4f} > budget {max_down:.4f}  "
-                f"({beats:.1f} beats, {actual_seconds:.3f}s)"
-            )
+    # ── Reachable-band check (gates + avoidable point hazards) ────────────────
+    errors.extend(reachability_errors(data, base_bpm, bpm_changes))
 
     # ── Speed-zone readability check ─────────────────────────────────────────
     for i, gate in enumerate(gates):

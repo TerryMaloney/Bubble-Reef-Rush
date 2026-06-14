@@ -22,6 +22,21 @@ const OVERLAP_Y_PX: float = 80.0   # §6.3 same-beat lane overlap threshold
 # Positional gate types — all others are point hazards excluded from gap analysis.
 const POSITIONAL_TYPES: Array[String] = ["pressure_wall", "kelp_curtain"]
 
+# ── Reachable-band geometry (mirrors tools/check_movements.py) ────────────────
+const PLAYER_HALF: float = 28.0      # half of the 56px player capsule height
+const SAFETY: float = 0.90           # use 90% of theoretical budget — leave room
+const CLAMP_MARGIN: float = 60.0
+const Y_MIN: float = CLAMP_MARGIN
+const Y_MAX: float = CANVAS_H - CLAMP_MARGIN
+const GAP_MAX_PX: float = 280.0
+const GAP_MIN_PX: float = 200.0
+# Centre-to-centre danger half-height (px) for avoidable point hazards.
+const EXCL_HALF: Dictionary = {
+	"jellyfish_drift": 128.0,  # body 40 + player 28 + ±60 drift
+	"bubble_mine": 84.0,       # body 56 + player 28
+	"crystal_shard": 68.0,     # capsule half 40 + player 28
+}
+
 
 ## Validate a parsed .brl Dictionary.
 ## Returns an Array of human-readable error strings.  Empty = valid.
@@ -83,7 +98,10 @@ static func validate(data: Dictionary) -> Array[String]:
 						]
 					)
 
-	# ── Movement budget check ─────────────────────────────────────────────────
+	# ── Reachable-band movement check (gates + avoidable point hazards) ───────
+	errors.append_array(_reachability_errors(beat_map, base_bpm, bpm_changes))
+
+	# Active gates, needed below for speed-zone readability.
 	var gates: Array[Dictionary] = []
 	for entry: Variant in beat_map:
 		var e: Dictionary = entry as Dictionary
@@ -93,36 +111,6 @@ static func validate(data: Dictionary) -> Array[String]:
 	gates.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return float(a.get("beat_index", 0)) < float(b.get("beat_index", 0))
 	)
-
-	for i: int in range(1, gates.size()):
-		var prev: Dictionary = gates[i - 1]
-		var curr: Dictionary = gates[i]
-		var b_prev: float = float(prev.get("beat_index", 0))
-		var b_curr: float = float(curr.get("beat_index", 0))
-		var beats: float = b_curr - b_prev
-		if beats <= 0.0:
-			continue
-
-		var actual_s: float = _beats_to_seconds(b_prev, b_curr, base_bpm, bpm_changes)
-		var max_up: float = (FLOAT_TERMINAL * actual_s) / CANVAS_H
-		var max_down: float = (DIVE_TERMINAL  * actual_s) / CANVAS_H
-
-		var y0: float = _get_gap_y(prev)
-		var y1: float = _get_gap_y(curr)
-		var delta: float = y1 - y0
-
-		if delta < -(max_up + EPS):
-			errors.append(
-				"B%.1f(%.3f) → B%.1f(%.3f): up Δ=%.4f > budget %.4f (%.1f beats, %.3fs)." % [
-					b_prev, y0, b_curr, y1, -delta, max_up, beats, actual_s
-				]
-			)
-		elif delta > max_down + EPS:
-			errors.append(
-				"B%.1f(%.3f) → B%.1f(%.3f): down Δ=%.4f > budget %.4f (%.1f beats, %.3fs)." % [
-					b_prev, y0, b_curr, y1, delta, max_down, beats, actual_s
-				]
-			)
 
 	# ── Speed-zone readability ────────────────────────────────────────────────
 	for i: int in range(gates.size()):
@@ -229,3 +217,122 @@ static func _get_speed_mult(beat: float, speed_zones: Array) -> float:
 		if beat >= float(z.get("start_beat", 0)) and beat < float(z.get("end_beat", 0)):
 			return float(z.get("speed_multiplier", 1.0))
 	return 1.0
+
+
+# ── Reachable-band engine ─────────────────────────────────────────────────────
+# Intervals are Vector2(lo, hi) in px; a band is an Array[Vector2], sorted/disjoint.
+
+## Safe centre-band for a gate, or Vector2(-1,-1) if open water / no gap.
+static func _gate_corridor(entry: Dictionary) -> Vector2:
+	var otype: String = str(entry.get("obstacle_type", ""))
+	if not (otype in POSITIONAL_TYPES):
+		return Vector2(-1.0, -1.0)
+	var y: float = _get_gap_y(entry)
+	if y < 0.0:
+		return Vector2(-1.0, -1.0)
+	var intensity: float = float((entry.get("parameters", {}) as Dictionary).get("intensity", 0.5))
+	if otype == "pressure_wall" and intensity <= SKIP_INTENSITY:
+		return Vector2(-1.0, -1.0)
+	var gap_px: float = lerpf(GAP_MAX_PX, GAP_MIN_PX, clampf(intensity, 0.0, 1.0))
+	var center: float = clampf(y * CANVAS_H, gap_px * 0.5 + 40.0, CANVAS_H - gap_px * 0.5 - 40.0)
+	return Vector2(center - gap_px * 0.5 + PLAYER_HALF, center + gap_px * 0.5 - PLAYER_HALF)
+
+
+static func _merge(bands: Array) -> Array:
+	var cleaned: Array = []
+	for iv: Vector2 in bands:
+		if iv.y - iv.x > EPS:
+			cleaned.append(iv)
+	cleaned.sort_custom(func(a: Vector2, b: Vector2) -> bool: return a.x < b.x)
+	if cleaned.is_empty():
+		return []
+	var out: Array = [cleaned[0]]
+	for k: int in range(1, cleaned.size()):
+		var iv: Vector2 = cleaned[k]
+		var last: Vector2 = out[-1]
+		if iv.x <= last.y + EPS:
+			out[-1] = Vector2(last.x, maxf(last.y, iv.y))
+		else:
+			out.append(iv)
+	return out
+
+
+static func _intersect(bands: Array, lo: float, hi: float) -> Array:
+	if hi - lo <= EPS:
+		return []
+	var out: Array = []
+	for iv: Vector2 in bands:
+		out.append(Vector2(maxf(iv.x, lo), minf(iv.y, hi)))
+	return _merge(out)
+
+
+static func _subtract(bands: Array, lo: float, hi: float) -> Array:
+	var out: Array = []
+	for iv: Vector2 in bands:
+		if hi <= iv.x + EPS or lo >= iv.y - EPS:
+			out.append(iv)
+			continue
+		if iv.x < lo - EPS:
+			out.append(Vector2(iv.x, lo))
+		if iv.y > hi + EPS:
+			out.append(Vector2(hi, iv.y))
+	return _merge(out)
+
+
+## Forward-propagate the feasible height-band through every gate and avoidable
+## point hazard. Returns an error string for each beat where no safe path exists.
+static func _reachability_errors(beat_map: Array, base_bpm: float, bpm_changes: Array[Dictionary]) -> Array[String]:
+	var events: Array[Dictionary] = []
+	for entry: Variant in beat_map:
+		var e: Dictionary = entry as Dictionary
+		var is_gate: bool = _gate_corridor(e).x >= 0.0
+		var is_haz: bool = EXCL_HALF.has(str(e.get("obstacle_type", "")))
+		if is_gate or is_haz:
+			events.append(e)
+	events.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a.get("beat_index", 0)) < float(b.get("beat_index", 0))
+	)
+
+	var errors: Array[String] = []
+	if events.is_empty():
+		return errors
+
+	var bands: Array = [Vector2(Y_MIN, Y_MAX)]
+	var prev_beat: float = float(events[0].get("beat_index", 0))
+	var idx: int = 0
+	while idx < events.size():
+		var beat: float = float(events[idx].get("beat_index", 0))
+		# Collect all events on this beat.
+		var group: Array[Dictionary] = []
+		while idx < events.size() and absf(float(events[idx].get("beat_index", 0)) - beat) < EPS:
+			group.append(events[idx])
+			idx += 1
+
+		if beat > prev_beat:
+			var dt: float = _beats_to_seconds(prev_beat, beat, base_bpm, bpm_changes)
+			var rise: float = FLOAT_TERMINAL * dt * SAFETY
+			var dive: float = DIVE_TERMINAL * dt * SAFETY
+			var expanded: Array = []
+			for iv: Vector2 in bands:
+				expanded.append(Vector2(maxf(Y_MIN, iv.x - rise), minf(Y_MAX, iv.y + dive)))
+			bands = _merge(expanded)
+		prev_beat = beat
+
+		for e: Dictionary in group:
+			var corridor: Vector2 = _gate_corridor(e)
+			if corridor.x >= 0.0:
+				bands = _intersect(bands, corridor.x, corridor.y)
+			else:
+				var hy: float = _get_gap_y(e)
+				if hy < 0.0:
+					hy = 0.5
+				var h: float = float(EXCL_HALF[str(e.get("obstacle_type", ""))])
+				bands = _subtract(bands, hy * CANVAS_H - h, hy * CANVAS_H + h)
+
+		if bands.is_empty():
+			errors.append(
+				"Beat %.1f: no reachable path — player cannot be anywhere safe on this beat." % beat
+			)
+			bands = [Vector2(Y_MIN, Y_MAX)]   # reset to surface further independent breaks
+
+	return errors

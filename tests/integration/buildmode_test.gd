@@ -28,6 +28,7 @@ func _init() -> void:
 	_test_brl_round_trip()
 	_test_validator_valid()
 	_test_validator_impossible_movement()
+	_test_validator_point_hazard_blocks_path()
 	_test_validator_density_cap()
 	_test_validator_overlap()
 	_test_tagger_table()
@@ -182,6 +183,29 @@ func _test_validator_impossible_movement() -> void:
 		_fail("PlayabilityValidator impossible movement: expected errors, got none")
 	else:
 		print("PlayabilityValidator impossible movement: %d error(s) detected — OK" % errors.size())
+
+
+## ── 5b. Reachable-band: a point hazard blocking the only path is flagged ─────
+## The old gates-only check ignored jellyfish entirely; the band engine subtracts
+## the hazard exclusion from the gate corridor. A jelly centred in a tight gate
+## gap on the same beat leaves no safe height → must error.
+func _test_validator_point_hazard_blocks_path() -> void:
+	var data: Dictionary = _make_simple_level(1, [
+		# Tight gate (intensity 1.0 → 200px gap → 144px corridor) centred at 0.5 …
+		{"beat_index": 4.0, "lane_position": 0.5, "obstacle_type": "pressure_wall",
+			"parameters": {"intensity": 1.0, "gap_y_normalized": 0.5}},
+		# … with a jellyfish (±128px exclusion) right in that gap on the same beat.
+		{"beat_index": 4.0, "lane_position": 0.5, "obstacle_type": "jellyfish_drift"},
+	])
+	var errors: Array[String] = PlayabilityValidator.validate(data)
+	var found: bool = false
+	for e: String in errors:
+		if "no reachable path" in e:
+			found = true
+	if not found:
+		_fail("PlayabilityValidator point hazard: jelly-blocked gap not flagged. Errors: %s" % str(errors))
+	else:
+		print("PlayabilityValidator point hazard: jelly blocking gate gap detected — OK")
 
 
 ## ── 6. PlayabilityValidator: density cap ─────────────────────────────────────
