@@ -6,10 +6,14 @@ extends Node2D
 class_name GhostPlayer
 
 const CANVAS_H: float = 1920.0
-const FLOAT_FORCE: float = 480.0
-const DIVE_FORCE: float = 1220.0
-const MAX_FLOAT_SPEED: float = 480.0
-const MAX_DIVE_SPEED: float = 720.0
+# These MUST mirror PlayerController / GameConstants exactly, or the ghost
+# replays the same dive inputs under different physics and desyncs — drifting
+# to the floor or ceiling instead of tracking the recorded run.
+const FLOAT_FORCE: float = 1250.0
+const DIVE_FORCE: float = 1940.0
+const MAX_FLOAT_SPEED: float = 700.0
+const MAX_DIVE_SPEED: float = 1100.0
+const DIVE_IMPULSE: float = 220.0
 const DRAG: float = 0.983
 
 var _inputs: Array = []
@@ -50,7 +54,7 @@ func _process(delta: float) -> void:
 			var ev: String = str(inp.get("event", ""))
 			if ev == "dive_start":
 				_diving = true
-				_velocity_y = 480.0
+				_velocity_y = DIVE_IMPULSE
 			elif ev == "dive_end":
 				_diving = false
 			_input_idx += 1
