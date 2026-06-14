@@ -117,7 +117,12 @@ func _spawn_obstacle(entry: Dictionary, _current_beat: float) -> void:
 	get_parent().add_child(obstacle)
 
 	if obstacle.has_method("setup"):
-		obstacle.setup(entry)
+		# Pass the difficulty-adjusted params (not the raw entry) so per-difficulty
+		# tweaks — e.g. kelp_curtain gap_height, eel_snap dormant_beats — actually
+		# reach the obstacle. Other entry fields are preserved.
+		var spawn_entry: Dictionary = entry.duplicate(true)
+		spawn_entry["parameters"] = params
+		obstacle.setup(spawn_entry)
 
 
 ## Build a gate: a top and bottom CoralSpike with a navigable gap between them.

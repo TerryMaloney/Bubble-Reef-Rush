@@ -82,6 +82,10 @@ func _ready() -> void:
 
 
 func start_level(level_id: String) -> void:
+	# Any launch that isn't the active build test-play clears leaked build state,
+	# so finishing a Journey level can never boomerang back into the editor.
+	if level_id != pending_build_test_path:
+		_abandon_build_test()
 	current_state = State.LOADING
 	current_level_id = level_id
 	_last_progress_pct = 0.0
@@ -95,6 +99,7 @@ func retry_level() -> void:
 
 func go_to_menu() -> void:
 	current_state = State.MENU
+	_abandon_build_test()
 	_clear_session_state()
 	# Cleared here (not in _clear_session_state) so PartyHub's
 	# show_ghost → go_to_zone_select() flow survives navigation.
@@ -123,6 +128,7 @@ func finish_level(score: int, stars: int) -> void:
 
 func go_to_zone_select() -> void:
 	current_state = State.MENU
+	_abandon_build_test()
 	_clear_session_state()
 	TransitionLayer.go_to(ZONE_SELECT_SCENE)
 
@@ -183,6 +189,19 @@ func _cleanup_build_test() -> void:
 	if not pending_build_test_path.is_empty():
 		DirAccess.remove_absolute(pending_build_test_path)
 		pending_build_test_path = ""
+	is_practice_mode = false
+
+
+## Fully abandon a build test-play: delete the temp file, drop the stashed
+## session, and clear the practice flag. No-op when no build test is active,
+## so it never disturbs a normal (e.g. practice) run launch.
+func _abandon_build_test() -> void:
+	if pending_build_session == null and pending_build_test_path.is_empty():
+		return
+	if not pending_build_test_path.is_empty():
+		DirAccess.remove_absolute(pending_build_test_path)
+		pending_build_test_path = ""
+	pending_build_session = null
 	is_practice_mode = false
 
 

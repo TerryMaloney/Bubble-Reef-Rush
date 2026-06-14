@@ -95,5 +95,6 @@ run_stage "Hazard warning test"         "tests/integration/hazard_warning_test.g
 run_stage "Pearl reachability test"     "tests/integration/pearl_reachability_test.gd"      "PEARL_REACHABILITY_OK"
 run_stage "Build mode overlay test"     "tests/integration/build_mode_overlay_test.gd"      "BUILD_MODE_OVERLAY_OK"
 run_stage "HUD difficulty test"         "tests/integration/hud_difficulty_test.gd"          "HUD_DIFFICULTY_OK"
+run_stage "Build test leak test"        "tests/integration/build_test_leak_test.gd"         "BUILD_TEST_LEAK_OK"
 
 echo "==> All tests passed."
