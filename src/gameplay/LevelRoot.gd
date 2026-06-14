@@ -101,7 +101,7 @@ func _ready() -> void:
 	# Test-play banner.
 	if $HUD.has_node("TestBanner") and GameManager.pending_build_session != null:
 		var banner: Label = $HUD/TestBanner as Label
-		var sd: Dictionary = (GameManager.pending_build_session as Node).call("get_data") as Dictionary
+		var sd: Dictionary = (GameManager.pending_build_session as BuildSession).get_data()
 		var meta: Dictionary = sd.get("metadata", {}) as Dictionary
 		var beat_count: int = (sd.get("beat_map", []) as Array).size()
 		banner.text = "TESTING: %s  |  Objects: %d" % [str(meta.get("name", "My Level")), beat_count]

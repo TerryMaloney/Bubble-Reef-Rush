@@ -27,8 +27,24 @@ signal obstacle_moved(beat_map_index: int, new_beat: float, new_lane: float)
 const CANVAS_H: float = 1920.0
 const BEATS_VISIBLE_DEFAULT: int = 16
 const RULER_H: float = 44.0
-const TRASH_ZONE_H: float = 80.0
 const DRAG_THRESHOLD: float = 14.0  # pixels of movement before drag activates
+
+# Trash target: a compact pill in the top-right corner, shown only while
+# dragging an obstacle — keeps the whole editing area clear (no bottom strip).
+const TRASH_W: float = 220.0
+const TRASH_H: float = 56.0
+const TRASH_MARGIN: float = 12.0
+
+# Gate geometry — mirrors ObstacleSpawner.gd so the editor is WYSIWYG.
+const GAP_MAX_PX: float = 280.0
+const GAP_MIN_PX: float = 200.0
+
+# Real in-game body sizes (canvas px) for point hazards, so chips match play.
+const HAZARD_RADIUS: Dictionary = {
+	"jellyfish_drift": 40.0,
+	"bubble_mine": 56.0,
+	"crystal_shard": 40.0,
+}
 
 var px_per_beat: float = 60.0
 var px_per_lane: float = 1.0
@@ -61,6 +77,10 @@ var _place_beat: float = 0.0
 var _place_lane: float = 0.0
 var _press_on_ruler: bool = false
 
+# True only between a press and its release — gates motion so a bare mouse
+# move (no button held) never pans the timeline ("grab to slide").
+var _pressed: bool = false
+
 const COL_BG: Color = Color(0.04, 0.05, 0.14)
 const COL_RULER: Color = Color(0.10, 0.12, 0.22)
 const COL_BEAT: Color = Color(0.30, 0.30, 0.46)
@@ -72,11 +92,18 @@ const COL_TRASH_IDLE: Color = Color(0.55, 0.10, 0.10, 0.80)
 const COL_TRASH_HOT: Color = Color(0.95, 0.15, 0.15, 0.95)
 
 const OBSTACLE_COLORS: Dictionary = {
-	"pressure_wall":   Color(0.25, 0.65, 1.0),
-	"jellyfish_drift": Color(0.85, 0.35, 0.95),
-	"boss_projectile": Color(1.0, 0.35, 0.25),
-	"speed_ring":      Color(0.25, 0.95, 0.55),
-	"gravity_flip":    Color(0.95, 0.75, 0.15),
+	"coral_spike":     Color(0.85, 0.30, 0.20),
+	"jellyfish_drift": Color(0.72, 0.25, 0.82),
+	"kelp_curtain":    Color(0.20, 0.65, 0.35),
+	"bubble_mine":     Color(0.88, 0.60, 0.10),
+	"current_jet":     Color(0.18, 0.62, 0.88),
+	"anchor_chain":    Color(0.50, 0.42, 0.28),
+	"eel_snap":        Color(0.30, 0.75, 0.55),
+	"lava_burst":      Color(0.95, 0.35, 0.05),
+	"pressure_wall":   Color(0.18, 0.52, 0.88),
+	"dark_void":       Color(0.30, 0.15, 0.55),
+	"crystal_shard":   Color(0.40, 0.80, 0.95),
+	"mirror_fish":     Color(0.60, 0.60, 0.75),
 	"secret_exit":     Color(0.95, 0.85, 0.2),
 }
 const COL_OBSTACLE_DEFAULT: Color = Color(0.3, 0.8, 1.0, 0.9)
@@ -130,29 +157,34 @@ func _draw() -> void:
 				draw_line(Vector2(qx, RULER_H), Vector2(qx, size.y),
 						COL_BEAT_8 * Color(1, 1, 1, 0.5), 1.0)
 
-	# ── Obstacles ──────────────────────────────────────────────────────────────
+	# ── Obstacles (drawn at their true in-game footprint) ──────────────────────
 	if session != null:
 		var beat_map: Array = (session.get_data().get("beat_map", []) as Array)
 		for i: int in range(beat_map.size()):
 			if _obs_dragging and i == _obs_drag_index:
 				continue  # drawn separately below at drag position
 			var entry: Dictionary = beat_map[i] as Dictionary
-			var beat_idx: float = float(entry.get("beat_index", 0))
-			var lane_y: float = float(entry.get("lane_position", 0.5))
-			var otype: String = str(entry.get("obstacle_type", "?"))
-			_draw_obstacle(beat_idx, lane_y, otype, i == selected_index, false)
+			_draw_obstacle_entry(
+					float(entry.get("beat_index", 0)),
+					float(entry.get("lane_position", 0.5)),
+					str(entry.get("obstacle_type", "?")),
+					entry.get("parameters", {}) as Dictionary,
+					i == selected_index, false)
 
 	# ── Dragged obstacle ghost ─────────────────────────────────────────────────
 	if _obs_dragging and session != null:
 		var beat_map: Array = (session.get_data().get("beat_map", []) as Array)
 		if _obs_drag_index < beat_map.size():
 			var drag_entry: Dictionary = beat_map[_obs_drag_index] as Dictionary
-			var drag_otype: String = str(drag_entry.get("obstacle_type", "?"))
-			_draw_obstacle(_obs_drag_beat, _obs_drag_lane, drag_otype, true, _obs_drag_over_trash)
+			_draw_obstacle_entry(_obs_drag_beat, _obs_drag_lane,
+					str(drag_entry.get("obstacle_type", "?")),
+					drag_entry.get("parameters", {}) as Dictionary,
+					true, _obs_drag_over_trash)
 
 	# ── Placement preview (dragging out a new obstacle in place mode) ──────────
 	if _placing and not active_type.is_empty():
-		_draw_obstacle(_place_beat, _place_lane, active_type, true, false)
+		_draw_obstacle_entry(_place_beat, _place_lane, active_type,
+				_default_params(active_type), true, false)
 
 	# ── Place-mode hint banner ─────────────────────────────────────────────────
 	if not active_type.is_empty() and not _placing and not _obs_dragging:
@@ -162,14 +194,13 @@ func _draw() -> void:
 		draw_string(font, Vector2(18.0, RULER_H + 33.0), hint,
 				HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color.WHITE)
 
-	# ── Trash zone (visible only while dragging an obstacle) ───────────────────
+	# ── Trash pill (top-right corner, only while dragging an obstacle) ─────────
 	if _obs_dragging:
+		var tr: Rect2 = _trash_rect()
 		var trash_col: Color = COL_TRASH_HOT if _obs_drag_over_trash else COL_TRASH_IDLE
-		draw_rect(Rect2(0.0, size.y - TRASH_ZONE_H, size.x, TRASH_ZONE_H), trash_col)
-		draw_string(font,
-				Vector2(size.x * 0.5 - 100.0, size.y - TRASH_ZONE_H + 52.0),
-				"Drag here to remove",
-				HORIZONTAL_ALIGNMENT_LEFT, -1, 26, Color.WHITE)
+		draw_rect(tr, trash_col)
+		draw_string(font, Vector2(tr.position.x + 14.0, tr.position.y + 37.0),
+				"🗑  Drop to delete", HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color.WHITE)
 
 	# ── Playhead ───────────────────────────────────────────────────────────────
 	var ph_x: float = (playhead_beat - pan_beat) * px_per_beat
@@ -183,36 +214,131 @@ func _draw() -> void:
 			Color(0.5, 0.5, 0.7, 0.6), 1.0)
 
 
-func _draw_obstacle(beat_idx: float, lane_y_norm: float, otype: String,
-		is_sel: bool, is_trashing: bool) -> void:
+## Canvas-Y (0..1920) → screen-Y scale for the play area below the ruler.
+func _vscale() -> float:
+	return (size.y - RULER_H) / CANVAS_H
+
+
+func _trash_rect() -> Rect2:
+	return Rect2(size.x - TRASH_W - TRASH_MARGIN, RULER_H + TRASH_MARGIN, TRASH_W, TRASH_H)
+
+
+## Default parameters for a freshly-placed obstacle (for the placement preview).
+func _default_params(otype: String) -> Dictionary:
+	var result: Dictionary = {}
+	for pdef: Dictionary in ObstacleParamSchema.params_for(otype):
+		result[str(pdef.get("key", ""))] = pdef.get("default")
+	return result
+
+
+## Draw an obstacle at its real in-game footprint: walls span the full height
+## with the true gap, spikes are triangles of their height, point hazards are
+## circles of their real radius. This makes the editor WYSIWYG.
+func _draw_obstacle_entry(beat_idx: float, lane_y_norm: float, otype: String,
+		params: Dictionary, is_sel: bool, is_trashing: bool) -> void:
 	var x: float = (beat_idx - pan_beat) * px_per_beat
-	var y: float = RULER_H + lane_y_norm * (size.y - RULER_H)
-	if x < -60.0 or x > size.x + 60.0:
+	if x < -160.0 or x > size.x + 160.0:
 		return
 
-	var base_col: Color = OBSTACLE_COLORS.get(otype, COL_OBSTACLE_DEFAULT) as Color
+	var col: Color = OBSTACLE_COLORS.get(otype, COL_OBSTACLE_DEFAULT) as Color
 	if is_trashing:
-		base_col = Color(1.0, 0.2, 0.2)
+		col = Color(1.0, 0.3, 0.3)
 	elif is_sel:
-		base_col = COL_SELECTED
+		col = COL_SELECTED
 
-	var rw: float = maxf(48.0, px_per_beat * 0.55)
-	var rh: float = 48.0
-	# Shadow
-	draw_rect(Rect2(x - rw * 0.5 + 3.0, y - rh * 0.5 + 3.0, rw, rh),
-			Color(0.0, 0.0, 0.0, 0.35))
-	# Chip body
-	draw_rect(Rect2(x - rw * 0.5, y - rh * 0.5, rw, rh), base_col.darkened(0.35))
-	draw_rect(Rect2(x - rw * 0.5 + 2.0, y - rh * 0.5 + 2.0, rw - 4.0, rh - 4.0), base_col)
+	var w: float = maxf(40.0, px_per_beat * 0.45)
+	var vs: float = _vscale()
+	var label_y: float = RULER_H + lane_y_norm * (size.y - RULER_H)
 
-	# Friendly short label using display_name
+	match otype:
+		"pressure_wall", "kelp_curtain":
+			label_y = _draw_gate(x, w, otype, params, col, vs)
+		"coral_spike":
+			label_y = _draw_spike(x, params, col, vs)
+		"jellyfish_drift", "bubble_mine", "crystal_shard":
+			var r: float = float(HAZARD_RADIUS.get(otype, 40.0)) * vs
+			var range_px: float = 0.0
+			if otype == "jellyfish_drift":
+				range_px = float(params.get("oscillation_amplitude", 80.0)) * vs
+			_draw_blob(x, lane_y_norm, r, col, range_px)
+		_:
+			_draw_generic(x, lane_y_norm, w, col)
+
+	# Selection ring around the whole footprint for clarity.
+	if is_sel:
+		var rr: Rect2 = _obstacle_rect_local(beat_idx, lane_y_norm, otype, params)
+		draw_rect(rr, COL_SELECTED, false, 2.0)
+
+	# Short friendly label.
 	var short: String = ObstacleParamSchema.display_name(otype)
-	if short.length() > 6:
-		short = short.substr(0, 6)
-	draw_string(ThemeDB.fallback_font,
-			Vector2(x - rw * 0.5 + 4.0, y + 6.0),
-			short, HORIZONTAL_ALIGNMENT_LEFT, -1, 13,
-			Color(0.05, 0.05, 0.1, 0.95))
+	draw_string(ThemeDB.fallback_font, Vector2(x - w * 0.5 - 2.0, label_y),
+			short, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(0.95, 0.97, 1.0))
+
+
+## Draw a top+bottom wall with the real navigable gap. Returns a y for the label.
+func _draw_gate(x: float, w: float, otype: String, params: Dictionary,
+		col: Color, vs: float) -> float:
+	var gap_px: float
+	var center_norm: float = float(params.get("gap_y_normalized", 0.5))
+	if otype == "pressure_wall":
+		var intensity: float = float(params.get("intensity", 0.5))
+		gap_px = lerpf(GAP_MAX_PX, GAP_MIN_PX, clampf(intensity, 0.0, 1.0))
+	else:
+		gap_px = float(params.get("gap_height", 240.0))
+	var center: float = center_norm * CANVAS_H
+	var gap_top: float = center - gap_px * 0.5
+	var gap_bot: float = center + gap_px * 0.5
+	var lx: float = x - w * 0.5
+
+	if gap_top > 0.0:
+		var top_h: float = gap_top * vs
+		draw_rect(Rect2(lx, RULER_H, w, top_h), col.darkened(0.35))
+		draw_rect(Rect2(lx + 2.0, RULER_H, w - 4.0, maxf(0.0, top_h - 2.0)), col)
+	if gap_bot < CANVAS_H:
+		var bot_y: float = RULER_H + gap_bot * vs
+		draw_rect(Rect2(lx, bot_y, w, size.y - bot_y), col.darkened(0.35))
+		draw_rect(Rect2(lx + 2.0, bot_y + 2.0, w - 4.0, size.y - bot_y - 2.0), col)
+	return RULER_H + center * vs
+
+
+## Draw a spike triangle of its configured height from the chosen wall.
+func _draw_spike(x: float, params: Dictionary, col: Color, vs: float) -> float:
+	var h: float = float(params.get("height", 120)) * vs
+	var attach: String = str(params.get("wall_attachment", "bottom"))
+	var bw: float = maxf(56.0, 60.0 * vs)
+	var pts: PackedVector2Array = PackedVector2Array()
+	var label_y: float
+	if attach == "top":
+		pts.append(Vector2(x - bw * 0.5, RULER_H))
+		pts.append(Vector2(x + bw * 0.5, RULER_H))
+		pts.append(Vector2(x, RULER_H + h))
+		label_y = RULER_H + h + 14.0
+	else:
+		pts.append(Vector2(x - bw * 0.5, size.y))
+		pts.append(Vector2(x + bw * 0.5, size.y))
+		pts.append(Vector2(x, size.y - h))
+		label_y = size.y - h - 6.0
+	draw_colored_polygon(pts, col)
+	return label_y
+
+
+## Draw a point hazard as a circle of its real radius, with optional drift range.
+func _draw_blob(x: float, lane_y_norm: float, r: float, col: Color, range_px: float) -> void:
+	var cy: float = RULER_H + lane_y_norm * (size.y - RULER_H)
+	r = maxf(r, 9.0)
+	if range_px > 2.0:
+		draw_rect(Rect2(x - 3.0, cy - range_px, 6.0, range_px * 2.0),
+				Color(col.r, col.g, col.b, 0.22))
+	draw_circle(Vector2(x, cy), r + 2.0, col.darkened(0.35))
+	draw_circle(Vector2(x, cy), r, col)
+
+
+## Fallback chip for hazards without a simple geometric footprint.
+func _draw_generic(x: float, lane_y_norm: float, w: float, col: Color) -> void:
+	var cy: float = RULER_H + lane_y_norm * (size.y - RULER_H)
+	var rh: float = 52.0
+	draw_rect(Rect2(x - w * 0.5, cy - rh * 0.5, w, rh), col.darkened(0.35))
+	draw_rect(Rect2(x - w * 0.5 + 2.0, cy - rh * 0.5 + 2.0, w - 4.0, rh - 4.0), col)
 
 
 func _gui_input(event: InputEvent) -> void:
@@ -252,6 +378,7 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _handle_press(pos: Vector2, is_right: bool) -> void:
+	_pressed = true
 	_press_pos = pos
 	_moved_enough = false
 	_pan_active = false
@@ -273,11 +400,15 @@ func _handle_press(pos: Vector2, is_right: bool) -> void:
 
 
 func _handle_motion(pos: Vector2, rel: Vector2) -> void:
+	# Grab to slide: ignore bare mouse movement when nothing is held down.
+	if not _pressed:
+		return
+
 	if _obs_dragging:
 		# Update obstacle ghost position.
 		_obs_drag_beat = _snap_beat(pan_beat + pos.x / px_per_beat)
 		_obs_drag_lane = clampf((pos.y - RULER_H) / (size.y - RULER_H), 0.0, 1.0)
-		_obs_drag_over_trash = (pos.y > size.y - TRASH_ZONE_H)
+		_obs_drag_over_trash = _trash_rect().has_point(pos)
 		queue_redraw()
 		return
 
@@ -330,6 +461,7 @@ func _handle_motion(pos: Vector2, rel: Vector2) -> void:
 
 
 func _handle_release(pos: Vector2) -> void:
+	_pressed = false
 	if _placing:
 		obstacle_placed.emit(_place_beat, _place_lane)
 		selected_index = -1
@@ -381,18 +513,42 @@ func _handle_release(pos: Vector2) -> void:
 
 
 func _hit_test(pos: Vector2, beat_map: Array) -> int:
-	var rh: float = 48.0
-	for i: int in range(beat_map.size()):
+	# Iterate back-to-front so the visually top-most obstacle wins.
+	for i: int in range(beat_map.size() - 1, -1, -1):
 		var entry: Dictionary = beat_map[i] as Dictionary
-		var beat_idx: float = float(entry.get("beat_index", 0))
-		var lane_y: float = float(entry.get("lane_position", 0.5))
-		var ox: float = (beat_idx - pan_beat) * px_per_beat
-		var oy: float = RULER_H + lane_y * (size.y - RULER_H)
-		var rw: float = maxf(48.0, px_per_beat * 0.55)
-		var rect: Rect2 = Rect2(ox - rw * 0.5, oy - rh * 0.5, rw, rh)
+		var rect: Rect2 = _obstacle_rect_local(
+				float(entry.get("beat_index", 0)),
+				float(entry.get("lane_position", 0.5)),
+				str(entry.get("obstacle_type", "?")),
+				entry.get("parameters", {}) as Dictionary)
 		if rect.has_point(pos):
 			return i
 	return -1
+
+
+## Selectable on-screen bounds for an obstacle, matching how it is drawn.
+func _obstacle_rect_local(beat_idx: float, lane_y_norm: float, otype: String,
+		params: Dictionary) -> Rect2:
+	var x: float = (beat_idx - pan_beat) * px_per_beat
+	var w: float = maxf(40.0, px_per_beat * 0.45)
+	var vs: float = _vscale()
+	match otype:
+		"pressure_wall", "kelp_curtain":
+			# Whole vertical column is tappable.
+			return Rect2(x - w * 0.5, RULER_H, w, size.y - RULER_H)
+		"coral_spike":
+			var h: float = float(params.get("height", 120)) * vs
+			var bw: float = maxf(56.0, 60.0 * vs)
+			if str(params.get("wall_attachment", "bottom")) == "top":
+				return Rect2(x - bw * 0.5, RULER_H, bw, h)
+			return Rect2(x - bw * 0.5, size.y - h, bw, h)
+		"jellyfish_drift", "bubble_mine", "crystal_shard":
+			var r: float = maxf(12.0, float(HAZARD_RADIUS.get(otype, 40.0)) * vs)
+			var cy: float = RULER_H + lane_y_norm * (size.y - RULER_H)
+			return Rect2(x - r, cy - r, r * 2.0, r * 2.0)
+		_:
+			var cy2: float = RULER_H + lane_y_norm * (size.y - RULER_H)
+			return Rect2(x - w * 0.5, cy2 - 28.0, w, 56.0)
 
 
 func _snap_beat(raw_beat: float) -> float:

@@ -9,6 +9,10 @@ const ZONE_NAMES: Array[String] = ["", "World 1", "World 2", "World 3", "World 4
 
 
 func _ready() -> void:
+	# Fill the screen so the dim background and centred panel position correctly
+	# (otherwise the panel anchors against a zero-size rect and lands off-centre,
+	# leaving only a sliver of each button actually tappable).
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build_ui()
 
 
@@ -19,11 +23,14 @@ func _build_ui() -> void:
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(bg)
 
-	# Centered panel.
+	# Centre the panel within the full screen.
+	var center: CenterContainer = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(center)
+
 	var panel: PanelContainer = PanelContainer.new()
-	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	panel.custom_minimum_size = Vector2(640, 720)
-	add_child(panel)
+	panel.custom_minimum_size = Vector2(680, 760)
+	center.add_child(panel)
 
 	var vbox: VBoxContainer = VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 12)
