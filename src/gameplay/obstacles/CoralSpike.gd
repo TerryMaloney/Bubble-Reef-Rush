@@ -3,6 +3,10 @@ extends Area2D
 class_name CoralSpike
 
 const SPIKE_WIDTH: float = 60.0
+## Collision is intentionally narrower than the visual and stops short of the
+## tip so brushing the edge of a spike doesn't read as a hit (forgiving feel).
+const COLLISION_WIDTH: float = 46.0
+const TIP_FORGIVE: float = 16.0
 const _BASE_PATH: String = "res://assets/obstacles/coral_spike_base.png"
 const _BODY_PATH: String = "res://assets/obstacles/coral_spike_body.png"
 
@@ -36,28 +40,32 @@ func configure(attachment: String, height: float) -> void:
 
 func _configure(attachment: String, height: float) -> void:
 	var shape: RectangleShape2D = RectangleShape2D.new()
+	# Collision length runs base->tip; inset the tip end so the very point is
+	# forgiving. The base stays anchored at the wall (origin side).
+	var col_len: float = maxf(8.0, height - TIP_FORGIVE)
+	var half: float = col_len * 0.5
 
 	match attachment:
 		"top":
-			shape.size = Vector2(SPIKE_WIDTH, height)
+			shape.size = Vector2(COLLISION_WIDTH, col_len)
 			_collision.shape = shape
-			_collision.position = Vector2(0.0, height * 0.5)
+			_collision.position = Vector2(0.0, half)
 		"bottom":
-			shape.size = Vector2(SPIKE_WIDTH, height)
+			shape.size = Vector2(COLLISION_WIDTH, col_len)
 			_collision.shape = shape
-			_collision.position = Vector2(0.0, -height * 0.5)
+			_collision.position = Vector2(0.0, -half)
 		"left":
-			shape.size = Vector2(height, SPIKE_WIDTH)
+			shape.size = Vector2(col_len, COLLISION_WIDTH)
 			_collision.shape = shape
-			_collision.position = Vector2(height * 0.5, 0.0)
+			_collision.position = Vector2(half, 0.0)
 		"right":
-			shape.size = Vector2(height, SPIKE_WIDTH)
+			shape.size = Vector2(col_len, COLLISION_WIDTH)
 			_collision.shape = shape
-			_collision.position = Vector2(-height * 0.5, 0.0)
+			_collision.position = Vector2(-half, 0.0)
 		_:
-			shape.size = Vector2(SPIKE_WIDTH, height)
+			shape.size = Vector2(COLLISION_WIDTH, col_len)
 			_collision.shape = shape
-			_collision.position = Vector2(0.0, -height * 0.5)
+			_collision.position = Vector2(0.0, -half)
 
 	_build_visual(attachment, height)
 	_try_load_sprites(attachment, height)

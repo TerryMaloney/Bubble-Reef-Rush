@@ -135,6 +135,35 @@ def dehalo(img: Image.Image) -> Image.Image:
     return img
 
 
+# Single-frame sprites whose transparent margins should be cropped so the
+# visible art fills the texture (collision boxes are sized to the texture).
+# NEVER trim multi-frame sheets (swim/dive/death) — it breaks the grid.
+SINGLE_SPRITES_TO_TRIM = [
+    "assets/obstacles/coral_spike_body.png",
+    "assets/obstacles/coral_spike_base.png",
+    "assets/obstacles/jellyfish_drift.png",
+    "assets/obstacles/bubble_mine.png",
+    "assets/characters/player.png",
+]
+
+
+def trim_to_content(path: Path) -> bool:
+    """Crop a single-frame sprite to the bounding box of its opaque pixels."""
+    if not path.exists():
+        print(f"  SKIP (missing): {path.relative_to(REPO)}")
+        return False
+    img = Image.open(path).convert("RGBA")
+    bbox = img.getbbox()  # tightest box containing all non-transparent pixels
+    if bbox is None:
+        print(f"  SKIP (empty): {path.relative_to(REPO)}")
+        return False
+    before = img.size
+    cropped = img.crop(bbox)
+    cropped.save(path)
+    print(f"  TRIMMED: {path.relative_to(REPO)}  {before[0]}x{before[1]} -> {cropped.size[0]}x{cropped.size[1]}")
+    return True
+
+
 def process(path: Path, backup: bool) -> bool:
     if not path.exists():
         print(f"  SKIP (missing): {path.relative_to(REPO)}")
@@ -155,6 +184,14 @@ def process(path: Path, backup: bool) -> bool:
 
 
 def main() -> None:
+    if "--trim" in sys.argv[1:]:
+        print("Trimming transparent margins on single-frame sprites:")
+        n = 0
+        for t in SINGLE_SPRITES_TO_TRIM:
+            if trim_to_content(REPO / t):
+                n += 1
+        print(f"Done. {n} sprite(s) trimmed.")
+        return
     args = [a for a in sys.argv[1:] if a != "--backup"]
     backup = "--backup" in sys.argv[1:]
     targets = args if args else DEFAULT_TARGETS

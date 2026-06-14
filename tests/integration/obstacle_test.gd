@@ -122,9 +122,13 @@ func _test_mine_warning() -> bool:
 	mine.arm_radius = 160.0
 	holder.add_child(mine)
 	# Let _process run naturally (distance check happens in _process, not physics).
-
+	# Re-pin x each frame: with no level active ScrollService.speed_now() returns
+	# BASE_SPEED, so _process scrolls the mine left and would drift it out of
+	# arm_radius — making the WARNING snapshot flaky. Pinning isolates the
+	# distance→WARNING logic this test actually cares about.
 	for _i: int in range(4):
 		await process_frame
+		mine.position = Vector2(400.0, 400.0)
 
 	var in_warning: bool = (mine._state == mine.State.WARNING)
 	mine.set_process(false)  # stop before queue_free to prevent any deferred scrolling

@@ -87,7 +87,9 @@ func _on_body_entered(body: Node2D) -> void:
 	if not body.has_method("on_hit"):
 		return
 	_state = State.EXPLODE
-	_collision.disabled = true
+	# Deferred: can't toggle a collision shape while physics is flushing queries
+	# (we're inside the body_entered callback).
+	_collision.set_deferred("disabled", true)
 	if _has_sprite:
 		modulate = Color(1.0, 0.3, 0.0)
 	else:

@@ -55,7 +55,8 @@ func _fail(msg: String) -> void:
 ## Input:  intensity=0.5, gap_y_normalized=0.5, canvas_h=1920
 ## Expect: gap_px = lerp(280,200, 0.5) = 240
 ##         gap_center_y = 0.5 × 1920 = 960
-##         top_height = bottom_height = 960 – 120 = 840 px
+##         spike spans 960 – 120 = 840 px, minus CoralSpike.TIP_FORGIVE (16)
+##         applied to the collision tip → 824 px collision height.
 func _test_gate_heights() -> void:
 	var holder: Node2D = Node2D.new()
 	root.add_child(holder)
@@ -105,11 +106,12 @@ func _test_gate_heights() -> void:
 	if found < 2:
 		_fail("Gate produced %d spikes, expected 2" % found)
 	else:
-		# Expected: gap_px=240, gap_center=960, so each spike is 840 px tall.
-		if absf(top_h - 840.0) > 1.0:
-			_fail("Top spike height %.1f px — expected 840 (gate top half in 1920-px space)" % top_h)
-		if absf(bot_h - 840.0) > 1.0:
-			_fail("Bottom spike height %.1f px — expected 840 (gate bottom half)" % bot_h)
+		# Expected: gap_px=240, gap_center=960 → 840 px spike, minus the 16 px
+		# CoralSpike.TIP_FORGIVE collision inset → 824 px collision height.
+		if absf(top_h - 824.0) > 1.0:
+			_fail("Top spike height %.1f px — expected 824 (840 gate half − 16 tip forgive)" % top_h)
+		if absf(bot_h - 824.0) > 1.0:
+			_fail("Bottom spike height %.1f px — expected 824 (840 gate half − 16 tip forgive)" % bot_h)
 		if absf(spawn_x - (CANVAS_W + 100.0)) > 1.0:
 			_fail("Spike spawn x=%.1f — expected %.1f (CANVAS_W + 100)" % [spawn_x, CANVAS_W + 100.0])
 		print("Gate check: top %.0f px, bot %.0f px at x=%.0f — OK" % [top_h, bot_h, spawn_x])
