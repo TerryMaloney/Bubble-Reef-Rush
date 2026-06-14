@@ -203,6 +203,20 @@ custom_minimum_size = Vector2(144, 104)
 text = "| |"
 theme_override_font_sizes/font_size = 36
 
+[node name="DifficultyBadge" type="Label" parent="HUD"]
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -360.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 76.0
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 28
+text = ""
+visible = false
+
 [node name="TestBanner" type="Label" parent="HUD"]
 anchor_left = 0.5
 anchor_top = 0.0

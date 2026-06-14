@@ -26,6 +26,9 @@ class_name BuildModeRoot
 var _session: BuildSession = null
 var _profile_id: String = "player1"
 var _validation_errors: Array[String] = []
+var _all_diff_errors: Dictionary = {}
+var _preview_difficulty: String = "Normal"
+var _preview_diff_btn: Button = null
 
 ## When true: next run_completed marks the session as played_through.
 var _awaiting_playtest: bool = false
@@ -68,6 +71,13 @@ func _ready() -> void:
 	_timeline.delete_requested.connect(_on_delete_obstacle)
 	_validate_label.pressed.connect(_on_validate_label_pressed)
 	_build_errors_popup()
+
+	# Preview-difficulty cycle button — built in code so no tscn edit needed.
+	_preview_diff_btn = Button.new()
+	_preview_diff_btn.text = "▶ Normal"
+	_preview_diff_btn.add_theme_font_size_override("font_size", 22)
+	$PaletteStrip.add_child(_preview_diff_btn)
+	_preview_diff_btn.pressed.connect(_on_preview_diff_cycled)
 
 	for i: int in range(1, 7):
 		_zone_opt.add_item("World %d" % i, i)
@@ -218,7 +228,11 @@ func _on_save_pressed() -> void:
 		_validate_label.text = "Try your level first!"
 		_validate_label.modulate = Color(1.0, 0.6, 0.1)
 		return
-	if not _validation_errors.is_empty():
+	var any_fail: bool = false
+	for diff: String in _all_diff_errors.keys():
+		if not (_all_diff_errors[diff] as Array).is_empty():
+			any_fail = true
+	if any_fail:
 		_validate_label.text = "Fix the problems first!"
 		_validate_label.modulate = Color(1.0, 0.2, 0.2)
 		return
@@ -320,19 +334,47 @@ func _on_delete_obstacle(index: int) -> void:
 func _validate_and_tag() -> void:
 	if _session == null:
 		return
-	_validation_errors = PlayabilityValidator.validate(_session.get_data())
-	if _validation_errors.is_empty():
-		_validate_label.text = "Looks Good!"
-		_validate_label.modulate = Color(0.5, 1.0, 0.5)
-	else:
-		_validate_label.text = "%d Problem(s)  ▼" % _validation_errors.size()
-		_validate_label.modulate = Color(1.0, 0.3, 0.3)
+	_all_diff_errors = PlayabilityValidator.validate_all_difficulties(_session.get_data())
+
+	# Populate _validation_errors from the current preview difficulty for popup.
+	_validation_errors.clear()
+	for e: Variant in (_all_diff_errors.get(_preview_difficulty, []) as Array):
+		_validation_errors.append(str(e))
+
+	# Build E/N/H status string for the validate button.
+	var any_fail: bool = false
+	var parts: Array[String] = []
+	for diff: String in ["Easy", "Normal", "Hard"]:
+		var errs: Array = _all_diff_errors.get(diff, []) as Array
+		if errs.is_empty():
+			parts.append("%s:✓" % diff.left(1))
+		else:
+			parts.append("%s:%d✗" % [diff.left(1), errs.size()])
+			any_fail = true
+	_validate_label.text = "  ".join(parts) + "  ▼"
+	_validate_label.modulate = Color(0.5, 1.0, 0.5) if not any_fail else Color(1.0, 0.3, 0.3)
+
 	# Keep popup in sync if it's open.
 	if _errors_popup != null and _errors_popup.visible:
 		_refresh_errors_popup()
 
+	# Update timeline autoshadow for the selected preview difficulty.
+	var trace: Array[Dictionary] = PlayabilityValidator.compute_band_trace(
+			_session.get_data(), _preview_difficulty)
+	_timeline.set_band_trace(trace)
+
 	var tag: String = DifficultyTagger.compute_tag(_session.get_data())
 	_diff_label.text = "Difficulty: %s" % tag
+
+
+func _on_preview_diff_cycled() -> void:
+	match _preview_difficulty:
+		"Normal": _preview_difficulty = "Hard"
+		"Hard": _preview_difficulty = "Easy"
+		_: _preview_difficulty = "Normal"
+	if _preview_diff_btn != null:
+		_preview_diff_btn.text = "▶ %s" % _preview_difficulty
+	_validate_and_tag()
 
 
 func _build_errors_popup() -> void:
@@ -362,7 +404,7 @@ func _build_errors_popup() -> void:
 
 	var title: Label = Label.new()
 	title.name = "Title"
-	title.text = "Level Problems"
+	title.text = "Level Problems (%s)" % _preview_difficulty
 	title.add_theme_font_size_override("font_size", 32)
 	title.modulate = Color(1.0, 0.4, 0.4)
 	vbox.add_child(title)
@@ -390,6 +432,9 @@ func _build_errors_popup() -> void:
 func _refresh_errors_popup() -> void:
 	if _errors_popup == null:
 		return
+	var title_lbl: Label = _errors_popup.get_node_or_null("VBoxContainer/Title") as Label
+	if title_lbl != null:
+		title_lbl.text = "Level Problems (%s)" % _preview_difficulty
 	var list: VBoxContainer = _errors_popup.get_node_or_null("VBoxContainer/Scroll/List") as VBoxContainer
 	if list == null:
 		return

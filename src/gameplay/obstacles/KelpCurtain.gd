@@ -23,16 +23,17 @@ func _ready() -> void:
 func setup(entry: Dictionary) -> void:
 	var params: Dictionary = entry.get("parameters", {}) as Dictionary
 	var gap_y_norm: float = float(params.get("gap_y_normalized", entry.get("lane_position", 0.5)))
+	var gap_half: float = float(params.get("gap_height", 120.0)) * 0.5
 	_sway_speed = float(params.get("sway_speed", 2.0))
 
 	# Root at top of screen; blade positions are in local screen-coordinate space.
 	position.y = 0.0
-	_build_blades(gap_y_norm * CANVAS_H, CANVAS_H)
+	_build_blades(gap_y_norm * CANVAS_H, CANVAS_H, gap_half)
 
 
-func _build_blades(gap_center_y: float, screen_h: float) -> void:
-	var gap_top: float = gap_center_y - GAP_HALF
-	var gap_bottom: float = gap_center_y + GAP_HALF
+func _build_blades(gap_center_y: float, screen_h: float, gap_half: float = GAP_HALF) -> void:
+	var gap_top: float = gap_center_y - gap_half
+	var gap_bottom: float = gap_center_y + gap_half
 
 	# Blades above the gap — step upward from the gap edge.
 	# Include a blade as long as its center is above -BLADE_H/2 (partial off-screen top OK).

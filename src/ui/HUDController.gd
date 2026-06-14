@@ -14,6 +14,7 @@ class_name HUDController
 @export var power_button: Button
 @export var ghost_intro_label: Label
 @export var ghost_delta_label: Label
+@export var difficulty_badge: Label
 
 var score: int = 0
 
@@ -83,6 +84,14 @@ func _on_run_started(level_id: String) -> void:
 		progress_bar.value = 0.0
 	if ghost_delta_label != null:
 		ghost_delta_label.visible = false
+	if difficulty_badge != null:
+		var diff: String = str(GameManager.active_difficulty)
+		difficulty_badge.text = diff.to_upper()
+		match diff:
+			"easy": difficulty_badge.modulate = Color(0.2, 0.9, 1.0)
+			"hard": difficulty_badge.modulate = Color(1.0, 0.4, 0.1)
+			_: difficulty_badge.modulate = Color.WHITE
+		difficulty_badge.show()
 	# Show total attempts for this level so far (this run will be recorded on fail/complete).
 	if attempt_label != null:
 		var profile: String = SaveSystem.get_active_profile_id()

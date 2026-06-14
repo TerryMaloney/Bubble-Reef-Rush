@@ -38,6 +38,208 @@ const EXCL_HALF: Dictionary = {
 }
 
 
+## Apply Easy/Normal/Hard difficulty patches to a shallow copy of data.
+## Only beat_map entries for pressure_wall / kelp_curtain are modified.
+static func _apply_difficulty_patch(data: Dictionary, difficulty: String) -> Dictionary:
+	if difficulty == "normal":
+		return data
+	var patched: Dictionary = data.duplicate(false)
+	var orig_bm: Array = data.get("beat_map", []) as Array
+	var new_bm: Array = []
+	for entry: Variant in orig_bm:
+		var e: Dictionary = (entry as Dictionary).duplicate(false)
+		var otype: String = str(e.get("obstacle_type", ""))
+		if otype == "pressure_wall" or otype == "kelp_curtain":
+			var params: Dictionary = (e.get("parameters", {}) as Dictionary).duplicate(false)
+			match otype:
+				"pressure_wall":
+					var delta: float = 0.12 if difficulty == "hard" else -0.12
+					params["intensity"] = clampf(float(params.get("intensity", 0.5)) + delta, 0.18, 1.0)
+				"kelp_curtain":
+					var delta: float = -60.0 if difficulty == "hard" else 60.0
+					params["gap_height"] = clampf(float(params.get("gap_height", 240.0)) + delta, 120.0, 500.0)
+			e["parameters"] = params
+		new_bm.append(e)
+	patched["beat_map"] = new_bm
+	return patched
+
+
+## Run validate() under Easy / Normal / Hard.
+## Returns {"Easy": errors, "Normal": errors, "Hard": errors}.
+static func validate_all_difficulties(data: Dictionary) -> Dictionary:
+	var result: Dictionary = {}
+	for diff: String in ["Easy", "Normal", "Hard"]:
+		result[diff] = validate(_apply_difficulty_patch(data, diff.to_lower()))
+	return result
+
+
+## Compute the reachable Y-band (in canvas-px) after each obstacle beat.
+## Returns Array of {beat, lo, hi} – one entry per obstacle beat in order.
+## Used by TimelineView to draw the autoshadow overlay.
+static func compute_band_trace(data: Dictionary, difficulty: String = "Normal") -> Array[Dictionary]:
+	var patched: Dictionary = _apply_difficulty_patch(data, difficulty.to_lower())
+	var meta: Dictionary = patched.get("metadata", {}) as Dictionary
+	var base_bpm: float = float(meta.get("bpm", 110.0))
+	var is_variable: bool = bool(meta.get("bpm_variable", false))
+	var bpm_changes_raw: Array = (meta.get("bpm_changes", []) if is_variable else []) as Array
+	var bpm_changes: Array[Dictionary] = []
+	for c: Variant in bpm_changes_raw:
+		bpm_changes.append(c as Dictionary)
+
+	var beat_map: Array = patched.get("beat_map", []) as Array
+	var events: Array[Dictionary] = []
+	for entry: Variant in beat_map:
+		var e: Dictionary = entry as Dictionary
+		var is_gate: bool = _gate_corridor(e).x >= 0.0
+		var is_haz: bool = EXCL_HALF.has(str(e.get("obstacle_type", "")))
+		if is_gate or is_haz:
+			events.append(e)
+	events.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a.get("beat_index", 0)) < float(b.get("beat_index", 0))
+	)
+
+	var trace: Array[Dictionary] = []
+	if events.is_empty():
+		return trace
+
+	var bands: Array = [Vector2(Y_MIN, Y_MAX)]
+	var prev_beat: float = float(events[0].get("beat_index", 0))
+	var idx: int = 0
+
+	while idx < events.size():
+		var beat: float = float(events[idx].get("beat_index", 0))
+		var group: Array[Dictionary] = []
+		while idx < events.size() and absf(float(events[idx].get("beat_index", 0)) - beat) < EPS:
+			group.append(events[idx])
+			idx += 1
+
+		if beat > prev_beat:
+			var dt: float = _beats_to_seconds(prev_beat, beat, base_bpm, bpm_changes)
+			var rise: float = FLOAT_TERMINAL * dt * SAFETY
+			var dive: float = DIVE_TERMINAL * dt * SAFETY
+			var expanded: Array = []
+			for iv: Vector2 in bands:
+				expanded.append(Vector2(maxf(Y_MIN, iv.x - rise), minf(Y_MAX, iv.y + dive)))
+			bands = _merge(expanded)
+		prev_beat = beat
+
+		for e: Dictionary in group:
+			var corridor: Vector2 = _gate_corridor(e)
+			if corridor.x >= 0.0:
+				bands = _intersect(bands, corridor.x, corridor.y)
+			else:
+				var hy: float = _get_gap_y(e)
+				if hy < 0.0: hy = 0.5
+				var h: float = float(EXCL_HALF[str(e.get("obstacle_type", ""))])
+				bands = _subtract(bands, hy * CANVAS_H - h, hy * CANVAS_H + h)
+
+		if bands.is_empty():
+			return trace
+		trace.append({"beat": beat, "lo": (bands[0] as Vector2).x, "hi": (bands[-1] as Vector2).y})
+
+	return trace
+
+
+## Return the reachable band at target_beat (after all obstacles at that beat applied).
+static func _band_at_beat(beat_map: Array, target_beat: float,
+		base_bpm: float, bpm_changes: Array[Dictionary]) -> Array:
+	var events: Array[Dictionary] = []
+	for entry: Variant in beat_map:
+		var e: Dictionary = entry as Dictionary
+		if float(e.get("beat_index", 0)) > target_beat + EPS:
+			continue
+		if _gate_corridor(e).x >= 0.0 or EXCL_HALF.has(str(e.get("obstacle_type", ""))):
+			events.append(e)
+	events.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a.get("beat_index", 0)) < float(b.get("beat_index", 0))
+	)
+
+	var bands: Array = [Vector2(Y_MIN, Y_MAX)]
+	if events.is_empty():
+		if target_beat > 0.0:
+			var dt: float = _beats_to_seconds(0.0, target_beat, base_bpm, bpm_changes)
+			var expanded: Array = []
+			for iv: Vector2 in bands:
+				expanded.append(Vector2(maxf(Y_MIN, iv.x - FLOAT_TERMINAL * dt * SAFETY),
+						minf(Y_MAX, iv.y + DIVE_TERMINAL * dt * SAFETY)))
+			return _merge(expanded)
+		return bands
+
+	var prev_beat: float = float(events[0].get("beat_index", 0))
+	var idx: int = 0
+
+	while idx < events.size():
+		var beat: float = float(events[idx].get("beat_index", 0))
+		var group: Array[Dictionary] = []
+		while idx < events.size() and absf(float(events[idx].get("beat_index", 0)) - beat) < EPS:
+			group.append(events[idx])
+			idx += 1
+
+		if beat > prev_beat:
+			var dt: float = _beats_to_seconds(prev_beat, beat, base_bpm, bpm_changes)
+			var expanded: Array = []
+			for iv: Vector2 in bands:
+				expanded.append(Vector2(maxf(Y_MIN, iv.x - FLOAT_TERMINAL * dt * SAFETY),
+						minf(Y_MAX, iv.y + DIVE_TERMINAL * dt * SAFETY)))
+			bands = _merge(expanded)
+		prev_beat = beat
+
+		for e: Dictionary in group:
+			var corridor: Vector2 = _gate_corridor(e)
+			if corridor.x >= 0.0:
+				bands = _intersect(bands, corridor.x, corridor.y)
+			else:
+				var hy: float = _get_gap_y(e)
+				if hy < 0.0: hy = 0.5
+				var h: float = float(EXCL_HALF[str(e.get("obstacle_type", ""))])
+				bands = _subtract(bands, hy * CANVAS_H - h, hy * CANVAS_H + h)
+
+		if bands.is_empty():
+			return []
+
+	if target_beat > prev_beat + EPS:
+		var dt: float = _beats_to_seconds(prev_beat, target_beat, base_bpm, bpm_changes)
+		var expanded: Array = []
+		for iv: Vector2 in bands:
+			expanded.append(Vector2(maxf(Y_MIN, iv.x - FLOAT_TERMINAL * dt * SAFETY),
+					minf(Y_MAX, iv.y + DIVE_TERMINAL * dt * SAFETY)))
+		bands = _merge(expanded)
+
+	return bands
+
+
+## Check that every pearl is within the reachable band at its beat.
+static func _pearl_errors(data: Dictionary, base_bpm: float, bpm_changes: Array[Dictionary]) -> Array[String]:
+	var errors: Array[String] = []
+	var pearls: Array = data.get("collectibles", []) as Array
+	var beat_map: Array = data.get("beat_map", []) as Array
+	for pearl: Variant in pearls:
+		var p: Dictionary = pearl as Dictionary
+		if str(p.get("collectible_type", "")) != "pearl":
+			continue
+		var pb: float = float(p.get("beat_index", 0))
+		var py: float = float(p.get("lane_position", 0.5)) * CANVAS_H
+		var bands: Array = _band_at_beat(beat_map, pb, base_bpm, bpm_changes)
+		var reachable: bool = false
+		for iv: Vector2 in bands:
+			if py >= iv.x - EPS and py <= iv.y + EPS:
+				reachable = true
+				break
+		if not reachable:
+			var band_str: String
+			if bands.is_empty():
+				band_str = "no path (level unbeatable before this beat)"
+			else:
+				band_str = "%.0f–%.0f px" % [(bands[0] as Vector2).x, (bands[-1] as Vector2).y]
+			errors.append(
+				"Pearl at beat %.1f (lane=%.2f, y=%.0fpx) unreachable — band is [%s]. Suggested lane: %.2f." % [
+					pb, float(p.get("lane_position", 0.5)), py, band_str,
+					((bands[0] as Vector2).x + (bands[-1] as Vector2).y) * 0.5 / CANVAS_H if not bands.is_empty() else 0.5
+				]
+			)
+	return errors
+
+
 ## Validate a parsed .brl Dictionary.
 ## Returns an Array of human-readable error strings.  Empty = valid.
 static func validate(data: Dictionary) -> Array[String]:
@@ -100,6 +302,9 @@ static func validate(data: Dictionary) -> Array[String]:
 
 	# ── Reachable-band movement check (gates + avoidable point hazards) ───────
 	errors.append_array(_reachability_errors(beat_map, base_bpm, bpm_changes))
+
+	# ── Pearl reachability check ──────────────────────────────────────────────
+	errors.append_array(_pearl_errors(data, base_bpm, bpm_changes))
 
 	# Active gates, needed below for speed-zone readability.
 	var gates: Array[Dictionary] = []
@@ -230,10 +435,15 @@ static func _gate_corridor(entry: Dictionary) -> Vector2:
 	var y: float = _get_gap_y(entry)
 	if y < 0.0:
 		return Vector2(-1.0, -1.0)
-	var intensity: float = float((entry.get("parameters", {}) as Dictionary).get("intensity", 0.5))
-	if otype == "pressure_wall" and intensity <= SKIP_INTENSITY:
-		return Vector2(-1.0, -1.0)
-	var gap_px: float = lerpf(GAP_MAX_PX, GAP_MIN_PX, clampf(intensity, 0.0, 1.0))
+	var params: Dictionary = entry.get("parameters", {}) as Dictionary
+	var gap_px: float
+	if otype == "kelp_curtain":
+		gap_px = float(params.get("gap_height", 240.0))
+	else:
+		var intensity: float = float(params.get("intensity", 0.5))
+		if intensity <= SKIP_INTENSITY:
+			return Vector2(-1.0, -1.0)
+		gap_px = lerpf(GAP_MAX_PX, GAP_MIN_PX, clampf(intensity, 0.0, 1.0))
 	var center: float = clampf(y * CANVAS_H, gap_px * 0.5 + 40.0, CANVAS_H - gap_px * 0.5 - 40.0)
 	return Vector2(center - gap_px * 0.5 + PLAYER_HALF, center + gap_px * 0.5 - PLAYER_HALF)
 

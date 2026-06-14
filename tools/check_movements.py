@@ -260,6 +260,108 @@ def reachability_errors(data: dict, base_bpm: float, bpm_changes: list) -> list:
     return errors
 
 
+def apply_difficulty_patch(data: dict, difficulty: str) -> dict:
+    """Return a copy of data with obstacle params adjusted for Easy/Normal/Hard."""
+    if difficulty == "normal":
+        return data
+    import copy
+    patched = dict(data)
+    patched["beat_map"] = []
+    for entry in data.get("beat_map", []):
+        e = dict(entry)
+        otype = e.get("obstacle_type", "")
+        if otype in ("pressure_wall", "kelp_curtain"):
+            params = dict(e.get("parameters") or {})
+            if otype == "pressure_wall":
+                delta = 0.12 if difficulty == "hard" else -0.12
+                intensity = float(params.get("intensity", 0.5)) + delta
+                params["intensity"] = max(0.18, min(1.0, intensity))
+            elif otype == "kelp_curtain":
+                delta = -60.0 if difficulty == "hard" else 60.0
+                gh = float(params.get("gap_height", 240.0)) + delta
+                params["gap_height"] = max(120.0, min(500.0, gh))
+            e["parameters"] = params
+        patched["beat_map"].append(e)
+    return patched
+
+
+def band_at_beat(data: dict, target_beat: float, base_bpm: float, bpm_changes: list) -> list:
+    """Return reachable bands (list of (lo,hi)) at target_beat using the beat_map in data."""
+    events = [e for e in data.get("beat_map", [])
+              if gate_corridor(e) is not None or e.get("obstacle_type") in POINT_HAZARDS]
+    events = [e for e in events if float(e["beat_index"]) <= target_beat + EPS]
+    events.sort(key=lambda e: float(e["beat_index"]))
+
+    bands = [(Y_MIN, Y_MAX)]
+    if not events:
+        if target_beat > 0.0:
+            dt = beats_to_seconds(0.0, target_beat, base_bpm, bpm_changes)
+            rise = FLOAT_TERMINAL * dt * SAFETY
+            dive = DIVE_TERMINAL * dt * SAFETY
+            bands = _merge([(max(Y_MIN, lo - rise), min(Y_MAX, hi + dive)) for lo, hi in bands])
+        return bands
+
+    groups: list = []
+    for e in events:
+        b = float(e["beat_index"])
+        if groups and abs(groups[-1][0] - b) < EPS:
+            groups[-1][1].append(e)
+        else:
+            groups.append([b, [e]])
+
+    prev_beat = groups[0][0]
+    for beat, group in groups:
+        if beat > prev_beat:
+            dt = beats_to_seconds(prev_beat, beat, base_bpm, bpm_changes)
+            rise = FLOAT_TERMINAL * dt * SAFETY
+            dive = DIVE_TERMINAL * dt * SAFETY
+            bands = _merge([(max(Y_MIN, lo - rise), min(Y_MAX, hi + dive)) for lo, hi in bands])
+        prev_beat = beat
+        for e in group:
+            corridor = gate_corridor(e)
+            if corridor is not None:
+                bands = _intersect(bands, corridor[0], corridor[1])
+            else:
+                y = (get_gap_y(e) or 0.5) * SCREEN_H
+                h = EXCL_HALF[e["obstacle_type"]]
+                bands = _subtract(bands, y - h, y + h)
+        if not bands:
+            return []
+
+    if target_beat > prev_beat + EPS:
+        dt = beats_to_seconds(prev_beat, target_beat, base_bpm, bpm_changes)
+        rise = FLOAT_TERMINAL * dt * SAFETY
+        dive = DIVE_TERMINAL * dt * SAFETY
+        bands = _merge([(max(Y_MIN, lo - rise), min(Y_MAX, hi + dive)) for lo, hi in bands])
+
+    return bands
+
+
+def pearl_reachability_errors(data: dict, base_bpm: float, bpm_changes: list) -> list:
+    """Check every pearl in collectibles against the reachable band at its beat."""
+    errors: list[str] = []
+    for pearl in data.get("collectibles", []):
+        if pearl.get("collectible_type") != "pearl":
+            continue
+        pb = float(pearl["beat_index"])
+        lane = float(pearl.get("lane_position", 0.5))
+        py = lane * SCREEN_H
+        bands = band_at_beat(data, pb, base_bpm, bpm_changes)
+        reachable = any(lo - EPS <= py <= hi + EPS for lo, hi in bands)
+        if not reachable:
+            if bands:
+                band_str = f"{bands[0][0]:.0f}–{bands[-1][1]:.0f}px"
+                mid = (bands[0][0] + bands[-1][1]) * 0.5 / SCREEN_H
+                hint = f"  Suggested lane: {mid:.2f}"
+            else:
+                band_str = "no path (level unbeatable before this beat)"
+                hint = ""
+            errors.append(
+                f"  B{pb:.1f}: pearl lane={lane:.2f} (y={py:.0f}px) unreachable — band [{band_str}].{hint}"
+            )
+    return errors
+
+
 def check_file(path: str) -> bool:
     try:
         with open(path, encoding="utf-8") as f:
@@ -273,47 +375,53 @@ def check_file(path: str) -> bool:
     is_variable = bool(meta.get("bpm_variable", False))
     bpm_changes = meta.get("bpm_changes", []) if is_variable else []
     speed_zones = data.get("speed_zones", [])
-
-    gates = [e for e in data.get("beat_map", []) if is_active_positional(e)]
-    gates.sort(key=lambda e: float(e["beat_index"]))
-
-    errors: list[str] = []
-
-    # ── Reachable-band check (gates + avoidable point hazards) ────────────────
-    errors.extend(reachability_errors(data, base_bpm, bpm_changes))
-
-    # ── Speed-zone readability check ─────────────────────────────────────────
-    for i, gate in enumerate(gates):
-        beat = float(gate["beat_index"])
-        mult = get_speed_multiplier_at_beat(beat, speed_zones)
-        if mult <= 0.0:
-            continue
-
-        # Rule 1: on-screen lead time ≥ 1.0s
-        lead_time_s = (CANVAS_W - JUDGMENT_X) / (BASE_SPEED * mult)
-        if lead_time_s < 1.0 - EPS:
-            errors.append(
-                f"  B{beat:.1f}: speed mult {mult:.2f}× → lead time {lead_time_s:.2f}s < 1.0s"
-            )
-
-        # Rule 2: mult > 1.3 → next gate must be ≥ 2 beats away
-        if mult > 1.3 and i + 1 < len(gates):
-            next_beat = float(gates[i + 1]["beat_index"])
-            gap_beats = next_beat - beat
-            if gap_beats < 2.0 - EPS:
-                errors.append(
-                    f"  B{beat:.1f}: speed mult {mult:.2f}× > 1.3 but next gate only {gap_beats:.1f} beats away (need ≥ 2)"
-                )
-
     label = os.path.relpath(path)
-    if errors:
-        print(f"FAIL  {label}  (BPM={base_bpm:.0f}, variable={is_variable})")
-        for e in errors:
-            print(e)
-        return False
+    all_ok = True
 
-    print(f"PASS  {label}  (BPM={base_bpm:.0f}, {len(gates)} active positional obstacles)")
-    return True
+    for difficulty in ("normal", "easy", "hard"):
+        patched = apply_difficulty_patch(data, difficulty)
+        gates = [e for e in patched.get("beat_map", []) if is_active_positional(e)]
+        gates.sort(key=lambda e: float(e["beat_index"]))
+
+        errors: list[str] = []
+
+        # ── Reachable-band check (gates + avoidable point hazards) ────────────
+        errors.extend(reachability_errors(patched, base_bpm, bpm_changes))
+
+        # ── Pearl reachability check ──────────────────────────────────────────
+        errors.extend(pearl_reachability_errors(patched, base_bpm, bpm_changes))
+
+        # ── Speed-zone readability check (Normal only — speed zones don't change) ─
+        if difficulty == "normal":
+            for i, gate in enumerate(gates):
+                beat = float(gate["beat_index"])
+                mult = get_speed_multiplier_at_beat(beat, speed_zones)
+                if mult <= 0.0:
+                    continue
+                lead_time_s = (CANVAS_W - JUDGMENT_X) / (BASE_SPEED * mult)
+                if lead_time_s < 1.0 - EPS:
+                    errors.append(
+                        f"  B{beat:.1f}: speed mult {mult:.2f}× → lead time {lead_time_s:.2f}s < 1.0s"
+                    )
+                if mult > 1.3 and i + 1 < len(gates):
+                    next_beat = float(gates[i + 1]["beat_index"])
+                    gap_beats = next_beat - beat
+                    if gap_beats < 2.0 - EPS:
+                        errors.append(
+                            f"  B{beat:.1f}: speed mult {mult:.2f}× > 1.3 but next gate only "
+                            f"{gap_beats:.1f} beats away (need ≥ 2)"
+                        )
+
+        if errors:
+            print(f"FAIL  {label}  [{difficulty}]  (BPM={base_bpm:.0f})")
+            for e in errors:
+                print(e)
+            all_ok = False
+
+    if all_ok:
+        normal_gates = [e for e in data.get("beat_map", []) if is_active_positional(e)]
+        print(f"PASS  {label}  (BPM={base_bpm:.0f}, {len(normal_gates)} active positional obstacles)")
+    return all_ok
 
 
 def collect_paths(args: list[str]) -> list[str]:

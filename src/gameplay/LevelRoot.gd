@@ -35,6 +35,7 @@ func _ready() -> void:
 	_hud_controller.power_button = $HUD/PowerButton if $HUD.has_node("PowerButton") else null
 	_hud_controller.ghost_intro_label = $HUD/GhostIntroLabel if $HUD.has_node("GhostIntroLabel") else null
 	_hud_controller.ghost_delta_label = $HUD/GhostDeltaLabel if $HUD.has_node("GhostDeltaLabel") else null
+	_hud_controller.difficulty_badge = $HUD/DifficultyBadge if $HUD.has_node("DifficultyBadge") else null
 
 	var retry_btn: Button = $HUD/RetryButton
 	_hud_controller.retry_button = retry_btn
@@ -106,12 +107,6 @@ func _ready() -> void:
 		var beat_count: int = (sd.get("beat_map", []) as Array).size()
 		banner.text = "TESTING: %s  |  Objects: %d" % [str(meta.get("name", "My Level")), beat_count]
 		banner.show()
-
-	# Physics tuner overlay — debug builds only.
-	if OS.is_debug_build():
-		var tuner_scene: PackedScene = load("res://scenes/debug/PhysicsTuner.tscn")
-		if tuner_scene != null:
-			add_child(tuner_scene.instantiate())
 
 	_level_loader.level_ended.connect(_on_level_ended)
 	_level_loader.load_level(GameManager.current_level_id)

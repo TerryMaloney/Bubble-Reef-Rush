@@ -81,6 +81,9 @@ var _press_on_ruler: bool = false
 # move (no button held) never pans the timeline ("grab to slide").
 var _pressed: bool = false
 
+# Reachability autoshadow — set by BuildModeRoot on every edit.
+var _band_trace: Array[Dictionary] = []
+
 const COL_BG: Color = Color(0.04, 0.05, 0.14)
 const COL_RULER: Color = Color(0.10, 0.12, 0.22)
 const COL_BEAT: Color = Color(0.30, 0.30, 0.46)
@@ -156,6 +159,26 @@ func _draw() -> void:
 				var qx: float = x + px_per_beat * (float(q) * 0.25)
 				draw_line(Vector2(qx, RULER_H), Vector2(qx, size.y),
 						COL_BEAT_8 * Color(1, 1, 1, 0.5), 1.0)
+
+	# ── Reachability autoshadow ────────────────────────────────────────────────
+	if not _band_trace.is_empty():
+		var vs: float = _vscale()
+		for i: int in range(_band_trace.size()):
+			var te: Dictionary = _band_trace[i] as Dictionary
+			var beat: float = float(te.get("beat", 0))
+			var next_beat: float = beat + 2.0
+			if i + 1 < _band_trace.size():
+				next_beat = float((_band_trace[i + 1] as Dictionary).get("beat", beat + 2.0))
+			var lo: float = float(te.get("lo", 60.0))
+			var hi: float = float(te.get("hi", 1860.0))
+			var x1: float = (beat - pan_beat) * px_per_beat - px_per_beat * 0.5
+			var x2: float = (next_beat - pan_beat) * px_per_beat - px_per_beat * 0.5
+			var rx: float = maxf(0.0, x1)
+			var rx2: float = minf(size.x, x2)
+			if rx2 <= rx:
+				continue
+			draw_rect(Rect2(rx, RULER_H + lo * vs, rx2 - rx, (hi - lo) * vs),
+					Color(0.2, 1.0, 0.3, 0.18))
 
 	# ── Obstacles (drawn at their true in-game footprint) ──────────────────────
 	if session != null:
@@ -553,6 +576,11 @@ func _obstacle_rect_local(beat_idx: float, lane_y_norm: float, otype: String,
 
 func _snap_beat(raw_beat: float) -> float:
 	return roundf(raw_beat / snap_beats) * snap_beats
+
+
+func set_band_trace(trace: Array[Dictionary]) -> void:
+	_band_trace = trace
+	queue_redraw()
 
 
 func cycle_zoom() -> void:

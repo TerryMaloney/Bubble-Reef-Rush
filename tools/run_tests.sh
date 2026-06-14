@@ -92,5 +92,8 @@ run_stage "Profile manager scene test"  "tests/integration/profile_manager_scene
 run_stage "Zone select scene test"      "tests/integration/zone_select_scene_test.gd"      "ZONE_SELECT_SCENE_OK"
 run_stage "Pass play setup scene test"  "tests/integration/pass_play_setup_scene_test.gd"  "PASS_PLAY_SETUP_SCENE_OK"
 run_stage "Hazard warning test"         "tests/integration/hazard_warning_test.gd"          "HAZARD_WARNING_OK"
+run_stage "Pearl reachability test"     "tests/integration/pearl_reachability_test.gd"      "PEARL_REACHABILITY_OK"
+run_stage "Build mode overlay test"     "tests/integration/build_mode_overlay_test.gd"      "BUILD_MODE_OVERLAY_OK"
+run_stage "HUD difficulty test"         "tests/integration/hud_difficulty_test.gd"          "HUD_DIFFICULTY_OK"
 
 echo "==> All tests passed."
