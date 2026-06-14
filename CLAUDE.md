@@ -6,7 +6,7 @@ Godot 4.6 (GDScript, typed). Portrait 1080×1920. Android-first.
 ## Quick commands
 
 ```bash
-# Run full test suite (36 stages, ~4 min)
+# Run full test suite (49 stages, ~6 min)
 GODOT=/tmp/Godot_v4.6.3-stable_linux.x86_64 ./tools/run_tests.sh
 
 # Validate all .brl level files (73 total)
@@ -76,9 +76,9 @@ assets/
 
 tests/
   smoke/          run_smoke_tests.gd
-  integration/    35 headless test scripts
+  integration/    39 headless test scripts
 tools/
-  run_tests.sh    36-stage headless suite runner
+  run_tests.sh    45-stage headless suite runner
   validate_brl.py JSON-schema validation for .brl files
   check_movements.py  Movement budget + speed-zone readability checks
   gen_audio.py    Procedural WAV click-track generator
@@ -150,7 +150,7 @@ SpecialLevelController is created lazily by LevelRoot on run_started when level_
 
 Boss scripts: `src/gameplay/bosses/boss_z{3-6}.gd` — each defines `get_phases() -> Array`
 
-## Test suite (36 stages)
+## Test suite (49 stages)
 
 | Stage | Script | Marker |
 |-------|--------|--------|
@@ -190,6 +190,18 @@ Boss scripts: `src/gameplay/bosses/boss_z{3-6}.gd` — each defines `get_phases(
 | 33 | `tests/integration/copilot_test.gd` | `COPILOT_OK` |
 | 34 | `tests/integration/level_tennis_test.gd` | `LEVEL_TENNIS_OK` |
 | 35 | `tests/integration/reef_radio_test.gd` | `REEF_RADIO_OK` |
+| 36 | `tests/integration/settings_scene_test.gd` | `SETTINGS_SCENE_OK` |
+| 37 | `tests/integration/collection_room_scene_test.gd` | `COLLECTION_ROOM_SCENE_OK` |
+| 38 | `tests/integration/challenge_import_scene_test.gd` | `CHALLENGE_IMPORT_SCENE_OK` |
+| 39 | `tests/integration/theme_test.gd` | `THEME_OK` |
+| 40 | `tests/integration/profile_manager_scene_test.gd` | `PROFILE_MANAGER_SCENE_OK` |
+| 41 | `tests/integration/zone_select_scene_test.gd` | `ZONE_SELECT_SCENE_OK` |
+| 42 | `tests/integration/pass_play_setup_scene_test.gd` | `PASS_PLAY_SETUP_SCENE_OK` |
+| 43 | `tests/integration/hazard_warning_test.gd` | `HAZARD_WARNING_OK` |
+| 44 | `tests/integration/pearl_reachability_test.gd` | `PEARL_REACHABILITY_OK` |
+| 45 | `tests/integration/build_mode_overlay_test.gd` | `BUILD_MODE_OVERLAY_OK` |
+| 46 | `tests/integration/hud_difficulty_test.gd` | `HUD_DIFFICULTY_OK` |
+| 47 | `tests/integration/build_test_leak_test.gd` | `BUILD_TEST_LEAK_OK` |
 
 ## Level format (.brl)
 
