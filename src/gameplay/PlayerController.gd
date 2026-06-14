@@ -30,10 +30,13 @@ var _ghost_recorder: GhostRecorder = null
 var score_provider: Callable
 
 const _ART_PATH: String = "res://assets/characters/player.png"
-## Target on-screen height (px) for drop-in character art. The sprite is scaled
-## to this regardless of the source PNG's resolution, so any reasonably-sized
-## export "just works" without matching exact pixel dimensions.
+const _SWIM_PATH: String = "res://assets/characters/player_swim.png"
+const _DIVE_PATH: String = "res://assets/characters/player_dive.png"
+const _DEATH_PATH: String = "res://assets/characters/player_death.png"
+## Target on-screen height (px) for drop-in character art.
 const _ART_TARGET_HEIGHT: float = 110.0
+
+var _anim_sprite: AnimatedSprite2D = null
 
 
 func _ready() -> void:
@@ -43,6 +46,14 @@ func _ready() -> void:
 
 
 func _try_load_art() -> void:
+	# Try animated sprite system first (swim/dive/death sheets).
+	if ResourceLoader.exists(_SWIM_PATH):
+		var swim_tex: Texture2D = load(_SWIM_PATH) as Texture2D
+		if swim_tex != null:
+			$Visual.hide()
+			_build_animated_sprite(swim_tex)
+			return
+	# Fallback: static player.png.
 	if not ResourceLoader.exists(_ART_PATH):
 		return
 	var tex: Texture2D = load(_ART_PATH) as Texture2D
@@ -53,9 +64,71 @@ func _try_load_art() -> void:
 	sp.texture = tex
 	var tex_h: float = float(tex.get_height())
 	if tex_h > 0.0:
-		var s: float = _ART_TARGET_HEIGHT / tex_h
-		sp.scale = Vector2(s, s)
+		sp.scale = Vector2(_ART_TARGET_HEIGHT / tex_h, _ART_TARGET_HEIGHT / tex_h)
 	add_child(sp)
+
+
+func _build_animated_sprite(swim_tex: Texture2D) -> void:
+	var frames := SpriteFrames.new()
+
+	# swim — 2×2 grid → 4 frames.
+	frames.add_animation("swim")
+	frames.set_animation_loop("swim", true)
+	frames.set_animation_speed("swim", 7.0)
+	var sw: int = swim_tex.get_width() / 2
+	var sh: int = swim_tex.get_height() / 2
+	for row: int in range(2):
+		for col: int in range(2):
+			var a := AtlasTexture.new()
+			a.atlas = swim_tex
+			a.region = Rect2(col * sw, row * sh, sw, sh)
+			frames.add_frame("swim", a)
+
+	# dive — 2 frames side by side.
+	if ResourceLoader.exists(_DIVE_PATH):
+		var dive_tex: Texture2D = load(_DIVE_PATH) as Texture2D
+		if dive_tex != null:
+			frames.add_animation("dive")
+			frames.set_animation_loop("dive", false)
+			frames.set_animation_speed("dive", 8.0)
+			var dw: int = dive_tex.get_width() / 2
+			var dh: int = dive_tex.get_height()
+			for col: int in range(2):
+				var a := AtlasTexture.new()
+				a.atlas = dive_tex
+				a.region = Rect2(col * dw, 0, dw, dh)
+				frames.add_frame("dive", a)
+
+	# death — bottom row of 3×2 grid (3 clean frames without panel borders).
+	if ResourceLoader.exists(_DEATH_PATH):
+		var death_tex: Texture2D = load(_DEATH_PATH) as Texture2D
+		if death_tex != null:
+			frames.add_animation("death")
+			frames.set_animation_loop("death", false)
+			frames.set_animation_speed("death", 5.0)
+			var ew: int = death_tex.get_width() / 3
+			var eh: int = death_tex.get_height() / 2
+			for col: int in range(3):
+				var a := AtlasTexture.new()
+				a.atlas = death_tex
+				a.region = Rect2(col * ew, eh, ew, eh)
+				frames.add_frame("death", a)
+
+	var sp := AnimatedSprite2D.new()
+	sp.sprite_frames = frames
+	var s: float = _ART_TARGET_HEIGHT / float(sh) if sh > 0 else 1.0
+	sp.scale = Vector2(s, s)
+	sp.play("swim")
+	add_child(sp)
+	_anim_sprite = sp
+
+
+func _update_anim() -> void:
+	if _anim_sprite == null or not alive:
+		return
+	var target: StringName = &"dive" if diving else &"swim"
+	if _anim_sprite.sprite_frames.has_animation(target) and _anim_sprite.animation != target:
+		_anim_sprite.play(target)
 
 
 func set_ghost_recorder(recorder: GhostRecorder) -> void:
@@ -75,10 +148,12 @@ func _input(event: InputEvent) -> void:
 		timing_judge.judge_input(BeatConductor.get_current_beat_time_ms())
 		if _ghost_recorder != null:
 			_ghost_recorder.record_event(BeatConductor.get_current_beat_position(), "dive_start")
+		_update_anim()
 	elif event.is_action_released("swim_dive"):
 		diving = false
 		if _ghost_recorder != null:
 			_ghost_recorder.record_event(BeatConductor.get_current_beat_position(), "dive_end")
+		_update_anim()
 
 
 func _physics_process(delta: float) -> void:
@@ -121,7 +196,10 @@ func on_hit() -> void:
 		if rc.consume_shield():
 			return
 	alive = false
-	modulate = Color(1.0, 0.3, 0.3)
+	if _anim_sprite != null and _anim_sprite.sprite_frames.has_animation(&"death"):
+		_anim_sprite.play("death")
+	else:
+		modulate = Color(1.0, 0.3, 0.3)
 	EventBus.player_hit.emit()
 	_die_after_delay()
 
