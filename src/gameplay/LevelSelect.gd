@@ -54,7 +54,7 @@ func _build_difficulty_row(zone_id: String) -> void:
 	for diff: String in DIFFICULTY_ORDER:
 		var btn: Button = Button.new()
 		btn.text = DIFFICULTY_LABELS[diff] as String
-		btn.custom_minimum_size = Vector2(260.0, 76.0)
+		btn.custom_minimum_size = Vector2(260.0, 88.0)
 		btn.add_theme_font_size_override("font_size", 28)
 		var d: String = diff  # capture
 		btn.pressed.connect(func() -> void: _on_difficulty_selected(d, zone_id))

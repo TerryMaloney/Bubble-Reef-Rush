@@ -24,13 +24,13 @@ theme_override_constants/separation = 18
 text = "LEVEL COMPLETE!"
 horizontal_alignment = 1
 vertical_alignment = 1
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 40
 
 [node name="StarsLabel" type="Label" parent="Center/VBox"]
 text = "- - -"
 horizontal_alignment = 1
 vertical_alignment = 1
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 36
 
 [node name="ScoreLabel" type="Label" parent="Center/VBox"]
 text = "Score: 0"
@@ -64,15 +64,15 @@ theme_override_constants/separation = 6
 custom_minimum_size = Vector2(0, 8)
 
 [node name="NextLevelButton" type="Button" parent="Center/VBox"]
-custom_minimum_size = Vector2(0, 72)
+custom_minimum_size = Vector2(0, 88)
 text = "NEXT LEVEL"
 
 [node name="RetryButton" type="Button" parent="Center/VBox"]
-custom_minimum_size = Vector2(0, 72)
+custom_minimum_size = Vector2(0, 88)
 text = "PLAY AGAIN"
 
 [node name="LevelsButton" type="Button" parent="Center/VBox"]
-custom_minimum_size = Vector2(0, 72)
+custom_minimum_size = Vector2(0, 88)
 text = "LEVELS"
 
 [node name="MenuButton" type="Button" parent="Center/VBox"]
