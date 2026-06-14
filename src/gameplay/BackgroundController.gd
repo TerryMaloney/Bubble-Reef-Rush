@@ -10,7 +10,7 @@ const ZONE_COLORS: Dictionary = {
 	3: Color(0.18, 0.18, 0.35),   # Shipwreck Alley — deep navy
 	4: Color(0.32, 0.10, 0.06),   # Volcanic Vent — dark red-brown
 	5: Color(0.03, 0.08, 0.25),   # Twilight Trench — near-black blue
-	6: Color(0.14, 0.28, 0.42),   # Crystal Caves — pale crystalline blue
+	6: Color(0.08, 0.10, 0.14),   # Ancient Sunken Factory — dark industrial slate
 }
 const PULSE_BRIGHTNESS: float = 0.10
 const PULSE_DECAY: float = 8.0

@@ -8,7 +8,7 @@ const ZONE_NAMES: Dictionary = {
 	"z3": "Shipwreck Alley",
 	"z4": "Volcanic Vent Fields",
 	"z5": "Twilight Trench",
-	"z6": "Crystal Caves",
+	"z6": "Ancient Sunken Factory",
 }
 
 const LEVEL_NAMES: Dictionary = {
@@ -22,8 +22,8 @@ const LEVEL_NAMES: Dictionary = {
 		   "Dual Hazard", "Volcanic Surge", "Heat Wave", "Eruption Finale"],
 	"z5": ["Slow Descent", "Dark Passage", "Mirror Run", "Void Mirror",
 		   "Full Chaos", "Max Range", "Precision Run", "Trench Master"],
-	"z6": ["Shard Intro", "Shard Mirror", "Burst Shard", "Wall Shard",
-		   "Dark Shard", "Peak Difficulty", "Triple Gauntlet", "Rainbow Run"],
+	"z6": ["Pipe Maze", "Mirror Tanks", "Steam Burst", "Pressure Valve",
+		   "Dark Assembly", "Reactor Core", "Factory Gauntlet", "Systems Offline"],
 }
 
 const DIFFICULTY_LABELS: Dictionary = {"easy": "Easy", "normal": "Normal", "hard": "Hard"}

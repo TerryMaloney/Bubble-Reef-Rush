@@ -12,7 +12,7 @@ const ZONES: Array = [
 	{"id": "z3", "name": "3. Shipwreck Alley", "bpm": "130-145 BPM", "requires": "z2-l4"},
 	{"id": "z4", "name": "4. Volcanic Vent Fields", "bpm": "145-165 BPM", "requires": "z3-l4"},
 	{"id": "z5", "name": "5. Twilight Trench", "bpm": "80-165 BPM", "requires": "z4-l4"},
-	{"id": "z6", "name": "6. Crystal Caves", "bpm": "170-180 BPM", "secret": true},
+	{"id": "z6", "name": "6. Ancient Sunken Factory", "bpm": "170-180 BPM", "secret": true},
 ]
 
 var _profile: String = ""
