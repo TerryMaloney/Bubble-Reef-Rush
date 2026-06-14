@@ -15,8 +15,8 @@ class_name BuildModeRoot
 @onready var _bpm_spin: SpinBox = $TopBar/HBox/BpmSpin
 @onready var _zone_opt: OptionButton = $TopBar/HBox/ZoneOpt
 @onready var _save_btn: Button = $TopBar/HBox/SaveBtn
-@onready var _validate_label: Label = $TopBar/HBox/ValidateLabel
-@onready var _diff_label: Label = $TopBar/HBox/DiffLabel
+@onready var _validate_label: Label = $PaletteStrip/ValidateLabel
+@onready var _diff_label: Label = $PaletteStrip/DiffLabel
 @onready var _back_btn: Button = $TopBar/HBox/BackBtn
 @onready var _undo_btn: Button = $TopBar/HBox/UndoBtn
 @onready var _redo_btn: Button = $TopBar/HBox/RedoBtn
@@ -182,6 +182,9 @@ func _on_property_changed(beat_map_index: int, key: String, value: Variant) -> v
 		params[key] = value
 		entry["parameters"] = params
 		_session.update_beat_entry(beat_map_index, entry)
+		# Redraw so gap size / position / height changes show live in the editor.
+		_timeline.selected_index = beat_map_index
+		_timeline.refresh()
 		_validate_and_tag()
 
 
@@ -322,7 +325,7 @@ func _validate_and_tag() -> void:
 		_validate_label.modulate = Color(1.0, 0.3, 0.3)
 
 	var tag: String = DifficultyTagger.compute_tag(_session.get_data())
-	_diff_label.text = tag
+	_diff_label.text = "Difficulty: %s" % tag
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

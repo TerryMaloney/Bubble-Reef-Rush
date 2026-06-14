@@ -21,6 +21,10 @@ var _combo: int = 0
 var _judgment_tween: Tween = null
 var _beat_tween: Tween = null
 
+## Latest run progress (0–100), shown as "You made it X%" on death.
+var _last_pct: float = 0.0
+var _death_label: Label = null
+
 ## Timing judge reference — must be set by LevelRoot after instantiating the judge.
 var timing_judge: TimingJudge = null
 
@@ -42,6 +46,7 @@ func _ready() -> void:
 	if retry_button != null:
 		retry_button.pressed.connect(_on_retry_pressed)
 		retry_button.hide()
+		_make_death_label()
 
 	# Power button starts disabled — enabled only when fully charged.
 	if power_button != null:
@@ -71,6 +76,9 @@ func _on_run_started(level_id: String) -> void:
 		judgment_label.text = ""
 	if retry_button != null:
 		retry_button.hide()
+	if _death_label != null:
+		_death_label.visible = false
+	_last_pct = 0.0
 	if progress_bar != null:
 		progress_bar.value = 0.0
 	if ghost_delta_label != null:
@@ -83,6 +91,7 @@ func _on_run_started(level_id: String) -> void:
 
 
 func _on_run_progress(_level_id: String, pct: float) -> void:
+	_last_pct = pct
 	if progress_bar != null:
 		progress_bar.value = pct
 	if ghost_delta_label != null and GhostLibrary.last_ghost_score >= 0:
@@ -134,6 +143,32 @@ func _on_run_failed_hud(_level_id: String, _score: int) -> void:
 		return  # practice respawn; no retry button
 	if retry_button != null:
 		retry_button.show()
+	if _death_label != null:
+		_death_label.text = "You made it %d%%!" % int(roundf(_last_pct))
+		_death_label.visible = true
+
+
+## Build the "You made it X%" banner shown on death, above the retry button.
+func _make_death_label() -> void:
+	var parent: Node = retry_button.get_parent()
+	if parent == null:
+		return
+	_death_label = Label.new()
+	_death_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	_death_label.anchor_left = 0.5
+	_death_label.anchor_right = 0.5
+	_death_label.offset_left = -360.0
+	_death_label.offset_right = 360.0
+	_death_label.offset_top = 560.0
+	_death_label.offset_bottom = 660.0
+	_death_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_death_label.add_theme_font_size_override("font_size", 64)
+	_death_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.4))
+	_death_label.add_theme_color_override("font_outline_color", Color(0.0, 0.0, 0.0))
+	_death_label.add_theme_constant_override("outline_size", 8)
+	_death_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_death_label.visible = false
+	parent.add_child(_death_label)
 
 
 ## Restore score after a practice checkpoint respawn.

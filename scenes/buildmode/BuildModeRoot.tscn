@@ -42,12 +42,12 @@ text = "My Level"
 theme_override_font_sizes/font_size = 26
 
 [node name="BpmSpin" type="SpinBox" parent="TopBar/HBox"]
-custom_minimum_size = Vector2(140, 86)
+custom_minimum_size = Vector2(150, 86)
 min_value = 60.0
 max_value = 220.0
 step = 0.5
 value = 120.0
-prefix = "Speed "
+prefix = "♪"
 theme_override_font_sizes/font_size = 24
 
 [node name="ZoneOpt" type="OptionButton" parent="TopBar/HBox"]
@@ -55,33 +55,20 @@ custom_minimum_size = Vector2(140, 86)
 theme_override_font_sizes/font_size = 22
 
 [node name="UndoBtn" type="Button" parent="TopBar/HBox"]
-custom_minimum_size = Vector2(90, 86)
-text = "↩ UNDO"
-theme_override_font_sizes/font_size = 20
+custom_minimum_size = Vector2(78, 86)
+text = "↩"
+theme_override_font_sizes/font_size = 28
 disabled = true
 
 [node name="RedoBtn" type="Button" parent="TopBar/HBox"]
-custom_minimum_size = Vector2(90, 86)
-text = "↪ REDO"
-theme_override_font_sizes/font_size = 20
+custom_minimum_size = Vector2(78, 86)
+text = "↪"
+theme_override_font_sizes/font_size = 28
 disabled = true
 
-[node name="DiffLabel" type="Label" parent="TopBar/HBox"]
-custom_minimum_size = Vector2(130, 86)
-text = "Beginner"
-vertical_alignment = 1
-theme_override_font_sizes/font_size = 22
-
-[node name="ValidateLabel" type="Label" parent="TopBar/HBox"]
-custom_minimum_size = Vector2(160, 86)
-text = "Valid"
-modulate = Color(0.4, 1, 0.4, 1)
-vertical_alignment = 1
-theme_override_font_sizes/font_size = 22
-
 [node name="SaveBtn" type="Button" parent="TopBar/HBox"]
-custom_minimum_size = Vector2(140, 86)
-text = "💾 Save Level"
+custom_minimum_size = Vector2(160, 86)
+text = "💾 Save"
 theme_override_font_sizes/font_size = 26
 
 [node name="MainArea" type="HBoxContainer" parent="."]
@@ -104,9 +91,28 @@ offset_bottom = 1560.0
 [node name="StripLabel" type="Label" parent="PaletteStrip"]
 offset_left = 12.0
 offset_top = 4.0
-offset_right = 700.0
+offset_right = 560.0
 offset_bottom = 30.0
 text = "Pick a piece, then tap the grid to drop it"
+theme_override_font_sizes/font_size = 20
+
+[node name="ValidateLabel" type="Label" parent="PaletteStrip"]
+offset_left = 580.0
+offset_top = 4.0
+offset_right = 840.0
+offset_bottom = 30.0
+text = "Looks Good!"
+modulate = Color(0.4, 1, 0.4, 1)
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 20
+
+[node name="DiffLabel" type="Label" parent="PaletteStrip"]
+offset_left = 850.0
+offset_top = 4.0
+offset_right = 1068.0
+offset_bottom = 30.0
+text = "Difficulty: Beginner"
+horizontal_alignment = 2
 theme_override_font_sizes/font_size = 20
 
 [node name="PalettePanel" type="ScrollContainer" parent="PaletteStrip"]
