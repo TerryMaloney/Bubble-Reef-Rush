@@ -75,7 +75,11 @@ func _process(_delta: float) -> void:
 
 func _spawn_obstacle(entry: Dictionary, _current_beat: float) -> void:
 	var obstacle_type: String = str(entry.get("obstacle_type", ""))
-	var params: Dictionary = entry.get("parameters", {}) as Dictionary
+	var params: Dictionary = DifficultyModifier.apply(
+		entry.get("parameters", {}) as Dictionary,
+		obstacle_type,
+		GameManager.active_difficulty
+	)
 
 	# A "pressure_wall" entry is either a static DDA gate (no travel_speed)
 	# or a moving PressureWave wall (travel_speed present).
@@ -121,6 +125,8 @@ func _spawn_obstacle(entry: Dictionary, _current_beat: float) -> void:
 ## the gap *center* comes from the authored chart.
 func _spawn_gate(entry: Dictionary, params: Dictionary) -> void:
 	var beat_index: int = int(entry.get("beat_index", 0))
+	# Apply difficulty before reading intensity — easy widens gaps, hard narrows.
+	params = DifficultyModifier.apply(params, "pressure_wall", GameManager.active_difficulty)
 	var authored: float = float(params.get("intensity", 0.5))
 
 	var effective: float = authored

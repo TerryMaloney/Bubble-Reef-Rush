@@ -57,12 +57,8 @@ func refresh_palette(max_zone: int) -> void:
 	_buttons.clear()
 	_available_types.clear()
 
-	var profile_id: String = SaveSystem.get_active_profile_id()
-	var all_types: Array[String] = ObstacleParamSchema.types_for_zone(max_zone)
-
-	for otype: String in all_types:
-		if SaveSystem.has_build_unlock(profile_id, "obstacles", otype):
-			_available_types.append(otype)
+	# Build Mode is a creator tool — show the full obstacle roster always.
+	_available_types = ObstacleParamSchema.all_types()
 
 	# Single horizontal row — all cards on one line, scrolled sideways.
 	_grid.columns = maxi(1, _available_types.size())

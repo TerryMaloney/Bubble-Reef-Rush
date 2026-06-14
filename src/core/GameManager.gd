@@ -17,6 +17,7 @@ const PASS_PLAY_NEXT_PLAYER_SCENE: String = "res://scenes/ui/PassPlayNextPlayerS
 var current_state: State = State.MENU
 var current_level_id: String = ""
 var current_zone_id: String = ""
+var active_difficulty: String = "normal"
 
 ## Consecutive deaths on the current level, carried across instant-retries so
 ## the DifficultyDirector can ease a level a player is stuck on. Reset when a
@@ -114,6 +115,7 @@ func finish_level(score: int, stars: int) -> void:
 	# Economy grants BEFORE update so improvement check sees previous best score.
 	last_coins_earned = EconomyService.process_run_completed(current_level_id, score, stars)
 	SaveSystem.update_level_result(_active_profile, current_level_id, score, stars)
+	SaveSystem.update_difficulty_stars(_active_profile, current_level_id, active_difficulty, stars)
 	# Evaluate achievements AFTER update so level results are current.
 	AchievementSystem.evaluate_run(_active_profile, current_level_id, score, stars)
 	TransitionLayer.go_to(RESULTS_SCENE)

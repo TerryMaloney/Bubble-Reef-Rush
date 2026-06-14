@@ -64,6 +64,15 @@ static func zones_for(obstacle_type: String) -> Array[int]:
 	return []
 
 
+## Full roster of obstacle types — used by Build Mode so creators always see every type.
+static func all_types() -> Array[String]:
+	return [
+		"coral_spike", "jellyfish_drift", "kelp_curtain", "bubble_mine",
+		"current_jet", "anchor_chain", "eel_snap", "lava_burst",
+		"pressure_wall", "dark_void", "crystal_shard", "mirror_fish"
+	]
+
+
 ## All obstacle types available for a given zone (unlocked by having cleared that zone).
 ## Zone 1 is always available; higher zones unlock when the player clears up to that zone.
 static func types_for_zone(highest_cleared_zone: int) -> Array[String]:
@@ -87,9 +96,9 @@ static func types_for_zone(highest_cleared_zone: int) -> Array[String]:
 static func _coral_spike() -> Array[Dictionary]:
 	return [
 		{"key": "wall_attachment", "label": "Attach To", "type": "enum",
-			"options": ["top", "bottom"], "default": "bottom"},
-		{"key": "height", "label": "Height", "type": "enum",
-			"options": [120, 180, 240], "default": 120},
+			"options": ["bottom", "top", "left", "right"], "default": "bottom"},
+		{"key": "height", "label": "Length", "type": "int",
+			"min": 60, "max": 400, "default": 120},
 	]
 
 

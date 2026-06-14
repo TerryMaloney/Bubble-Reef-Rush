@@ -15,7 +15,7 @@ class_name BuildModeRoot
 @onready var _bpm_spin: SpinBox = $TopBar/HBox/BpmSpin
 @onready var _zone_opt: OptionButton = $TopBar/HBox/ZoneOpt
 @onready var _save_btn: Button = $TopBar/HBox/SaveBtn
-@onready var _validate_label: Label = $PaletteStrip/ValidateLabel
+@onready var _validate_label: Button = $PaletteStrip/ValidateLabel
 @onready var _diff_label: Label = $PaletteStrip/DiffLabel
 @onready var _back_btn: Button = $TopBar/HBox/BackBtn
 @onready var _undo_btn: Button = $TopBar/HBox/UndoBtn
@@ -33,6 +33,8 @@ var _awaiting_playtest: bool = false
 var _undo_stack: Array[Dictionary] = []
 var _redo_stack: Array[Dictionary] = []
 const MAX_UNDO: int = 30
+
+var _errors_popup: Panel = null
 
 
 func _ready() -> void:
@@ -64,6 +66,8 @@ func _ready() -> void:
 		_delete_btn.pressed.connect(_on_delete_selected)
 
 	_timeline.delete_requested.connect(_on_delete_obstacle)
+	_validate_label.pressed.connect(_on_validate_label_pressed)
+	_build_errors_popup()
 
 	for i: int in range(1, 7):
 		_zone_opt.add_item("World %d" % i, i)
@@ -321,11 +325,96 @@ func _validate_and_tag() -> void:
 		_validate_label.text = "Looks Good!"
 		_validate_label.modulate = Color(0.5, 1.0, 0.5)
 	else:
-		_validate_label.text = "%d Problem(s)" % _validation_errors.size()
+		_validate_label.text = "%d Problem(s)  ▼" % _validation_errors.size()
 		_validate_label.modulate = Color(1.0, 0.3, 0.3)
+	# Keep popup in sync if it's open.
+	if _errors_popup != null and _errors_popup.visible:
+		_refresh_errors_popup()
 
 	var tag: String = DifficultyTagger.compute_tag(_session.get_data())
 	_diff_label.text = "Difficulty: %s" % tag
+
+
+func _build_errors_popup() -> void:
+	_errors_popup = Panel.new()
+	_errors_popup.visible = false
+	_errors_popup.z_index = 10
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = Color(0.05, 0.08, 0.18, 0.97)
+	style.border_color = Color(1.0, 0.3, 0.3, 0.9)
+	style.set_border_width_all(3)
+	style.corner_radius_top_left = 12
+	style.corner_radius_top_right = 12
+	style.corner_radius_bottom_left = 12
+	style.corner_radius_bottom_right = 12
+	style.content_margin_left = 20
+	style.content_margin_right = 20
+	style.content_margin_top = 16
+	style.content_margin_bottom = 16
+	_errors_popup.add_theme_stylebox_override("panel", style)
+	_errors_popup.set_anchors_and_offsets_preset(Control.PRESET_CENTER, Control.PRESET_MODE_KEEP_SIZE)
+	_errors_popup.size = Vector2(900.0, 600.0)
+	_errors_popup.position = Vector2(90.0, 660.0)
+
+	var vbox: VBoxContainer = VBoxContainer.new()
+	vbox.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_errors_popup.add_child(vbox)
+
+	var title: Label = Label.new()
+	title.name = "Title"
+	title.text = "Level Problems"
+	title.add_theme_font_size_override("font_size", 32)
+	title.modulate = Color(1.0, 0.4, 0.4)
+	vbox.add_child(title)
+
+	var scroll: ScrollContainer = ScrollContainer.new()
+	scroll.name = "Scroll"
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(scroll)
+
+	var list: VBoxContainer = VBoxContainer.new()
+	list.name = "List"
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(list)
+
+	var close_btn: Button = Button.new()
+	close_btn.text = "Close"
+	close_btn.add_theme_font_size_override("font_size", 28)
+	close_btn.custom_minimum_size = Vector2(0.0, 72.0)
+	close_btn.pressed.connect(func() -> void: _errors_popup.visible = false)
+	vbox.add_child(close_btn)
+
+	add_child(_errors_popup)
+
+
+func _refresh_errors_popup() -> void:
+	if _errors_popup == null:
+		return
+	var list: VBoxContainer = _errors_popup.get_node_or_null("VBoxContainer/Scroll/List") as VBoxContainer
+	if list == null:
+		return
+	for c: Node in list.get_children():
+		c.queue_free()
+	if _validation_errors.is_empty():
+		var ok: Label = Label.new()
+		ok.text = "No problems — level looks good!"
+		ok.add_theme_font_size_override("font_size", 26)
+		ok.modulate = Color(0.5, 1.0, 0.5)
+		list.add_child(ok)
+	else:
+		for i: int in range(_validation_errors.size()):
+			var lbl: Label = Label.new()
+			lbl.text = "• " + _validation_errors[i]
+			lbl.add_theme_font_size_override("font_size", 24)
+			lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			list.add_child(lbl)
+
+
+func _on_validate_label_pressed() -> void:
+	if _errors_popup == null:
+		return
+	_refresh_errors_popup()
+	_errors_popup.visible = not _errors_popup.visible
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────

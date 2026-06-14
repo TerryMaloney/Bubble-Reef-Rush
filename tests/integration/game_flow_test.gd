@@ -14,6 +14,7 @@ var _run_completed: bool = false
 var _completed_level_id: String = ""
 var _completed_score: int = -1
 var _completed_stars: int = -1
+var _aborted: bool = false
 
 
 func _init() -> void:
@@ -39,21 +40,29 @@ func _init() -> void:
 	var level: Node = level_scene.instantiate()
 	root.add_child(level)
 
-	# Let _ready chains run: LevelLoader loads .brl, _check_level_end connects to beat_fired.
-	await process_frame
+	# Give the async level-load chain (RhythmMap → LevelLoader._on_map_loaded →
+	# run_started → ObstacleSpawner.setup) enough frames to settle.
+	for _i: int in range(10):
+		await process_frame
 	await physics_frame
 
 	var level_loader: Node = level.get_node_or_null("LevelLoader")
 	_hard_assert(level_loader != null, "LevelLoader node missing from LevelRoot")
 	_hard_assert(level.get_node_or_null("Player") != null, "Player node missing from LevelRoot")
 
-	# Fire all 32 beats manually — bypasses real-time wall clock.
-	# Beat 31 is total_beats-1 and will trigger level_ended → run_completed.
-	for i: int in range(32):
+	# Fire enough beats to reach the end. Read actual total_beats from the loader
+	# (z1-l1 has 36, not 32 — firing too few silently never triggers level_ended).
+	var total_beats: int = int(level_loader.get("_total_beats") if level_loader != null else 40)
+	if total_beats <= 0:
+		total_beats = 40
+	for i: int in range(total_beats):
 		beat_conductor.beat_fired.emit(i)
 
-	# Let deferred scene change (change_scene_to_file → ResultsScreen) process.
-	await process_frame
+	# Drain frames until run_completed fires, or give up after 10 frames.
+	for _i: int in range(10):
+		if _run_completed:
+			break
+		await process_frame
 
 	# ---- Assertions ----
 	_hard_assert(_run_completed, "run_completed never fired after all 32 beats")
@@ -76,7 +85,10 @@ func _init() -> void:
 
 
 func _hard_assert(cond: bool, msg: String) -> void:
+	if _aborted:
+		return
 	if not cond:
+		_aborted = true
 		push_error("GAME_FLOW FAIL: " + msg)
 		print("GAME_FLOW FAIL: " + msg)
 		quit(1)

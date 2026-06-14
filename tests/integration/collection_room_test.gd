@@ -77,8 +77,13 @@ func _test_boss_trophy_round_trip(root: Node) -> void:
 ## 3. family_records_best — best score across all profiles is the highest value.
 func _test_family_records_best(root: Node) -> void:
 	var ss: Node = root.get_node("SaveSystem")
-	var pid_a: String = "cr_rec_a_%d" % Time.get_ticks_msec()
-	var pid_b: String = "cr_rec_b_%d" % Time.get_ticks_msec()
+	var pid_a: String = "cr_rec_a_fixed"
+	var pid_b: String = "cr_rec_b_fixed"
+	# Clean up any lingering profiles from previous runs to ensure clean slate.
+	for old: String in ss.list_profiles():
+		if old.begins_with("cr_rec_") or old.begins_with("test_") or old.begins_with("diff_test_"):
+			if old != "player1":
+				ss.delete_profile(old)
 	ss.ensure_profile(pid_a)
 	ss.ensure_profile(pid_b)
 
@@ -95,6 +100,9 @@ func _test_family_records_best(root: Node) -> void:
 			if sc > best_score:
 				best_score = sc
 				best_pid = pid
+
+	ss.delete_profile(pid_a)
+	ss.delete_profile(pid_b)
 
 	if best_score == 700:
 		_ok("family_records_best")

@@ -294,6 +294,51 @@ func get_best_stars(profile_id: String, level_id: String) -> int:
 	return int(((data.get("levels", {}) as Dictionary).get(level_id, {}) as Dictionary).get("best_stars", 0))
 
 
+## Update the per-difficulty star record for a level.
+## Also keeps `best_stars` as the max across all difficulties.
+func update_difficulty_stars(profile_id: String, level_id: String, difficulty: String, stars: int) -> void:
+	var data: Dictionary = load_progress(profile_id)
+	if data.is_empty():
+		ensure_profile(profile_id)
+		data = load_progress(profile_id)
+	var levels: Dictionary = data.get("levels", {}) as Dictionary
+	var entry: Dictionary = _ensure_level_entry(levels, level_id)
+	var diff_stars: Dictionary = entry.get("difficulty_stars", {}) as Dictionary
+	var prev: int = int(diff_stars.get(difficulty, 0))
+	if stars > prev:
+		diff_stars[difficulty] = stars
+		entry["difficulty_stars"] = diff_stars
+		# Keep best_stars as the overall maximum.
+		entry["best_stars"] = maxi(int(entry.get("best_stars", 0)), stars)
+		levels[level_id] = entry
+		data["levels"] = levels
+		# Recalculate total_stars.
+		var total: int = 0
+		for lv: Variant in levels.values():
+			total += int((lv as Dictionary).get("best_stars", 0))
+		data["total_stars"] = total
+		save_progress(profile_id, data)
+
+
+## Return stars earned for a specific difficulty (0 = not cleared on that difficulty).
+## Legacy saves (no `difficulty_stars` key at all) treat `best_stars` as Normal cleared.
+func get_difficulty_stars(profile_id: String, level_id: String, difficulty: String) -> int:
+	var data: Dictionary = load_progress(profile_id)
+	var entry: Dictionary = ((data.get("levels", {}) as Dictionary).get(level_id, {}) as Dictionary)
+	if not entry.has("difficulty_stars"):
+		# Legacy record: only Normal gets the existing best_stars.
+		if difficulty == "normal":
+			return int(entry.get("best_stars", 0))
+		return 0
+	var diff_stars: Dictionary = entry.get("difficulty_stars", {}) as Dictionary
+	return int(diff_stars.get(difficulty, 0))
+
+
+## Whether a specific difficulty has been beaten (at least 1 star).
+func is_difficulty_cleared(profile_id: String, level_id: String, difficulty: String) -> bool:
+	return get_difficulty_stars(profile_id, level_id, difficulty) > 0
+
+
 func get_best_progress_pct(profile_id: String, level_id: String) -> float:
 	var data: Dictionary = load_progress(profile_id)
 	return float(((data.get("levels", {}) as Dictionary).get(level_id, {}) as Dictionary).get("best_progress_pct", 0.0))

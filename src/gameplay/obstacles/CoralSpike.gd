@@ -19,10 +19,7 @@ func _process(delta: float) -> void:
 		queue_free()
 
 
-## Configure the spike from its beat_map entry. The spawner positions this node
-## at the wall (lane 0.0 = top edge, lane 1.0 = bottom edge); here we build the
-## collision shape and visual so the spike extends `height` px into the playfield
-## from that wall, making it both visible and properly collidable.
+## Configure from beat_map entry.
 func setup(entry: Dictionary) -> void:
 	var params: Dictionary = entry.get("parameters", {}) as Dictionary
 	var attachment: String = str(params.get("wall_attachment", "bottom"))
@@ -30,48 +27,68 @@ func setup(entry: Dictionary) -> void:
 	_configure(attachment, height)
 
 
-## Directly size this spike — used by ObstacleSpawner when composing a gate
-## out of a top and bottom piece. attachment is "top" or "bottom".
+## Directly configure — used by ObstacleSpawner when composing gate pieces.
 func configure(attachment: String, height: float) -> void:
 	_configure(attachment, height)
 
 
 func _configure(attachment: String, height: float) -> void:
-	# Build a fresh shape per instance so we never mutate a shared sub-resource.
 	var shape: RectangleShape2D = RectangleShape2D.new()
-	shape.size = Vector2(SPIKE_WIDTH, height)
 
-	if attachment == "top":
-		_collision.shape = shape
-		_collision.position = Vector2(0.0, height * 0.5)
-	else:
-		_collision.shape = shape
-		_collision.position = Vector2(0.0, -height * 0.5)
+	match attachment:
+		"top":
+			shape.size = Vector2(SPIKE_WIDTH, height)
+			_collision.shape = shape
+			_collision.position = Vector2(0.0, height * 0.5)
+		"bottom":
+			shape.size = Vector2(SPIKE_WIDTH, height)
+			_collision.shape = shape
+			_collision.position = Vector2(0.0, -height * 0.5)
+		"left":
+			shape.size = Vector2(height, SPIKE_WIDTH)
+			_collision.shape = shape
+			_collision.position = Vector2(height * 0.5, 0.0)
+		"right":
+			shape.size = Vector2(height, SPIKE_WIDTH)
+			_collision.shape = shape
+			_collision.position = Vector2(-height * 0.5, 0.0)
+		_:
+			shape.size = Vector2(SPIKE_WIDTH, height)
+			_collision.shape = shape
+			_collision.position = Vector2(0.0, -height * 0.5)
 
-	_build_placeholder(attachment, height)
+	_build_visual(attachment, height)
 
 
-## Placeholder visual: tapered spike polygon.
-## Called by VisualFactory when no real sprite is available.
-## Swap for a sprite by adding "sprite/obstacle/coral_spike" to asset_manifest.json.
-func _build_placeholder(attachment: String, height: float) -> void:
-	var half_w: float = SPIKE_WIDTH * 0.5
-	if attachment == "top":
-		_visual.polygon = PackedVector2Array([
-			Vector2(-half_w, 0.0),
-			Vector2(half_w, 0.0),
-			Vector2(half_w, height - 30.0),
-			Vector2(0.0, height),
-			Vector2(-half_w, height - 30.0),
-		])
-	else:
-		_visual.polygon = PackedVector2Array([
-			Vector2(-half_w, 0.0),
-			Vector2(half_w, 0.0),
-			Vector2(half_w, -height + 30.0),
-			Vector2(0.0, -height),
-			Vector2(-half_w, -height + 30.0),
-		])
+func _build_visual(attachment: String, height: float) -> void:
+	var hw: float = SPIKE_WIDTH * 0.5
+	var tip: float = 28.0  # how far the tip narrows before the point
+
+	match attachment:
+		"bottom":
+			_visual.polygon = PackedVector2Array([
+				Vector2(-hw, 0.0), Vector2(hw, 0.0),
+				Vector2(hw, -height + tip), Vector2(0.0, -height),
+				Vector2(-hw, -height + tip),
+			])
+		"top":
+			_visual.polygon = PackedVector2Array([
+				Vector2(-hw, 0.0), Vector2(hw, 0.0),
+				Vector2(hw, height - tip), Vector2(0.0, height),
+				Vector2(-hw, height - tip),
+			])
+		"left":
+			_visual.polygon = PackedVector2Array([
+				Vector2(0.0, -hw), Vector2(0.0, hw),
+				Vector2(height - tip, hw), Vector2(height, 0.0),
+				Vector2(height - tip, -hw),
+			])
+		"right":
+			_visual.polygon = PackedVector2Array([
+				Vector2(0.0, -hw), Vector2(0.0, hw),
+				Vector2(-(height - tip), hw), Vector2(-height, 0.0),
+				Vector2(-(height - tip), -hw),
+			])
 
 
 func _on_body_entered(body: Node2D) -> void:
