@@ -30,6 +30,10 @@ var _ghost_recorder: GhostRecorder = null
 var score_provider: Callable
 
 const _ART_PATH: String = "res://assets/characters/player.png"
+## Target on-screen height (px) for drop-in character art. The sprite is scaled
+## to this regardless of the source PNG's resolution, so any reasonably-sized
+## export "just works" without matching exact pixel dimensions.
+const _ART_TARGET_HEIGHT: float = 110.0
 
 
 func _ready() -> void:
@@ -47,6 +51,10 @@ func _try_load_art() -> void:
 	$Visual.hide()
 	var sp := Sprite2D.new()
 	sp.texture = tex
+	var tex_h: float = float(tex.get_height())
+	if tex_h > 0.0:
+		var s: float = _ART_TARGET_HEIGHT / tex_h
+		sp.scale = Vector2(s, s)
 	add_child(sp)
 
 
