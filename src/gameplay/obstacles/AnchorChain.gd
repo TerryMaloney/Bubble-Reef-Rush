@@ -53,6 +53,8 @@ func _build_chain() -> void:
 	rect.size = Vector2(80.0, 60.0)
 	col.shape = rect
 	anchor.add_child(col)
+	# Visible anchor block — without a visual the whole chain was invisible.
+	_add_visual(anchor, Vector2(80.0, 60.0), Color(0.42, 0.34, 0.22))
 	anchor.body_entered.connect(func(body: Node2D) -> void:
 		if body.has_method("on_hit"):
 			body.on_hit()
@@ -70,12 +72,26 @@ func _add_segment(local_pos: Vector2, radius: float, height: float) -> void:
 	cap.height = height
 	col.shape = cap
 	area.add_child(col)
+	# Visible chain link matching the capsule collision.
+	_add_visual(area, Vector2(radius * 2.0, height + radius), Color(0.50, 0.42, 0.28))
 	area.body_entered.connect(func(body: Node2D) -> void:
 		if body.has_method("on_hit"):
 			body.on_hit()
 	)
 	add_child(area)
 	_segments.append(area)
+
+
+## Attach a coloured rectangle visual (centred) to a collision area so the
+## chain/anchor is actually drawn, not just a phantom hitbox.
+func _add_visual(parent: Area2D, sz: Vector2, color: Color) -> void:
+	var poly: Polygon2D = Polygon2D.new()
+	var hw: float = sz.x * 0.5
+	var hh: float = sz.y * 0.5
+	poly.polygon = PackedVector2Array([
+		Vector2(-hw, -hh), Vector2(hw, -hh), Vector2(hw, hh), Vector2(-hw, hh)])
+	poly.color = color
+	parent.add_child(poly)
 
 
 func _process(delta: float) -> void:

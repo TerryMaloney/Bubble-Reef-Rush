@@ -21,6 +21,10 @@ var _tween: Tween = null
 @onready var _strike_col: CollisionShape2D = $StrikeArea/CollisionShape2D
 @onready var _visual: Polygon2D = $Visual
 
+## Visible strike bar that exactly overlays the kill collision (built in setup()).
+## Without this the eel struck an invisible 300px kill zone — an unfair death.
+var _strike_visual: Polygon2D = null
+
 
 func _ready() -> void:
 	add_to_group("scrolling")
@@ -43,6 +47,16 @@ func setup(entry: Dictionary) -> void:
 		_strike_area.position = Vector2(_strike_length * 0.5, 0.0)
 	else:
 		_strike_area.position = Vector2(-_strike_length * 0.5, 0.0)
+
+	# Build a visible bar overlaying the exact kill zone so the strike is never
+	# invisible. Hidden until the eel telegraphs/strikes.
+	var hw: float = _strike_length * 0.5
+	var hh: float = 30.0
+	_strike_visual = Polygon2D.new()
+	_strike_visual.polygon = PackedVector2Array([
+		Vector2(-hw, -hh), Vector2(hw, -hh), Vector2(hw, hh), Vector2(-hw, hh)])
+	_strike_visual.color = Color(1.0, 1.0, 1.0, 0.0)
+	_strike_area.add_child(_strike_visual)
 
 
 func _process(delta: float) -> void:
@@ -76,6 +90,16 @@ func _on_beat_fired(beat_idx: int) -> void:
 func _set_state(s: State) -> void:
 	_state = s
 	_time_in_state = 0.0
+	if _strike_visual != null:
+		match s:
+			State.TELEGRAPH:
+				# Warning preview of where the eel will strike.
+				_strike_visual.color = Color(1.0, 0.85, 0.2, 0.4)
+			State.STRIKE:
+				# Solid danger bar — matches the live kill collision exactly.
+				_strike_visual.color = Color(0.9, 0.25, 0.25, 0.95)
+			_:
+				_strike_visual.color = Color(1.0, 1.0, 1.0, 0.0)
 
 
 func _do_strike() -> void:

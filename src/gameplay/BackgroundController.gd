@@ -18,6 +18,7 @@ const PULSE_DECAY: float = 8.0
 var _background: ColorRect = null
 var _base_color: Color = ZONE_COLORS[1]
 var _pulse: float = 0.0
+var _parallax: ParallaxController = null
 
 
 func setup(background: ColorRect) -> void:
@@ -25,6 +26,10 @@ func setup(background: ColorRect) -> void:
 	_base_color = ZONE_COLORS[1]
 	if _background != null:
 		_background.color = _base_color
+	# Drop-in parallax background; stays inactive (flat gradient shows) until
+	# art exists at res://assets/backgrounds/z<zone>_bg_l<0..5>.png.
+	_parallax = ParallaxController.new()
+	add_child(_parallax)
 	BeatConductor.beat_fired.connect(_on_beat_fired)
 	EventBus.run_started.connect(_on_run_started)
 
@@ -42,6 +47,12 @@ func _on_run_started(level_id: String) -> void:
 		EventBus.hazard_warning.emit("DARKNESS FALLS")
 	if _background != null:
 		_background.color = _base_color
+	# Build parallax for this zone. If real art is found, hide the flat gradient
+	# so the scrolling layers show through; otherwise keep the gradient.
+	if _parallax != null:
+		var has_art: bool = _parallax.build(zone)
+		if _background != null:
+			_background.visible = not has_art
 
 
 func _process(delta: float) -> void:
