@@ -44,6 +44,9 @@ static var _thumbnail_cache: Dictionary = {}
 
 
 func _ready() -> void:
+	# Horizontal bottom-strip palette: scroll sideways, never vertically.
+	horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	refresh_palette(highest_cleared_zone)
 
 
@@ -60,6 +63,9 @@ func refresh_palette(max_zone: int) -> void:
 	for otype: String in all_types:
 		if SaveSystem.has_build_unlock(profile_id, "obstacles", otype):
 			_available_types.append(otype)
+
+	# Single horizontal row — all cards on one line, scrolled sideways.
+	_grid.columns = maxi(1, _available_types.size())
 
 	for otype: String in _available_types:
 		var btn: Button = _make_card(otype)
@@ -146,6 +152,12 @@ static func _generate_placeholder(otype: String) -> ImageTexture:
 
 
 func _on_btn_pressed(otype: String) -> void:
+	# Tapping the already-selected card toggles OFF (exits place mode).
+	if otype == selected_type:
+		selected_type = ""
+		_reset_card_styles()
+		obstacle_type_selected.emit("")
+		return
 	selected_type = otype
 	for i: int in range(_buttons.size()):
 		var t: String = _available_types[i]
@@ -166,3 +178,16 @@ func _on_btn_pressed(otype: String) -> void:
 			s.border_width_bottom = 3
 			s.bg_color = base.darkened(0.30)
 	obstacle_type_selected.emit(otype)
+
+
+## Reset every card to its unselected style (used when deselecting).
+func _reset_card_styles() -> void:
+	for i: int in range(_buttons.size()):
+		var base: Color = TYPE_COLORS.get(_available_types[i], TYPE_COLOR_DEFAULT) as Color
+		var s: StyleBoxFlat = _buttons[i].get_theme_stylebox("normal") as StyleBoxFlat
+		s.border_color = base
+		s.border_width_left = 3
+		s.border_width_right = 3
+		s.border_width_top = 3
+		s.border_width_bottom = 3
+		s.bg_color = base.darkened(0.30)

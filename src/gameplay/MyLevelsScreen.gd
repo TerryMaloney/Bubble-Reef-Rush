@@ -36,11 +36,12 @@ func _build_ui() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(title)
 
-	# "Make a New Level!" button.
+	# "Make a New Level!" button — the primary action, big and full-width.
 	var new_btn: Button = Button.new()
-	new_btn.text = "Make a New Level!"
-	new_btn.custom_minimum_size = Vector2(0, BTN_H)
-	new_btn.add_theme_font_size_override("font_size", 30)
+	new_btn.text = "＋  Make a New Level!"
+	new_btn.custom_minimum_size = Vector2(0, 130)
+	new_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	new_btn.add_theme_font_size_override("font_size", 36)
 	new_btn.pressed.connect(_on_new_level)
 	vbox.add_child(new_btn)
 

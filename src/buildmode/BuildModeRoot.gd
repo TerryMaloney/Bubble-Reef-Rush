@@ -8,7 +8,7 @@ class_name BuildModeRoot
 
 # ── Child node refs ───────────────────────────────────────────────────────────
 @onready var _timeline: TimelineView = $MainArea/TimelineView
-@onready var _palette: PalettePanel = $MainArea/PalettePanel
+@onready var _palette: PalettePanel = $PaletteStrip/PalettePanel
 @onready var _props: PropertiesPanel = $BottomPanel/PropertiesPanel
 @onready var _playback: PlaybackBar = $BottomPanel/PlaybackBar
 @onready var _name_edit: LineEdit = $TopBar/HBox/NameEdit

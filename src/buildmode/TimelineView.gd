@@ -2,12 +2,17 @@
 ## Custom-draw scrollable timeline grid for the Build Mode editor.
 ## Horizontal axis = beats (time), vertical axis = lane Y (0..CANVAS_H).
 ##
-## Interaction model (mobile-first):
-##   • Tap empty space with active_type → place obstacle
-##   • Tap existing obstacle → select it (shows properties)
-##   • Drag existing obstacle → reposition it in real time
-##   • Drag obstacle into the trash zone (bottom strip) → delete it
-##   • Drag empty space → pan the timeline
+## Interaction model (mobile-first), redesigned to remove the place-vs-pan clash:
+##   • Drag the RULER strip (top) → always pans the timeline (dedicated pan zone)
+##   • With an obstacle chosen in the palette ("place mode"):
+##       – Tap empty space        → place it there
+##       – Drag empty space        → live-preview placement, drops on release
+##         (placement never pans, so dropping no longer drags the map)
+##   • With NO obstacle chosen:
+##       – Drag empty space        → pan the timeline
+##       – Tap empty space         → deselect
+##   • Tap an existing obstacle    → select it (shows properties)
+##   • Drag an existing obstacle   → reposition it; drop on the trash strip to delete
 ##   • Zoom cycles 1×/2×/4× via PlaybackBar button
 extends Control
 
@@ -49,6 +54,12 @@ var _obs_drag_index: int = -1
 var _obs_drag_beat: float = 0.0
 var _obs_drag_lane: float = 0.0
 var _obs_drag_over_trash: bool = false
+
+# Placement state (dragging out a new obstacle in place mode)
+var _placing: bool = false
+var _place_beat: float = 0.0
+var _place_lane: float = 0.0
+var _press_on_ruler: bool = false
 
 const COL_BG: Color = Color(0.04, 0.05, 0.14)
 const COL_RULER: Color = Color(0.10, 0.12, 0.22)
@@ -138,6 +149,18 @@ func _draw() -> void:
 			var drag_entry: Dictionary = beat_map[_obs_drag_index] as Dictionary
 			var drag_otype: String = str(drag_entry.get("obstacle_type", "?"))
 			_draw_obstacle(_obs_drag_beat, _obs_drag_lane, drag_otype, true, _obs_drag_over_trash)
+
+	# ── Placement preview (dragging out a new obstacle in place mode) ──────────
+	if _placing and not active_type.is_empty():
+		_draw_obstacle(_place_beat, _place_lane, active_type, true, false)
+
+	# ── Place-mode hint banner ─────────────────────────────────────────────────
+	if not active_type.is_empty() and not _placing and not _obs_dragging:
+		var hint: String = "Placing: %s  —  tap or drag to drop" % ObstacleParamSchema.display_name(active_type)
+		var hint_w: float = 540.0
+		draw_rect(Rect2(8.0, RULER_H + 8.0, hint_w, 36.0), Color(0.1, 0.5, 0.2, 0.85))
+		draw_string(font, Vector2(18.0, RULER_H + 33.0), hint,
+				HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color.WHITE)
 
 	# ── Trash zone (visible only while dragging an obstacle) ───────────────────
 	if _obs_dragging:
@@ -233,10 +256,12 @@ func _handle_press(pos: Vector2, is_right: bool) -> void:
 	_moved_enough = false
 	_pan_active = false
 	_obs_dragging = false
+	_placing = false
 	_obs_drag_index = -1
+	_press_on_ruler = pos.y < RULER_H
 
-	# Ignore ruler tap area.
-	if pos.y < RULER_H:
+	# The ruler is the dedicated pan strip — never hit-tests obstacles.
+	if _press_on_ruler:
 		_press_obs_index = -1
 		return
 
@@ -256,6 +281,13 @@ func _handle_motion(pos: Vector2, rel: Vector2) -> void:
 		queue_redraw()
 		return
 
+	if _placing:
+		# Live-preview the new obstacle; placement never pans.
+		_place_beat = _snap_beat(pan_beat + pos.x / px_per_beat)
+		_place_lane = clampf((pos.y - RULER_H) / (size.y - RULER_H), 0.0, 1.0)
+		queue_redraw()
+		return
+
 	if _pan_active:
 		# Accumulate pan correctly using per-frame delta.
 		pan_beat = maxf(0.0, pan_beat - rel.x / px_per_beat)
@@ -265,7 +297,12 @@ func _handle_motion(pos: Vector2, rel: Vector2) -> void:
 	# Not yet committed to a mode — check if we've moved enough to disambiguate.
 	if not _moved_enough and _press_pos.distance_to(pos) >= DRAG_THRESHOLD:
 		_moved_enough = true
-		if _press_obs_index >= 0:
+		if _press_on_ruler:
+			# Ruler drag → pan.
+			_pan_active = true
+			pan_beat = maxf(0.0, pan_beat - rel.x / px_per_beat)
+			queue_redraw()
+		elif _press_obs_index >= 0:
 			# Start obstacle drag.
 			_obs_dragging = true
 			_obs_drag_index = _press_obs_index
@@ -279,14 +316,28 @@ func _handle_motion(pos: Vector2, rel: Vector2) -> void:
 			selected_index = _press_obs_index
 			obstacle_selected.emit(_press_obs_index)
 			queue_redraw()
+		elif not active_type.is_empty():
+			# Place mode: drag out a live placement preview (does NOT pan).
+			_placing = true
+			_place_beat = _snap_beat(pan_beat + pos.x / px_per_beat)
+			_place_lane = clampf((pos.y - RULER_H) / (size.y - RULER_H), 0.0, 1.0)
+			queue_redraw()
 		else:
-			# Start timeline pan.
+			# No obstacle chosen → body drag pans.
 			_pan_active = true
 			pan_beat = maxf(0.0, pan_beat - rel.x / px_per_beat)
 			queue_redraw()
 
 
 func _handle_release(pos: Vector2) -> void:
+	if _placing:
+		obstacle_placed.emit(_place_beat, _place_lane)
+		selected_index = -1
+		obstacle_deselected.emit()
+		_placing = false
+		queue_redraw()
+		return
+
 	if _obs_dragging:
 		if _obs_drag_over_trash:
 			delete_requested.emit(_obs_drag_index)
