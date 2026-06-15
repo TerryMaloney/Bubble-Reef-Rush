@@ -54,7 +54,9 @@ func _ready() -> void:
 	player.timing_judge.combo_updated.connect(director.on_combo_updated)
 
 	BeatConductor.user_latency_offset_ms = Accessibility.timing_offset_ms()
-	player.timing_judge.window_scale = 1.25 if Accessibility.wide_timing_windows() else 1.0
+	var _diff_window: Dictionary = {"easy": 1.5, "normal": 1.0, "hard": 0.65}
+	var _diff_scale: float = float(_diff_window.get(GameManager.active_difficulty, 1.0))
+	player.timing_judge.window_scale = _diff_scale * (1.25 if Accessibility.wide_timing_windows() else 1.0)
 
 	($JuiceDirector as JuiceDirector).setup($Camera2D as Camera2D)
 	($BackgroundController as BackgroundController).setup($Background as ColorRect)
