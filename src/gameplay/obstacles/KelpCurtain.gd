@@ -23,7 +23,7 @@ func _ready() -> void:
 func setup(entry: Dictionary) -> void:
 	var params: Dictionary = entry.get("parameters", {}) as Dictionary
 	var gap_y_norm: float = float(params.get("gap_y_normalized", entry.get("lane_position", 0.5)))
-	var gap_half: float = float(params.get("gap_height", 120.0)) * 0.5
+	var gap_half: float = float(params.get("gap_height", 240.0)) * 0.5
 	_sway_speed = float(params.get("sway_speed", 2.0))
 
 	# Root at top of screen; blade positions are in local screen-coordinate space.

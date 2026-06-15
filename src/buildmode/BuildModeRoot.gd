@@ -150,6 +150,9 @@ func _on_obstacle_placed(beat_index: float, lane_y_normalized: float) -> void:
 		"obstacle_type": _timeline.active_type,
 		"parameters": _default_params(_timeline.active_type)
 	}
+	# For kelp_curtain, the gap center should start at the tap position, not the schema default.
+	if _timeline.active_type == "kelp_curtain":
+		(entry["parameters"] as Dictionary)["gap_y_normalized"] = lane_y_normalized
 	_session.add_beat_entry(entry)
 	_timeline.refresh()
 	_validate_and_tag()
@@ -179,6 +182,11 @@ func _on_obstacle_moved(index: int, new_beat: float, new_lane: float) -> void:
 	var entry: Dictionary = (beat_map[index] as Dictionary).duplicate(true)
 	entry["beat_index"] = new_beat
 	entry["lane_position"] = new_lane
+	# Dragging a kelp_curtain moves the gap center with it.
+	if str(entry.get("obstacle_type", "")) == "kelp_curtain":
+		var p: Dictionary = entry.get("parameters", {}) as Dictionary
+		p["gap_y_normalized"] = new_lane
+		entry["parameters"] = p
 	_session.update_beat_entry(index, entry)
 	_timeline.selected_index = index
 	_timeline.refresh()
@@ -195,6 +203,9 @@ func _on_property_changed(beat_map_index: int, key: String, value: Variant) -> v
 		var params: Dictionary = entry.get("parameters", {}) as Dictionary
 		params[key] = value
 		entry["parameters"] = params
+		# Moving the gap position slider also repositions the obstacle icon on the timeline.
+		if key == "gap_y_normalized" and str(entry.get("obstacle_type", "")) == "kelp_curtain":
+			entry["lane_position"] = float(value)
 		_session.update_beat_entry(beat_map_index, entry)
 		# Redraw so gap size / position / height changes show live in the editor.
 		_timeline.selected_index = beat_map_index
