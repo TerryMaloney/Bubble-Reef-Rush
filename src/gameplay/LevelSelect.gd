@@ -36,6 +36,8 @@ var _profile: String = ""
 var _selected_difficulty: String = "normal"
 var _diff_btns: Dictionary = {}  # difficulty -> Button
 var _level_container: VBoxContainer = null
+var _selected_mutators: Array[String] = []
+var _mutator_defs: Array = []
 
 
 func _ready() -> void:
@@ -45,6 +47,8 @@ func _ready() -> void:
 	$ZoneTitle.text = ZONE_NAMES.get(zone_id, zone_id.to_upper()) as String
 	$BackButton.pressed.connect(func() -> void: GameManager.go_to_zone_select())
 	_build_difficulty_row(zone_id)
+	_load_mutator_defs()
+	_build_mutator_strip()
 	_build_level_list(zone_id)
 
 
@@ -146,9 +150,82 @@ func _build_level_list(zone_id: String) -> void:
 			var diff_badge: String = _diff_badge(stars)
 			btn.text = "L%d  %s  %s%s%s%s" % [i + 1, level_name, diff_badge, pct_text, score_text, ghost_marker]
 			var lid: String = level_id
-			btn.pressed.connect(func() -> void: GameManager.start_level(lid))
+			btn.pressed.connect(func() -> void: _launch_level(lid))
 
 		container.add_child(btn)
+
+
+func _launch_level(level_id: String) -> void:
+	MutatorSystem.active_mutators = _selected_mutators.duplicate()
+	GameManager.start_level(level_id)
+
+
+func _load_mutator_defs() -> void:
+	var file: FileAccess = FileAccess.open("res://assets/data/mutators.json", FileAccess.READ)
+	if file == null:
+		return
+	var json: JSON = JSON.new()
+	if json.parse(file.get_as_text()) == OK and json.data is Array:
+		_mutator_defs = json.data as Array
+	file.close()
+
+
+func _build_mutator_strip() -> void:
+	var unlocked: Array = []
+	for d: Variant in _mutator_defs:
+		var def: Dictionary = d as Dictionary
+		var cond: String = str(def.get("unlock_condition", "default"))
+		if _is_mutator_unlocked(cond):
+			unlocked.append(def)
+	if unlocked.is_empty():
+		return
+	var parent: Node = $LevelContainer.get_parent()
+	var insert_idx: int = $LevelContainer.get_index()
+
+	var strip_label: Label = Label.new()
+	strip_label.text = "Challenges:"
+	strip_label.add_theme_font_size_override("font_size", 24)
+	strip_label.modulate = Color(0.7, 0.9, 1.0)
+	parent.add_child(strip_label)
+	parent.move_child(strip_label, insert_idx)
+
+	var scroll: ScrollContainer = ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0.0, 80.0)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var strip: HBoxContainer = HBoxContainer.new()
+	strip.add_theme_constant_override("separation", 12)
+	scroll.add_child(strip)
+	parent.add_child(scroll)
+	parent.move_child(scroll, $LevelContainer.get_index())
+
+	for def: Variant in unlocked:
+		var d: Dictionary = def as Dictionary
+		var mid: String = str(d.get("id", ""))
+		var btn: Button = Button.new()
+		btn.text = str(d.get("name", mid))
+		btn.toggle_mode = true
+		btn.custom_minimum_size = Vector2(0.0, 72.0)
+		btn.add_theme_font_size_override("font_size", 22)
+		btn.toggled.connect(func(on: bool) -> void: _on_mutator_toggled(mid, on))
+		strip.add_child(btn)
+
+
+func _is_mutator_unlocked(cond: String) -> bool:
+	if cond == "default":
+		return true
+	if cond.begins_with("clear_"):
+		var level_id: String = cond.substr("clear_".length()).replace("_l", "-l")
+		return SaveSystem.is_level_cleared(_profile, level_id)
+	return false
+
+
+func _on_mutator_toggled(mutator_id: String, enabled: bool) -> void:
+	if enabled:
+		if mutator_id not in _selected_mutators:
+			_selected_mutators.append(mutator_id)
+	else:
+		_selected_mutators.erase(mutator_id)
 
 
 func _diff_badge(stars: int) -> String:

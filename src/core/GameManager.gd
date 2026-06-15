@@ -167,7 +167,7 @@ func _clear_session_state() -> void:
 	last_all_treasures_collected = false
 	last_th_pre_collected = 0
 	RuleCardSystem.set_active_rules([])
-	MutatorSystem.active_mutators.erase("treasure_only")
+	MutatorSystem.clear()
 
 
 func go_to_settings(return_scene: String = MAIN_MENU_SCENE) -> void:
