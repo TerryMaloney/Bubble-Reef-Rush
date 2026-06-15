@@ -59,8 +59,13 @@ var _pp_original_profile: String = ""
 ## Playlist (Daily Dive / Radio Shuffle) — levels queued after start_playlist().
 var playlist: Array[String] = []
 var playlist_index: int = 0
-## "daily_dive" | "radio_shuffle" | "" — determines end-of-playlist save behaviour.
+## "daily_dive" | "radio_shuffle" | "treasure_hunt" | "" — determines end-of-playlist save behaviour.
 var playlist_context: String = ""
+
+## Treasure Hunt — set by LevelRoot._on_level_ended before run_completed fires.
+var last_all_treasures_collected: bool = false
+## Number of coins already saved before the current run started (read by HUDController).
+var last_th_pre_collected: int = 0
 
 ## BuildMode: session stashed before test-play, restored in BuildModeRoot._ready().
 var pending_build_session = null  # BuildSession ref — untyped to avoid forward dep
@@ -123,6 +128,13 @@ func finish_level(score: int, stars: int) -> void:
 	SaveSystem.update_difficulty_stars(_active_profile, current_level_id, active_difficulty, stars)
 	# Evaluate achievements AFTER update so level results are current.
 	AchievementSystem.evaluate_run(_active_profile, current_level_id, score, stars)
+	# Evaluate active rule cards (e.g. Treasure Hunt) so ResultsScreen can display results.
+	if not RuleCardSystem.active_rules.is_empty():
+		var run_data: Dictionary = {
+			"score": score,
+			"all_treasures_collected": last_all_treasures_collected,
+		}
+		RuleCardSystem.evaluate_run(current_level_id, run_data)
 	TransitionLayer.go_to(RESULTS_SCENE)
 
 
@@ -152,6 +164,10 @@ func _clear_session_state() -> void:
 	playlist_context = ""
 	copilot_profile_b = ""
 	last_copilot_contribution = {}
+	last_all_treasures_collected = false
+	last_th_pre_collected = 0
+	RuleCardSystem.set_active_rules([])
+	MutatorSystem.active_mutators.erase("treasure_only")
 
 
 func go_to_settings(return_scene: String = MAIN_MENU_SCENE) -> void:
@@ -177,6 +193,10 @@ func start_playlist(levels: Array[String], context: String = "") -> void:
 	playlist = levels.duplicate()
 	playlist_index = 0
 	playlist_context = context
+	if context == "treasure_hunt":
+		if not MutatorSystem.is_active("treasure_only"):
+			MutatorSystem.active_mutators.append("treasure_only")
+		RuleCardSystem.set_active_rules(["treasure_hunt"])
 	if not playlist.is_empty():
 		start_level(playlist[0])
 

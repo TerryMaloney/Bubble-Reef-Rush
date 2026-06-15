@@ -234,4 +234,10 @@ func _on_level_ended(level_id: String) -> void:
 		stars = 2
 	elif s >= one_star:
 		stars = 1
+	# Treasure Hunt: snapshot coin completion before run_completed fires.
+	if GameManager.playlist_context == "treasure_hunt":
+		var th: Dictionary = ($CollectibleSpawner as CollectibleSpawner).get_treasure_status()
+		GameManager.last_all_treasures_collected = int(th.get("collected", 0)) >= int(th.get("total", 3))
+	else:
+		GameManager.last_all_treasures_collected = false
 	EventBus.run_completed.emit(level_id, s, stars)

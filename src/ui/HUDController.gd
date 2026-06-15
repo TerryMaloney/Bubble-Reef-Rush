@@ -25,6 +25,8 @@ var _beat_tween: Tween = null
 ## Latest run progress (0–100), shown as "You made it X%" on death.
 var _last_pct: float = 0.0
 var _death_label: Label = null
+var _treasure_label: Label = null
+var _th_collected: int = 0
 
 ## Timing judge reference — must be set by LevelRoot after instantiating the judge.
 var timing_judge: TimingJudge = null
@@ -39,6 +41,7 @@ func _ready() -> void:
 	EventBus.fever_started.connect(_on_fever_started)
 	EventBus.fever_ended.connect(_on_fever_ended)
 	EventBus.practice_checkpoint_saved.connect(_on_checkpoint_saved)
+	EventBus.treasure_coin_collected.connect(_on_treasure_coin_hud)
 	BeatConductor.beat_fired.connect(_on_beat_fired)
 	EventBus.power_charged.connect(_on_power_charged)
 	EventBus.power_cooldown_started.connect(_on_power_cooldown_started)
@@ -97,6 +100,31 @@ func _on_run_started(level_id: String) -> void:
 		var profile: String = SaveSystem.get_active_profile_id()
 		var attempts: int = SaveSystem.get_attempts(profile, level_id)
 		attempt_label.text = "Attempt %d" % (attempts + 1)
+	# Treasure Hunt coin counter — visible only in treasure_hunt playlist context.
+	_th_collected = GameManager.last_th_pre_collected
+	if GameManager.playlist_context == "treasure_hunt":
+		if _treasure_label == null:
+			_treasure_label = Label.new()
+			_treasure_label.add_theme_font_size_override("font_size", 52)
+			_treasure_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+			_treasure_label.add_theme_color_override("font_outline_color", Color(0.0, 0.0, 0.1))
+			_treasure_label.add_theme_constant_override("outline_size", 7)
+			_treasure_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			_treasure_label.anchor_left = 1.0
+			_treasure_label.anchor_right = 1.0
+			_treasure_label.anchor_top = 0.0
+			_treasure_label.anchor_bottom = 0.0
+			_treasure_label.offset_left = -320.0
+			_treasure_label.offset_right = -20.0
+			_treasure_label.offset_top = 80.0
+			_treasure_label.offset_bottom = 150.0
+			_treasure_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			if score_label != null:
+				score_label.get_parent().add_child(_treasure_label)
+		_treasure_label.text = "Coins %d/3" % _th_collected
+		_treasure_label.show()
+	elif _treasure_label != null:
+		_treasure_label.hide()
 
 
 func _on_run_progress(_level_id: String, pct: float) -> void:
@@ -188,6 +216,15 @@ func set_score(new_score: int) -> void:
 
 func _on_checkpoint_saved() -> void:
 	_flash_judgment("CP SAVED", Color(0.2, 0.9, 0.4))
+
+
+func _on_treasure_coin_hud(_level_id: String, _coin_idx: int) -> void:
+	if GameManager.playlist_context != "treasure_hunt":
+		return
+	_th_collected += 1
+	if _treasure_label != null:
+		_treasure_label.text = "Coins %d/3" % _th_collected
+	_flash_judgment("Coin! %d/3" % _th_collected, Color(1.0, 0.85, 0.2))
 
 
 func _on_collectible_taken(value: int) -> void:

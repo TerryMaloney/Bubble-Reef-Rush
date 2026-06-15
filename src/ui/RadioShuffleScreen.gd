@@ -33,7 +33,9 @@ func _start_mode(mode: String) -> void:
 	var levels: Array[String] = get_playlist(mode, 5)
 	if levels.is_empty():
 		return
-	GameManager.start_playlist(levels, "radio_shuffle")
+	# Treasure Hunt gets its own context so GameManager can activate the mutator and rule card.
+	var context: String = "treasure_hunt" if mode == "treasure_hunt" else "radio_shuffle"
+	GameManager.start_playlist(levels, context)
 	queue_free()
 
 
@@ -45,6 +47,8 @@ func get_playlist(mode: String, count: int) -> Array[String]:
 		"relaxed":
 			return DeterministicSeed.pick_levels(seed, count, [1, 2])
 		"standard":
+			return DeterministicSeed.pick_levels(seed, count, [1, 4])
+		"treasure_hunt":
 			return DeterministicSeed.pick_levels(seed, count, [1, 4])
 		"boss_rush":
 			return BOSS_LEVELS.slice(0, min(count, BOSS_LEVELS.size()))

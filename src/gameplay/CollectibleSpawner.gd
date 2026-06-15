@@ -12,10 +12,18 @@ const CANVAS_H: float = 1920.0
 var _pending: Array[Dictionary] = []
 var _rhythm_map: RhythmMap
 
+# Treasure hunt tracking — populated when treasure_only mutator is active.
+var _th_total: int = 0
+var _th_pre_collected: int = 0
+var _th_this_run: int = 0
+
 
 func setup(rhythm_map: RhythmMap, start_beat: float = 0.0) -> void:
 	_rhythm_map = rhythm_map
 	_pending.clear()
+	_th_total = 0
+	_th_pre_collected = 0
+	_th_this_run = 0
 
 	# Copy collectible entries at or after start_beat and sort ascending.
 	var raw: Dictionary = _rhythm_map.get_raw_data()
@@ -25,9 +33,45 @@ func setup(rhythm_map: RhythmMap, start_beat: float = 0.0) -> void:
 			continue
 		_pending.append(entry as Dictionary)
 
+	# Treasure Hunt: inject 3 evenly-spaced coins when BRL has none.
+	if MutatorSystem.is_active("treasure_only"):
+		var has_coins: bool = false
+		for e: Dictionary in _pending:
+			if str(e.get("type", "")) == "treasure_coin":
+				has_coins = true
+				break
+		if not has_coins:
+			var beat_map: Array = raw.get("beat_map", []) as Array
+			var total_beats: int = beat_map.size() if beat_map.size() > 0 else 32
+			for i: int in range(3):
+				_pending.append({
+					"type": "treasure_coin",
+					"beat_index": float(total_beats) * float(i + 1) / 4.0,
+					"lane_position": [0.3, 0.5, 0.7][i],
+					"coin_id": i,
+				})
+		_th_total = 3
+		var profile: String = SaveSystem.get_active_profile_id()
+		for i: int in range(3):
+			if SaveSystem.get_treasure_coin(profile, GameManager.current_level_id, i):
+				_th_pre_collected += 1
+		GameManager.last_th_pre_collected = _th_pre_collected
+		if not EventBus.treasure_coin_collected.is_connected(_on_th_coin_collected):
+			EventBus.treasure_coin_collected.connect(_on_th_coin_collected)
+
 	_pending.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return float(a.get("beat_index", 0)) < float(b.get("beat_index", 0))
 	)
+
+
+func _on_th_coin_collected(level_id: String, _coin_idx: int) -> void:
+	if level_id == GameManager.current_level_id:
+		_th_this_run += 1
+
+
+## Returns how many treasure coins exist and how many are collected (pre + this run).
+func get_treasure_status() -> Dictionary:
+	return {"total": _th_total, "collected": _th_pre_collected + _th_this_run}
 
 
 func _process(_delta: float) -> void:
