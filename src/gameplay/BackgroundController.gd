@@ -12,8 +12,8 @@ const ZONE_COLORS: Dictionary = {
 	5: Color(0.03, 0.08, 0.25),   # Twilight Trench — near-black blue
 	6: Color(0.08, 0.10, 0.14),   # Ancient Sunken Factory — dark industrial slate
 }
-const PULSE_BRIGHTNESS: float = 0.10
-const PULSE_DECAY: float = 8.0
+const PULSE_BRIGHTNESS: float = 0.28
+const PULSE_DECAY: float = 4.0
 
 var _background: ColorRect = null
 var _base_color: Color = ZONE_COLORS[1]

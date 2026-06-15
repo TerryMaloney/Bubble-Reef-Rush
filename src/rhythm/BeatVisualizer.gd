@@ -66,12 +66,18 @@ var _pulsing: bool = false
 ## Current ring draw color (changes on timing judgements).
 var _current_color: Color = Color.WHITE
 
+## Per-pulse overrides — set by set_timing_quality(), reset to exports on beat.
+var _active_scale_max: float = pulse_scale_max
+var _active_duration: float = pulse_duration_sec
+
 # ---------------------------------------------------------------------------
 # Node lifecycle
 # ---------------------------------------------------------------------------
 
 func _ready() -> void:
 	_current_color = base_color
+	_active_scale_max = pulse_scale_max
+	_active_duration = pulse_duration_sec
 	BeatConductor.beat_fired.connect(_on_beat_fired)
 
 
@@ -85,10 +91,10 @@ func _process(delta: float) -> void:
 		return
 
 	_pulse_timer += delta
-	var t: float = clampf(_pulse_timer / pulse_duration_sec, 0.0, 1.0)
+	var t: float = clampf(_pulse_timer / _active_duration, 0.0, 1.0)
 
-	# Scale: ease-out from pulse_scale_min to pulse_scale_max.
-	_current_scale = lerpf(pulse_scale_min, pulse_scale_max, _ease_out_quad(t))
+	# Scale: ease-out from pulse_scale_min to _active_scale_max.
+	_current_scale = lerpf(pulse_scale_min, _active_scale_max, _ease_out_quad(t))
 
 	# Alpha: hold full opacity for the first half then fade to zero.
 	if t < 0.5:
@@ -136,10 +142,16 @@ func set_timing_quality(result: TimingJudge.TimingResult) -> void:
 	match result:
 		TimingJudge.TimingResult.PERFECT:
 			_current_color = COLOR_PERFECT
+			_active_scale_max = 2.4   # big gold burst
+			_active_duration = 0.18
 		TimingJudge.TimingResult.GOOD:
 			_current_color = COLOR_GOOD
+			_active_scale_max = 1.8
+			_active_duration = 0.13
 		TimingJudge.TimingResult.MISS:
 			_current_color = COLOR_MISS
+			_active_scale_max = 0.9   # barely flickers
+			_active_duration = 0.08
 
 	# Trigger a fresh pulse burst on every timing result so the player gets
 	# immediate visual feedback timed to their input.
@@ -159,6 +171,8 @@ func _on_beat_fired(_beat_index: int) -> void:
 	# The color reflects the last judgement result until the next beat.
 	if not _pulsing:
 		_current_color = base_color
+		_active_scale_max = pulse_scale_max
+		_active_duration = pulse_duration_sec
 	_trigger_pulse()
 
 

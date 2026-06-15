@@ -8,14 +8,17 @@ const LEVELS_PER_ZONE: int = 8
 func _ready() -> void:
 	var score: int = GameManager.last_score
 	var stars: int = GameManager.last_stars
-
-	$Center/VBox/StarsLabel.text = _stars_text(stars)
-	$Center/VBox/ScoreLabel.text = "Score: %d" % score
-	$Center/VBox/BestScoreLabel.text = _best_score_text(score)
-
 	var coins: int = GameManager.last_coins_earned
+
+	# Start everything hidden — animation reveals them.
+	$Center/VBox/StarsLabel.text = "- - -"
+	$Center/VBox/StarsLabel.modulate.a = 0.0
+	$Center/VBox/ScoreLabel.text = "Score: 0"
+	$Center/VBox/BestScoreLabel.text = ""
+	$Center/VBox/BestScoreLabel.modulate.a = 0.0
 	$Center/VBox/CoinsLabel.text = "+%d coins" % coins
 	$Center/VBox/CoinsLabel.visible = coins > 0
+	$Center/VBox/CoinsLabel.modulate.a = 0.0
 
 	_show_ghost_delta(score)
 	_show_rule_card_results()
@@ -25,6 +28,53 @@ func _ready() -> void:
 	$Center/VBox/RetryButton.pressed.connect(_on_retry_pressed)
 	$Center/VBox/LevelsButton.pressed.connect(_on_levels_pressed)
 	$Center/VBox/MenuButton.pressed.connect(_on_menu_pressed)
+
+	_animate_results(score, stars, coins)
+
+
+func _animate_results(score: int, stars: int, coins: int) -> void:
+	var stars_lbl: Label = $Center/VBox/StarsLabel
+	var score_lbl: Label = $Center/VBox/ScoreLabel
+	var best_lbl: Label = $Center/VBox/BestScoreLabel
+	var coins_lbl: Label = $Center/VBox/CoinsLabel
+
+	# --- Stars pop-in at t=0.25 ---
+	var t_stars: Tween = create_tween()
+	t_stars.tween_interval(0.25)
+	t_stars.tween_callback(func() -> void: stars_lbl.text = _stars_text(stars))
+	t_stars.tween_property(stars_lbl, "scale", Vector2(1.2, 1.2), 0.12)
+	t_stars.tween_property(stars_lbl, "scale", Vector2(1.0, 1.0), 0.1).set_ease(Tween.EASE_OUT)
+	var t_stars_fade: Tween = create_tween()
+	t_stars_fade.tween_interval(0.25)
+	t_stars_fade.tween_property(stars_lbl, "modulate:a", 1.0, 0.18)
+
+	# --- Score count-up from 0, starts at t=0.5 ---
+	const COUNT_DUR: float = 1.25
+	var t_score: Tween = create_tween()
+	t_score.tween_interval(0.5)
+	t_score.tween_method(
+		func(v: float) -> void: score_lbl.text = "Score: %d" % int(v),
+		0.0, float(score), COUNT_DUR
+	).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+
+	# --- Best score label fades in after count-up (t≈1.85) ---
+	var is_new_best: bool = GameManager.last_prev_best_score == 0 or score > GameManager.last_prev_best_score
+	best_lbl.text = _best_score_text(score)
+	if is_new_best:
+		best_lbl.modulate = Color(1.0, 0.92, 0.2, 0.0)  # gold, starts transparent
+	var t_best: Tween = create_tween()
+	t_best.tween_interval(0.5 + COUNT_DUR + 0.1)
+	t_best.tween_property(best_lbl, "modulate:a", 1.0, 0.35)
+	if is_new_best:
+		# Flash brighter then settle — makes "NEW BEST!" feel earned.
+		t_best.tween_property(best_lbl, "modulate", Color(1.0, 1.0, 0.6, 1.0), 0.12)
+		t_best.tween_property(best_lbl, "modulate", Color(1.0, 0.92, 0.2, 1.0), 0.25)
+
+	# --- Coins fade in after best (t≈2.2) ---
+	if coins > 0:
+		var t_coins: Tween = create_tween()
+		t_coins.tween_interval(0.5 + COUNT_DUR + 0.45)
+		t_coins.tween_property(coins_lbl, "modulate:a", 1.0, 0.3)
 
 
 func _stars_text(stars: int) -> String:

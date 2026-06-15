@@ -244,9 +244,11 @@ func _on_input_judged(result: TimingJudge.TimingResult, _offset_ms: float, _beat
 		TimingJudge.TimingResult.PERFECT:
 			score += 100 * combo_mult
 			_flash_judgment("◆ PERFECT" if colorblind else "PERFECT", Color(1.0, 0.85, 0.0))
+			_spawn_score_popup("+%d" % (100 * combo_mult), Color(1.0, 0.9, 0.1))
 		TimingJudge.TimingResult.GOOD:
 			score += 60 * combo_mult
 			_flash_judgment("● GOOD" if colorblind else "GOOD", Color(0.2, 0.6, 1.0))
+			_spawn_score_popup("+%d" % (60 * combo_mult), Color(0.4, 0.7, 1.0))
 		TimingJudge.TimingResult.MISS:
 			pass  # no text — with no audio cue, a MISS label is just noise
 
@@ -255,8 +257,19 @@ func _on_input_judged(result: TimingJudge.TimingResult, _offset_ms: float, _beat
 
 
 func _on_combo_updated(count: int) -> void:
+	var prev_mult: int = _combo_multiplier(_combo)
 	_combo = count
+	var new_mult: int = _combo_multiplier(_combo)
 	_update_combo_label()
+	# Flash a tier-up banner and punch the combo label when multiplier increases.
+	if new_mult > prev_mult and new_mult > 1:
+		_flash_judgment("×%d MULTIPLIER!" % new_mult, Color(1.0, 0.75, 0.0), 1.2)
+		if combo_label != null:
+			if _beat_tween != null:
+				_beat_tween.kill()
+			_beat_tween = create_tween()
+			_beat_tween.tween_property(combo_label, "scale", Vector2(1.6, 1.6), 0.08)
+			_beat_tween.tween_property(combo_label, "scale", Vector2(1.0, 1.0), 0.25).set_ease(Tween.EASE_OUT)
 
 
 func _on_score_bonus(amount: int) -> void:
@@ -337,6 +350,36 @@ func _combo_multiplier(combo: int) -> int:
 		return 2
 	else:
 		return 1
+
+
+func _spawn_score_popup(text: String, color: Color) -> void:
+	var hud: Node = score_label.get_parent() if score_label != null else null
+	if hud == null:
+		return
+	# Determine screen position — place above the player's approximate location.
+	var spawn_pos: Vector2 = Vector2(280.0, 700.0)
+	var player: Node2D = get_tree().get_first_node_in_group("player") as Node2D
+	if player != null:
+		var vp: Viewport = get_viewport()
+		if vp != null:
+			spawn_pos = vp.get_canvas_transform() * player.global_position
+			spawn_pos += Vector2(-80.0, -140.0)
+	var lbl: Label = Label.new()
+	lbl.text = text
+	lbl.modulate = color
+	lbl.add_theme_font_size_override("font_size", 54)
+	lbl.add_theme_color_override("font_outline_color", Color(0.0, 0.0, 0.0, 0.85))
+	lbl.add_theme_constant_override("outline_size", 7)
+	lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lbl.position = spawn_pos
+	hud.add_child(lbl)
+	# Rise and fade — position moves up, alpha fades after a brief hold.
+	var rise: Tween = create_tween()
+	rise.tween_property(lbl, "position:y", spawn_pos.y - 170.0, 0.65).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
+	var fade: Tween = create_tween()
+	fade.tween_interval(0.28)
+	fade.tween_property(lbl, "modulate:a", 0.0, 0.45)
+	fade.tween_callback(lbl.queue_free)
 
 
 func _on_retry_pressed() -> void:
