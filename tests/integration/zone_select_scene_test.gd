@@ -29,7 +29,7 @@ func _fail(label: String, detail: String = "") -> void:
 	_fail_count += 1
 
 
-## 1. Six zone cards, ≥200px tall, 36px font, first card shows BPM.
+## 1. Zone cards (6 ocean + 1 space bubble = 7 total), ≥200px tall, 36px font, first shows BPM.
 func _test_zone_cards() -> void:
 	var packed: PackedScene = load("res://scenes/gameplay/ZoneSelect.tscn") as PackedScene
 	if packed == null:
@@ -39,8 +39,8 @@ func _test_zone_cards() -> void:
 	root.add_child(screen)
 	await process_frame
 	var container: Node = screen.get_node("ZoneContainer")
-	if container.get_child_count() != 6:
-		_fail("zone_cards", "expected 6 zone cards, got %d" % container.get_child_count())
+	if container.get_child_count() != 7:
+		_fail("zone_cards", "expected 7 zone cards, got %d" % container.get_child_count())
 		screen.queue_free()
 		return
 	var first: Button = container.get_child(0) as Button

@@ -58,6 +58,17 @@ func _setup_next_level_button() -> void:
 
 
 func _next_level_id(level_id: String) -> String:
+	# Space Bubble levels: space/sb_l1 → space/sb_l2, etc.
+	if level_id.begins_with("space/sb_l"):
+		var num_str: String = level_id.substr("space/sb_l".length())
+		if not num_str.is_valid_int():
+			return ""
+		var num: int = num_str.to_int()
+		if num >= LEVELS_PER_ZONE:
+			return ""
+		var next_id: String = "space/sb_l%d" % (num + 1)
+		return next_id if FileAccess.file_exists("res://assets/levels/%s.brl" % next_id) else ""
+	# Standard levels: z1-l1 → z1-l2, etc.
 	var parts: PackedStringArray = level_id.split("-")
 	if parts.size() != 2:
 		return ""
@@ -82,7 +93,8 @@ func _on_retry_pressed() -> void:
 
 
 func _on_levels_pressed() -> void:
-	var zone_id: String = GameManager.current_level_id.split("-")[0]
+	var level_id: String = GameManager.current_level_id
+	var zone_id: String = "sb" if level_id.begins_with("space/") else level_id.split("-")[0]
 	GameManager.go_to_level_select(zone_id)
 
 

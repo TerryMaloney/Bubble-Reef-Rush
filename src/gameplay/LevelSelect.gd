@@ -9,6 +9,7 @@ const ZONE_NAMES: Dictionary = {
 	"z4": "Volcanic Vent Fields",
 	"z5": "Twilight Trench",
 	"z6": "Ancient Sunken Factory",
+	"sb": "Space Bubble",
 }
 
 const LEVEL_NAMES: Dictionary = {
@@ -24,6 +25,8 @@ const LEVEL_NAMES: Dictionary = {
 		   "Full Chaos", "Max Range", "Precision Run", "Trench Master"],
 	"z6": ["Pipe Maze", "Mirror Tanks", "Steam Burst", "Pressure Valve",
 		   "Dark Assembly", "Reactor Core", "Factory Gauntlet", "Systems Offline"],
+	"sb": ["Gravity Ballet", "Nebula Drift", "Comet Trail", "Star Cluster",
+		   "Void Sprint", "Plasma Wave", "Dark Matter", "Space Finale"],
 }
 
 const DIFFICULTY_LABELS: Dictionary = {"easy": "Easy", "normal": "Normal", "hard": "Hard"}
@@ -114,7 +117,8 @@ func _build_level_list(zone_id: String) -> void:
 	var names: Array = LEVEL_NAMES.get(zone_id, []) as Array
 
 	for i: int in range(8):
-		var level_id: String = "%s-l%d" % [zone_id, i + 1]
+		# Space Bubble levels live in assets/levels/space/ with a different ID scheme.
+		var level_id: String = "space/sb_l%d" % (i + 1) if zone_id == "sb" else "%s-l%d" % [zone_id, i + 1]
 		var level_name: String = names[i] as String if i < names.size() else "Level %d" % (i + 1)
 		var btn: Button = Button.new()
 		btn.custom_minimum_size = Vector2(0, 88)

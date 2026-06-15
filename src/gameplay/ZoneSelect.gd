@@ -13,6 +13,8 @@ const ZONES: Array = [
 	{"id": "z4", "name": "4. Volcanic Vent Fields", "bpm": "145-165 BPM", "requires": "z3-l4"},
 	{"id": "z5", "name": "5. Twilight Trench", "bpm": "80-165 BPM", "requires": "z4-l4"},
 	{"id": "z6", "name": "6. Ancient Sunken Factory", "bpm": "170-180 BPM", "secret": true},
+	# Reef Radio — Space Bubble station (unlocked via radio_key "space_key").
+	{"id": "sb", "name": "Space Bubble", "bpm": "varies", "radio_key": "space_key"},
 ]
 
 var _profile: String = ""
@@ -39,6 +41,8 @@ func _build_zone_list() -> void:
 					btn.text = "???   (almost there…)"
 				else:
 					btn.text = "???"
+			elif z.has("radio_key"):
+				btn.text = "[LOCKED] %s\nUnlock via Reef Radio key" % (z["name"] as String)
 			elif z.has("requires"):
 				btn.text = "[LOCKED] %s\nComplete %s" % [
 					z["name"] as String,
@@ -58,6 +62,8 @@ func _build_zone_list() -> void:
 func _is_unlocked(zone: Dictionary, total_stars: int) -> bool:
 	if zone.get("secret", false):
 		return total_stars >= Z6_UNLOCK_STARS
+	if zone.has("radio_key"):
+		return SaveSystem.has_radio_key(_profile, zone["radio_key"] as String)
 	if zone.has("requires"):
 		return SaveSystem.is_level_cleared(_profile, zone["requires"] as String)
 	return true
