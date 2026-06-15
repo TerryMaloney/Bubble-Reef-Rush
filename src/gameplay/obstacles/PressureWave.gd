@@ -63,13 +63,26 @@ func _on_body_entered(body: Node2D) -> void:
 
 
 func _build_visual(gap_top: float, gap_bottom: float) -> void:
-	# Placeholder: a simple rectangle excluding the gap.
-	_visual.color = Color(0.1, 0.4, 0.9, 0.7)
+	var wall_col: Color = Color(0.1, 0.4, 0.9, 0.7)
 	var half_w: float = WALL_THICKNESS * 0.5
-	# Draw upper bar using polygon (gap_top height at top of screen).
+
+	# Upper bar spans from screen top down to the gap opening.
+	_visual.color = wall_col
 	_visual.polygon = PackedVector2Array([
 		Vector2(-half_w, 0.0),
 		Vector2(half_w, 0.0),
 		Vector2(half_w, gap_top),
 		Vector2(-half_w, gap_top),
 	])
+
+	# Lower bar spans from the gap bottom down to screen bottom.
+	if gap_bottom < CANVAS_H:
+		var lower: Polygon2D = Polygon2D.new()
+		lower.color = wall_col
+		lower.polygon = PackedVector2Array([
+			Vector2(-half_w, gap_bottom),
+			Vector2(half_w, gap_bottom),
+			Vector2(half_w, CANVAS_H),
+			Vector2(-half_w, CANVAS_H),
+		])
+		add_child(lower)

@@ -38,6 +38,9 @@ var _redo_stack: Array[Dictionary] = []
 const MAX_UNDO: int = 30
 
 var _errors_popup: Panel = null
+var _rank_label: Label = null
+
+const RANK_NAMES: Array[String] = ["Drifter", "Builder", "Architect", "Master Maker"]
 
 
 func _ready() -> void:
@@ -78,6 +81,13 @@ func _ready() -> void:
 	_preview_diff_btn.add_theme_font_size_override("font_size", 22)
 	$PaletteStrip.add_child(_preview_diff_btn)
 	_preview_diff_btn.pressed.connect(_on_preview_diff_cycled)
+
+	# Maker rank badge — shows workshop progression without any scene change.
+	_rank_label = Label.new()
+	_rank_label.add_theme_font_size_override("font_size", 20)
+	_rank_label.modulate = Color(0.7, 0.9, 1.0)
+	$PaletteStrip.add_child(_rank_label)
+	_refresh_rank_label()
 
 	for i: int in range(1, 7):
 		_zone_opt.add_item("World %d" % i, i)
@@ -252,6 +262,8 @@ func _on_save_pressed() -> void:
 		EventBus.buildmode_level_saved.emit(BrlSerializer.level_path(str(_session.get_metadata("id")), _profile_id))
 		_validate_label.text = "Level Saved!"
 		_validate_label.modulate = Color(0.3, 1.0, 0.3)
+		SaveSystem.add_workshop_xp(_profile_id, 5)
+		_refresh_rank_label()
 
 		# RhythmMap round-trip: verify saved file loads correctly.
 		var level_id: String = str(_session.get_metadata("id"))
@@ -278,6 +290,8 @@ func _on_run_completed(_level_id: String, _score: int, _stars: int) -> void:
 		_session.mark_played_through()
 		_validate_label.text = "Great job! Ready to save!"
 		_validate_label.modulate = Color(0.5, 1.0, 0.5)
+		SaveSystem.add_workshop_xp(_profile_id, 10)
+		_refresh_rank_label()
 
 
 # ── Back / Undo / Redo / Delete ───────────────────────────────────────────────
@@ -480,6 +494,14 @@ func _default_params(otype: String) -> Dictionary:
 	for pdef: Dictionary in ObstacleParamSchema.params_for(otype):
 		result[str(pdef.get("key", ""))] = pdef.get("default")
 	return result
+
+
+func _refresh_rank_label() -> void:
+	if _rank_label == null:
+		return
+	var rank: int = SaveSystem.get_workshop_rank(_profile_id)
+	var xp: int = int(SaveSystem.load_progress(_profile_id).get("workshop_xp", 0))
+	_rank_label.text = "✦ Maker: %s (%d XP)" % [RANK_NAMES[clampi(rank, 0, 3)], xp]
 
 
 func _highest_cleared_zone(progress: Dictionary) -> int:

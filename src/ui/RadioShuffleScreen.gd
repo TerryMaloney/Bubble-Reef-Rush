@@ -15,10 +15,8 @@ func _ready() -> void:
 	$Panel/VBox/WildButton.pressed.connect(func() -> void: _start_mode("wild"))
 	$Panel/VBox/TreasureHuntButton.pressed.connect(func() -> void: _start_mode("treasure_hunt"))
 	$Panel/VBox/CloseButton.pressed.connect(func() -> void: queue_free())
-	# Boss Rush is unfinished — disable so it doesn't start an empty run.
-	var boss_btn: Button = $Panel/VBox/BossRushButton as Button
-	boss_btn.disabled = true
-	boss_btn.text = "BOSS RUSH\n(Coming Soon)"
+	# Boss Rush not yet implemented — hide rather than confuse kids with a greyed button.
+	($Panel/VBox/BossRushButton as Button).hide()
 
 
 func _on_daily_dive_pressed() -> void:
